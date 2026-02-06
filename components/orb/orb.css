@@ -1,0 +1,124 @@
+/* Orb Module Styles - GeniusPro Theme */
+
+.orb-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition:
+    width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible;
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform: translateZ(0);
+}
+
+.orb-scene {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.orb-core {
+  transform-origin: center;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+}
+
+.highlight-soft {
+  filter: blur(2px);
+  transition: opacity 0.5s ease;
+}
+
+.dark .highlight-soft {
+  mix-blend-mode: plus-lighter;
+}
+
+.main-sphere {
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.15;
+  transform-origin: center;
+  backface-visibility: hidden;
+  mix-blend-mode: screen;
+}
+
+.orbitals {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.orbitals ellipse {
+  mix-blend-mode: screen;
+}
+
+.orb-icon {
+  transform-origin: center;
+}
+
+/* Breathing pulse animation for the orb glow */
+@keyframes orbBreathe {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(1.05);
+  }
+}
+
+.orb-breathe {
+  animation: orbBreathe 4s ease-in-out infinite;
+}
+
+/* Fade in animation for welcome text */
+@keyframes welcomeFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-fade-in {
+  animation: welcomeFadeIn 1s ease-out forwards;
+}
+
+.welcome-fade-in-delay {
+  opacity: 0;
+  animation: welcomeFadeIn 1s ease-out 0.3s forwards;
+}
+
+.welcome-fade-in-delay-2 {
+  opacity: 0;
+  animation: welcomeFadeIn 1s ease-out 0.6s forwards;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .orb-container,
+  .orb-container::before,
+  .orb-container::after,
+  .main-sphere,
+  .orb-core,
+  .orbitals ellipse,
+  .orb-breathe {
+    animation: none !important;
+    transition: none !important;
+  }
+}
