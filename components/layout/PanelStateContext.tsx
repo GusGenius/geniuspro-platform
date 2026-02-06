@@ -34,8 +34,8 @@ interface PanelStateContextType {
 }
 
 const defaultState: PanelState = {
-  chatVisible: false,
-  agentsVisible: false,
+  chatVisible: true,
+  agentsVisible: true,
   chatWidth: 400,
   agentsWidth: 300,
   currentAgentId: null,

@@ -14,7 +14,10 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-const publicRoutes = ["/", "/login"];
+// Routes that require login
+const protectedRoutes = ["/api-keys", "/usage"];
+// Routes that render without the app shell
+const bareRoutes = ["/login"];
 
 export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
@@ -22,18 +25,18 @@ export default function Layout({ children }: LayoutProps) {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user && !publicRoutes.includes(pathname || "")) {
+    if (!loading && !user && protectedRoutes.includes(pathname || "")) {
       router.push("/login");
     }
   }, [loading, user, pathname, router]);
 
-  // Public pages
-  if (publicRoutes.includes(pathname)) {
+  // Bare pages (no sidebar/panels)
+  if (bareRoutes.includes(pathname || "")) {
     return <>{children}</>;
   }
 
-  // Loading state
-  if (loading || (!user && !publicRoutes.includes(pathname || ""))) {
+  // Protected pages - show loading while checking auth
+  if (protectedRoutes.includes(pathname || "") && (loading || !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>
@@ -41,6 +44,7 @@ export default function Layout({ children }: LayoutProps) {
     );
   }
 
+  // Everything else gets the full app shell (including anonymous users)
   return (
     <PanelStateProvider>
       <LayoutContent>{children}</LayoutContent>
