@@ -138,6 +138,9 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-gray-400 text-sm mt-6">
+            Use your GeniusPro account to sign in.
+          </p>
+          <p className="text-center text-gray-500 text-xs mt-2">
             Access is invite-only. Contact admin for an account.
           </p>
         </div>
