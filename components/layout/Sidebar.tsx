@@ -21,10 +21,17 @@ import { useSidebar } from "./SidebarContext";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import {
+  applyThemeToDOM,
+  getStoredTheme,
+  setStoredTheme,
+  THEME_CHANGE_EVENT,
+  type Theme,
+} from "@/lib/theme/theme";
 
 export default function Sidebar() {
   const { isExpanded, setIsExpanded } = useSidebar();
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -64,18 +71,22 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("platform-theme");
-    if (savedTheme) {
-      setTheme(savedTheme);
-      if (savedTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } else {
-      setTheme("dark");
-      document.documentElement.classList.add("dark");
-    }
+    const apply = () => {
+      const stored = getStoredTheme();
+      const next: Theme = stored ?? "dark";
+      setTheme(next);
+      applyThemeToDOM(next);
+    };
+
+    apply();
+
+    const onChanged = () => apply();
+    window.addEventListener(THEME_CHANGE_EVENT, onChanged);
+    window.addEventListener("storage", onChanged);
+    return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, onChanged);
+      window.removeEventListener("storage", onChanged);
+    };
   }, []);
 
   useEffect(() => {
@@ -120,12 +131,8 @@ export default function Sidebar() {
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem("platform-theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    setStoredTheme(newTheme);
+    applyThemeToDOM(newTheme);
   };
 
   const navigation = [

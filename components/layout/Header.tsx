@@ -3,28 +3,41 @@
 import { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 
+import {
+  applyThemeToDOM,
+  getStoredTheme,
+  setStoredTheme,
+  THEME_CHANGE_EVENT,
+  type Theme,
+} from "@/lib/theme/theme";
+
 export default function Header() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("platform-theme");
-    if (savedTheme === "dark" || savedTheme === "light") {
-      setTheme(savedTheme);
-    } else {
-      setTheme("dark");
-      document.documentElement.classList.add("dark");
-    }
+    const apply = () => {
+      const stored = getStoredTheme();
+      const next: Theme = stored ?? "dark";
+      setTheme(next);
+      applyThemeToDOM(next);
+    };
+
+    apply();
+
+    const onChanged = () => apply();
+    window.addEventListener(THEME_CHANGE_EVENT, onChanged);
+    window.addEventListener("storage", onChanged);
+    return () => {
+      window.removeEventListener(THEME_CHANGE_EVENT, onChanged);
+      window.removeEventListener("storage", onChanged);
+    };
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem("platform-theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
+    setStoredTheme(newTheme);
+    applyThemeToDOM(newTheme);
   };
 
   return (
