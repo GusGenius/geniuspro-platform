@@ -17,7 +17,7 @@ interface LayoutProps {
 // Routes that require login
 const protectedRoutes = ["/api-keys", "/usage"];
 // Routes that render without the app shell
-const bareRoutes = ["/login"];
+const bareRoutes = ["/login", "/auth/handoff"];
 
 export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
