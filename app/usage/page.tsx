@@ -208,14 +208,12 @@ export default function UsagePage() {
   }
 
   return (
-    <div className="min-h-full p-6 md:p-10">
+    <div className="min-h-full p-4 sm:p-6 md:p-10 overflow-x-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Monitor your API usage and token consumption</p>
-          </div>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Monitor your API usage and token consumption</p>
         </div>
 
         {/* Period Filter */}
@@ -236,7 +234,7 @@ export default function UsagePage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
           <StatCard label="Total Tokens" value={formatNumber(stats.totalTokens)} />
           <StatCard label="Input Tokens" value={formatNumber(stats.promptTokens)} valueClass="text-blue-400" />
           <StatCard label="Output Tokens" value={formatNumber(stats.completionTokens)} valueClass="text-green-400" />
@@ -262,14 +260,14 @@ export default function UsagePage() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-6 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500/70 rounded" />
-                <span className="text-sm text-gray-500 dark:text-gray-400">Input Tokens</span>
+            <div className="flex gap-4 sm:gap-6 mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-blue-500/70 rounded" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Input</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500/70 rounded" />
-                <span className="text-sm text-gray-500 dark:text-gray-400">Output Tokens</span>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500/70 rounded" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Output</span>
               </div>
             </div>
           </div>
@@ -363,9 +361,9 @@ export default function UsagePage() {
 
 function StatCard({ label, value, valueClass = "text-gray-900 dark:text-white" }: { label: string; value: string; valueClass?: string }) {
   return (
-    <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
-      <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</div>
-      <div className={`text-2xl font-semibold ${valueClass}`}>{value}</div>
+    <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-5">
+      <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1 truncate">{label}</div>
+      <div className={`text-lg sm:text-2xl font-semibold truncate ${valueClass}`}>{value}</div>
     </div>
   );
 }
