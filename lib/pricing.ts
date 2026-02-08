@@ -10,42 +10,22 @@ export const PRICING = {
     label: "Superintelligence",
     description: "Superintelligence (regular surface)",
   },
-  "geniuspro-coding-agi-1.2": {
+  "GeniusPro-coding-agi-1.2": {
     input: 4.0, // $4 per 1M input tokens
     output: 20.0, // $20 per 1M output tokens
     label: "Coding Superintelligence",
     description: "Coding Superintelligence (Cursor surface)",
   },
-  "geniuspro-coder-v1": {
+  "GeniusPro-coder-v1": {
     input: 1.0, // $1 per 1M input tokens
     output: 8.0, // $8 per 1M output tokens
     label: "Coder",
     description: "Optimized for coding tasks",
   },
-  "geniuspro-voice": {
+  "GeniusPro-voice-v1": {
     perMinute: 0.05, // $0.05 per minute
     label: "Voice",
     description: "Voice synthesis and recognition",
-  },
-  // Legacy model id kept for historical usage logs / old clients.
-  "geniuspro-superintelligence-v1": {
-    input: 4.0,
-    output: 20.0,
-    label: "Legacy Superintelligence",
-    description: "Deprecated model id — use GeniusPro-agi-1.2",
-  },
-  // Aliases kept for backwards compatibility with early adopters.
-  "gp-agi-1.2": {
-    input: 4.0,
-    output: 20.0,
-    label: "Legacy Superintelligence (Alias)",
-    description: "Alias — use GeniusPro-agi-1.2",
-  },
-  "gp-coding-agi-1.2": {
-    input: 4.0,
-    output: 20.0,
-    label: "Legacy Coding Superintelligence (Alias)",
-    description: "Alias — use geniuspro-coding-agi-1.2",
   },
 } as const;
 

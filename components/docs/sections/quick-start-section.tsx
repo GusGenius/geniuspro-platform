@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Key, ArrowRight } from "lucide-react";
 
 import {
   API_BASE_URL_SUPERINTELLIGENCE,
@@ -18,165 +18,232 @@ type Props = {
   onCopyText: (text: string, id: string) => void;
 };
 
-export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props) {
+function CopyChip({
+  value,
+  id,
+  copiedText,
+  onCopy,
+  color = "blue",
+}: {
+  value: string;
+  id: string;
+  copiedText: string | null;
+  onCopy: (t: string, id: string) => void;
+  color?: "blue" | "green";
+}) {
+  const colorClasses =
+    color === "green"
+      ? "text-green-600 dark:text-green-400"
+      : "text-blue-500 dark:text-blue-400";
   return (
-    <section className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <span className="inline-flex items-center gap-1.5 bg-gray-200 dark:bg-gray-900 rounded-lg px-2.5 py-1 group">
+      <code className={`font-mono text-sm ${colorClasses} break-all`}>
+        {value}
+      </code>
+      <button
+        onClick={() => onCopy(value, id)}
+        className="p-0.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-400 hover:text-gray-700 dark:hover:text-white flex-shrink-0"
+        title="Copy"
+      >
+        {copiedText === id ? (
+          <Check className="w-3.5 h-3.5 text-green-400" />
+        ) : (
+          <Copy className="w-3.5 h-3.5" />
+        )}
+      </button>
+    </span>
+  );
+}
+
+export function QuickStartSection({
+  icon: Icon,
+  copiedText,
+  onCopyText,
+}: Props) {
+  return (
+    <section id="quick-start" className="mb-12 scroll-mt-24">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
         <Icon className="w-5 h-5 text-blue-400" />
         Quick Start
       </h2>
+      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
+        Get up and running in three steps.
+      </p>
 
-      <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 space-y-4">
-        <p className="text-gray-600 dark:text-gray-300">
-          GeniusPro API supports the `/v1` chat endpoints, and also includes Coding Superintelligence endpoints optimized for Cursor workflows.
+      {/* Step 1 */}
+      <div className="relative pl-8 pb-8 border-l-2 border-gray-200 dark:border-gray-700">
+        <div className="absolute -left-3.5 top-0 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">
+          1
+        </div>
+        <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">
+          Get your API key
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+          Go to{" "}
+          <a
+            href="/api-keys"
+            className="text-blue-500 dark:text-blue-400 underline underline-offset-2 hover:text-blue-600"
+          >
+            API Keys
+          </a>{" "}
+          to create a key. You&apos;ll use it in the{" "}
+          <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+            Authorization
+          </code>{" "}
+          header for every request.
+        </p>
+        <div className="bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3 inline-flex items-center gap-2">
+          <Key className="w-4 h-4 text-gray-400" />
+          <code className="text-sm text-gray-600 dark:text-gray-300">
+            Authorization: Bearer{" "}
+            <span className="text-blue-500 dark:text-blue-400">
+              YOUR_API_KEY
+            </span>
+          </code>
+        </div>
+      </div>
+
+      {/* Step 2 */}
+      <div className="relative pl-8 pb-8 border-l-2 border-gray-200 dark:border-gray-700">
+        <div className="absolute -left-3.5 top-0 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">
+          2
+        </div>
+        <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">
+          Choose your endpoint
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+          Pick the right base URL and model for your use case:
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Superintelligence Base URL
-              </div>
-              <button
-                onClick={() => onCopyText(API_BASE_URL_SUPERINTELLIGENCE, "base-url-si")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy base URL"
-              >
-                {copiedText === "base-url-si" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+        <div className="space-y-3">
+          {/* Superintelligence */}
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                Superintelligence
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
+                Recommended
+              </span>
             </div>
-            <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{API_BASE_URL_SUPERINTELLIGENCE}</code>
-          </div>
-
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Coding Superintelligence Base URL
-              </div>
-              <button
-                onClick={() => onCopyText(API_BASE_URL_CODING_SUPERINTELLIGENCE, "base-url-coding")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy base URL"
-              >
-                {copiedText === "base-url-coding" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-            <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{API_BASE_URL_CODING_SUPERINTELLIGENCE}</code>
-          </div>
-
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Superintelligence Model
-              </div>
-              <button
-                onClick={() => onCopyText(MODEL_SUPERINTELLIGENCE, "model-si")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy model id"
-              >
-                {copiedText === "model-si" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_SUPERINTELLIGENCE}</code>
-          </div>
-
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Coding Superintelligence Model
-              </div>
-              <button
-                onClick={() => onCopyText(MODEL_CODING_SUPERINTELLIGENCE, "model-coding")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy model id"
-              >
-                {copiedText === "model-coding" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_CODING_SUPERINTELLIGENCE}</code>
-          </div>
-
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden md:col-span-2">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Gateway Base URL (Coder + Voice)
-              </div>
-              <button
-                onClick={() => onCopyText(API_BASE_URL_GATEWAY, "base-url-gateway")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy base URL"
-              >
-                {copiedText === "base-url-gateway" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-            <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{API_BASE_URL_GATEWAY}</code>
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Use this for <span className="font-mono">{MODEL_CODER}</span> and <span className="font-mono">{MODEL_VOICE}</span>.
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              General-purpose AI &mdash; 200K context, best for chat, reasoning, and generation.
             </p>
+            <div className="flex flex-wrap gap-2">
+              <CopyChip
+                value={API_BASE_URL_SUPERINTELLIGENCE}
+                id="base-url-si"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+              />
+              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
+              <CopyChip
+                value={MODEL_SUPERINTELLIGENCE}
+                id="model-si"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+                color="green"
+              />
+            </div>
           </div>
 
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Coder Model
-              </div>
-              <button
-                onClick={() => onCopyText(MODEL_CODER, "model-coder")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy model id"
-              >
-                {copiedText === "model-coder" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+          {/* Coding Superintelligence */}
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                Coding Superintelligence
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">
+                Cursor
+              </span>
             </div>
-            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_CODER}</code>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Optimized for Cursor coding workflows &mdash; onboarding, tool-based routing, summarization.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <CopyChip
+                value={API_BASE_URL_CODING_SUPERINTELLIGENCE}
+                id="base-url-coding"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+              />
+              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
+              <CopyChip
+                value={MODEL_CODING_SUPERINTELLIGENCE}
+                id="model-coding"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+                color="green"
+              />
+            </div>
           </div>
 
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
-                GeniusPro Voice Model
-              </div>
-              <button
-                onClick={() => onCopyText(MODEL_VOICE, "model-voice")}
-                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy model id"
-              >
-                {copiedText === "model-voice" ? (
-                  <Check className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-              </button>
+          {/* Gateway */}
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
+                Gateway (Coder + Voice)
+              </span>
             </div>
-            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_VOICE}</code>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Lightweight coding model (32K context) and voice synthesis/recognition.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <CopyChip
+                value={API_BASE_URL_GATEWAY}
+                id="base-url-gw"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+              />
+              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
+              <CopyChip
+                value={MODEL_CODER}
+                id="model-coder"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+                color="green"
+              />
+              <span className="text-gray-300 dark:text-gray-600 self-center text-xs">
+                /
+              </span>
+              <CopyChip
+                value={MODEL_VOICE}
+                id="model-voice"
+                copiedText={copiedText}
+                onCopy={onCopyText}
+                color="green"
+              />
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Step 3 */}
+      <div className="relative pl-8">
+        <div className="absolute -left-3.5 top-0 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">
+          3
+        </div>
+        <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">
+          Make your first request
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Jump to{" "}
+          <button
+            onClick={() =>
+              document
+                .getElementById("code-examples")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            className="text-blue-500 dark:text-blue-400 underline underline-offset-2 hover:text-blue-600"
+          >
+            Code Examples
+          </button>{" "}
+          below for ready-to-run cURL, Python, and JavaScript snippets.
+        </p>
       </div>
     </section>
   );
 }
-

@@ -12,8 +12,8 @@ import {
 
 export function AvailableModelsSection() {
   return (
-    <section className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Available Models</h2>
+    <section id="available-models" className="mb-12 scroll-mt-24">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Available Models</h2>
 
       <div className="space-y-3 sm:hidden">
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">

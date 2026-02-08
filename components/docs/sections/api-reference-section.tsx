@@ -6,8 +6,8 @@ type Props = {
 
 export function ApiReferenceSection({ icon: Icon }: Props) {
   return (
-    <section className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <section id="api-reference" className="mb-12 scroll-mt-24">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <Icon className="w-5 h-5 text-blue-400" />
         API Reference
       </h2>

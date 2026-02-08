@@ -12,15 +12,18 @@ type Props = {
 
 export function AuthenticationSection({ icon: Icon, copiedText, onCopyText }: Props) {
   return (
-    <section className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+    <section id="authentication" className="mb-12 scroll-mt-24">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
         <Icon className="w-5 h-5 text-blue-400" />
         Authentication
       </h2>
+      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
+        Every request requires your API key in the header.
+      </p>
 
       <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
-          Authenticate using your API key in the Authorization header:
+        <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+          Add this header to all requests:
         </p>
 
         <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 font-mono text-sm relative group overflow-x-auto">

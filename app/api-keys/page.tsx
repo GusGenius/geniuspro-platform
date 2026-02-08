@@ -35,7 +35,7 @@ const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hin
   gateway: {
     label: "GeniusPro Gateway (Coder + Voice)",
     color: "bg-emerald-500/20 text-emerald-400",
-    hint: "Use with https://api.geniuspro.io/v1 for geniuspro-coder-v1 and geniuspro-voice.",
+    hint: "Use with https://api.geniuspro.io/v1 for GeniusPro-coder-v1 and GeniusPro-voice-v1.",
   },
   universal: {
     label: "Legacy Universal",
@@ -48,13 +48,10 @@ type CreatableApiKeyProfile = Exclude<ApiKeyProfile, "universal">;
 
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
-  "geniuspro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
+  "GeniusPro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
   "GeniusPro-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
-  "geniuspro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
-  "geniuspro-voice": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
-  "geniuspro-superintelligence-v1": { label: "Legacy Superintelligence", color: "bg-gray-500/20 text-gray-400" },
-  "gp-agi-1.2": { label: "Legacy Superintelligence (Alias)", color: "bg-gray-500/20 text-gray-400" },
-  "gp-coding-agi-1.2": { label: "Legacy Coding Superintelligence (Alias)", color: "bg-gray-500/20 text-gray-400" },
+  "GeniusPro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
+  "GeniusPro-voice-v1": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
 };
 
 function getModelBadge(model: string): { label: string; color: string } {
