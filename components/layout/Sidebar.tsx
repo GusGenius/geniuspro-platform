@@ -221,11 +221,12 @@ export default function Sidebar() {
                       <li key={item.name}>
                         {"handoff" in item && item.handoff ? (
                           <button
+                            type="button"
                             onClick={(e) => {
                               handleChatClick(e);
                               setIsMobileMenuOpen(false);
                             }}
-                            className={cls}
+                            className={`${cls} w-full`}
                           >
                             <Icon className="w-5 h-5 flex-shrink-0" />
                             <span className="text-sm font-medium ml-3">
@@ -349,8 +350,9 @@ export default function Sidebar() {
               <li key={item.name}>
                 {"handoff" in item && item.handoff ? (
                   <button
+                    type="button"
                     onClick={handleChatClick}
-                    className={cls}
+                    className={`${cls} w-full`}
                     title={!isExpanded ? item.name : ""}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
