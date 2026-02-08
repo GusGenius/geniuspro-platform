@@ -46,9 +46,13 @@
 
 .main-sphere {
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 0.15;
+  opacity: 0.45;
   transform-origin: center;
   backface-visibility: hidden;
+}
+
+.dark .main-sphere {
+  opacity: 0.15;
   mix-blend-mode: screen;
 }
 
@@ -58,7 +62,7 @@
   pointer-events: none;
 }
 
-.orbitals ellipse {
+.dark .orbitals ellipse {
   mix-blend-mode: screen;
 }
 

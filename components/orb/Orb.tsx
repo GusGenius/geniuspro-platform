@@ -16,10 +16,85 @@ const OrbSizes = {
   large: { width: "320px", height: "320px" },
 };
 
+function useIsDark() {
+  const [isDark, setIsDark] = React.useState(true);
+
+  React.useEffect(() => {
+    const check = () =>
+      setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return isDark;
+}
+
 export function Orb({ size = "large", className, label = "G" }: OrbProps) {
   const sizeConfig = OrbSizes[size];
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
   const orbRef = React.useRef<HTMLDivElement>(null);
+  const isDark = useIsDark();
+
+  // Theme-adaptive color palette
+  const c = isDark
+    ? {
+        core: [
+          "rgba(255,255,255,0.12)",
+          "rgba(240,247,255,0.04)",
+          "rgba(208,231,255,0.01)",
+        ],
+        rim: [
+          "rgba(255,255,255,0.6)",
+          "rgba(255,255,255,0.1)",
+          "rgba(255,255,255,0.6)",
+        ],
+        orb1: [
+          "rgba(156,163,175,0.6)",
+          "rgba(255,255,255,0.8)",
+          "rgba(107,114,128,0.6)",
+        ],
+        orb2: [
+          "rgba(107,114,128,0.6)",
+          "rgba(255,255,255,0.8)",
+          "rgba(156,163,175,0.6)",
+        ],
+        stroke: "rgba(255,255,255,0.1)",
+        label: "#ffffff",
+        dash: "rgba(255,255,255,0.15)",
+        glow: ["rgba(156,163,175,0.1)", "rgba(107,114,128,0.08)"],
+      }
+    : {
+        core: [
+          "rgba(30,50,100,0.18)",
+          "rgba(40,60,120,0.10)",
+          "rgba(50,70,140,0.04)",
+        ],
+        rim: [
+          "rgba(50,70,140,0.45)",
+          "rgba(50,70,140,0.08)",
+          "rgba(50,70,140,0.45)",
+        ],
+        orb1: [
+          "rgba(80,100,170,0.50)",
+          "rgba(50,70,150,0.65)",
+          "rgba(80,100,170,0.50)",
+        ],
+        orb2: [
+          "rgba(80,100,170,0.50)",
+          "rgba(50,70,150,0.65)",
+          "rgba(80,100,170,0.50)",
+        ],
+        stroke: "rgba(50,70,140,0.18)",
+        label: "#1e2850",
+        dash: "rgba(50,70,140,0.20)",
+        glow: ["rgba(50,70,140,0.08)", "rgba(50,70,140,0.05)"],
+      };
 
   const handleMouseMove = React.useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -60,8 +135,7 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
       <div
         className="absolute inset-0 rounded-full blur-[50px] opacity-30 transition-all duration-300 -z-10"
         style={{
-          background:
-            "radial-gradient(ellipse at 50% 50%, rgba(156, 163, 175, 0.1) 0%, rgba(107, 114, 128, 0.08) 25%, transparent 70%)",
+          background: `radial-gradient(ellipse at 50% 50%, ${c.glow[0]} 0%, ${c.glow[1]} 25%, transparent 70%)`,
           transform: `translate3d(${-mousePosition.x * 20}px, ${-mousePosition.y * 20}px, 0)`,
         }}
       />
@@ -81,15 +155,20 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
           style={{ shapeRendering: "geometricPrecision" }}
         >
           <defs>
-            {/* Core Gradient - Glass look (dark optimized) */}
+            {/* Core Gradient - Glass look */}
             <radialGradient id="gp-mainCoreGradient" cx="45%" cy="40%" r="75%">
-              <stop offset="0%" stopColor="rgba(255, 255, 255, 0.12)" />
-              <stop offset="50%" stopColor="rgba(240, 247, 255, 0.04)" />
-              <stop offset="100%" stopColor="rgba(208, 231, 255, 0.01)" />
+              <stop offset="0%" stopColor={c.core[0]} />
+              <stop offset="50%" stopColor={c.core[1]} />
+              <stop offset="100%" stopColor={c.core[2]} />
             </radialGradient>
 
             {/* Soft Shine Gradient */}
-            <radialGradient id="gp-softShineGradient" cx="50%" cy="50%" r="50%">
+            <radialGradient
+              id="gp-softShineGradient"
+              cx="50%"
+              cy="50%"
+              r="50%"
+            >
               <stop offset="0%" stopColor="rgba(255, 255, 255, 0.25)" />
               <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
             </radialGradient>
@@ -108,9 +187,9 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
               x2="100%"
               y2="100%"
             >
-              <stop offset="0%" stopColor="rgba(255,255,255,0.6)" />
-              <stop offset="50%" stopColor="rgba(255,255,255,0.1)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.6)" />
+              <stop offset="0%" stopColor={c.rim[0]} />
+              <stop offset="50%" stopColor={c.rim[1]} />
+              <stop offset="100%" stopColor={c.rim[2]} />
             </linearGradient>
 
             {/* Orbital gradients */}
@@ -122,18 +201,9 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
               y2="100%"
             >
               <stop offset="0%" stopColor="transparent" />
-              <stop
-                offset="20%"
-                stopColor="rgba(156, 163, 175, 0.6)"
-              />
-              <stop
-                offset="50%"
-                stopColor="rgba(255,255,255,0.8)"
-              />
-              <stop
-                offset="80%"
-                stopColor="rgba(107, 114, 128, 0.6)"
-              />
+              <stop offset="20%" stopColor={c.orb1[0]} />
+              <stop offset="50%" stopColor={c.orb1[1]} />
+              <stop offset="80%" stopColor={c.orb1[2]} />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
 
@@ -145,18 +215,9 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
               y2="100%"
             >
               <stop offset="0%" stopColor="transparent" />
-              <stop
-                offset="20%"
-                stopColor="rgba(107, 114, 128, 0.6)"
-              />
-              <stop
-                offset="50%"
-                stopColor="rgba(255,255,255,0.8)"
-              />
-              <stop
-                offset="80%"
-                stopColor="rgba(156, 163, 175, 0.6)"
-              />
+              <stop offset="20%" stopColor={c.orb2[0]} />
+              <stop offset="50%" stopColor={c.orb2[1]} />
+              <stop offset="80%" stopColor={c.orb2[2]} />
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
 
@@ -201,7 +262,7 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
           </defs>
 
           {/* Orb Core Group */}
-          <g className="orb-core" transform-origin="center">
+          <g className="orb-core" style={{ transformOrigin: "center" }}>
             {/* Subtle shadow underneath */}
             <ellipse
               cx="150"
@@ -220,7 +281,7 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
               cy="150"
               r="100"
               fill="url(#gp-mainCoreGradient)"
-              stroke="rgba(255,255,255,0.1)"
+              stroke={c.stroke}
               strokeWidth="0.5"
             />
 
@@ -256,12 +317,11 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontFamily:
-                    "'Google Sans Flex', system-ui, sans-serif",
+                  fontFamily: "'Google Sans Flex', system-ui, sans-serif",
                   fontSize: "90px",
                   fontWeight: 100,
                   textTransform: "uppercase",
-                  color: "#ffffff",
+                  color: c.label,
                   userSelect: "none",
                   lineHeight: 1,
                   letterSpacing: "-0.02em",
@@ -340,7 +400,7 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
                 rx="140"
                 ry="45"
                 fill="none"
-                stroke="rgba(255,255,255,0.15)"
+                stroke={c.dash}
                 strokeWidth="0.5"
                 strokeDasharray="3,8"
                 strokeLinecap="round"

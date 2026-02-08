@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { BarChart3, Calendar, Filter, Loader2 } from "lucide-react";
+import { BarChart3, Calendar, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+import { calculateCost, formatCost } from "@/lib/pricing";
 
 interface UsageStats {
   totalTokens: number;
@@ -11,12 +12,14 @@ interface UsageStats {
   completionTokens: number;
   totalRequests: number;
   avgLatencyMs: number;
+  totalCost: number;
 }
 
 interface DailyUsage {
   date: string;
   prompt: number;
   completion: number;
+  cost: number;
 }
 
 interface ModelBreakdown {
@@ -26,19 +29,27 @@ interface ModelBreakdown {
   completionTokens: number;
   totalTokens: number;
   avgLatencyMs: number;
+  cost: number;
+}
+
+interface KeyBreakdown {
+  keyId: string;
+  keyName: string;
+  keyPrefix: string;
+  requests: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  cost: number;
 }
 
 type Period = "week" | "month" | "quarter";
 
 function getPeriodStart(period: Period): string {
   const now = new Date();
-  if (period === "week") {
-    now.setDate(now.getDate() - 7);
-  } else if (period === "month") {
-    now.setDate(1);
-  } else {
-    now.setMonth(now.getMonth() - 3);
-  }
+  if (period === "week") now.setDate(now.getDate() - 7);
+  else if (period === "month") now.setDate(1);
+  else now.setMonth(now.getMonth() - 3);
   return now.toISOString();
 }
 
@@ -57,14 +68,11 @@ export default function UsagePage() {
   const [period, setPeriod] = useState<Period>("month");
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<UsageStats>({
-    totalTokens: 0,
-    promptTokens: 0,
-    completionTokens: 0,
-    totalRequests: 0,
-    avgLatencyMs: 0,
+    totalTokens: 0, promptTokens: 0, completionTokens: 0, totalRequests: 0, avgLatencyMs: 0, totalCost: 0,
   });
   const [daily, setDaily] = useState<DailyUsage[]>([]);
   const [models, setModels] = useState<ModelBreakdown[]>([]);
+  const [keys, setKeys] = useState<KeyBreakdown[]>([]);
 
   const fetchUsage = useCallback(async () => {
     if (!user) return;
@@ -72,10 +80,9 @@ export default function UsagePage() {
 
     try {
       const since = getPeriodStart(period);
-
       const { data: rows, error } = await supabase
         .from("usage_logs")
-        .select("model, prompt_tokens, completion_tokens, total_tokens, response_time_ms, created_at")
+        .select("model, prompt_tokens, completion_tokens, total_tokens, response_time_ms, created_at, api_key_id")
         .eq("user_id", user.id)
         .gte("created_at", since)
         .order("created_at", { ascending: true });
@@ -87,21 +94,27 @@ export default function UsagePage() {
       }
 
       if (!rows || rows.length === 0) {
-        setStats({ totalTokens: 0, promptTokens: 0, completionTokens: 0, totalRequests: 0, avgLatencyMs: 0 });
+        setStats({ totalTokens: 0, promptTokens: 0, completionTokens: 0, totalRequests: 0, avgLatencyMs: 0, totalCost: 0 });
         setDaily([]);
         setModels([]);
+        setKeys([]);
         setLoading(false);
         return;
       }
 
-      let totalTokens = 0;
-      let promptTokens = 0;
-      let completionTokens = 0;
-      let totalLatency = 0;
-      let latencyCount = 0;
+      // Fetch API key names
+      const keyIds = [...new Set(rows.map((r) => r.api_key_id).filter(Boolean))];
+      const { data: keyData } = await supabase
+        .from("api_keys")
+        .select("id, name, key_prefix")
+        .in("id", keyIds);
+      const keyLookup = new Map(keyData?.map((k) => [k.id, k]) || []);
 
-      const dailyMap = new Map<string, { prompt: number; completion: number }>();
+      let totalTokens = 0, promptTokens = 0, completionTokens = 0;
+      let totalLatency = 0, latencyCount = 0, totalCost = 0;
+      const dailyMap = new Map<string, { prompt: number; completion: number; cost: number }>();
       const modelMap = new Map<string, ModelBreakdown>();
+      const keyUsageMap = new Map<string, KeyBreakdown>();
 
       for (const row of rows) {
         const pt = row.prompt_tokens ?? 0;
@@ -109,62 +122,65 @@ export default function UsagePage() {
         const tt = row.total_tokens ?? 0;
         const lat = row.response_time_ms ?? 0;
         const model = row.model ?? "unknown";
+        const cost = calculateCost(model, pt, ct);
 
         totalTokens += tt;
         promptTokens += pt;
         completionTokens += ct;
-        if (lat > 0) {
-          totalLatency += lat;
-          latencyCount++;
-        }
+        totalCost += cost;
+        if (lat > 0) { totalLatency += lat; latencyCount++; }
 
         const dayKey = new Date(row.created_at).toISOString().slice(0, 10);
-        const dayEntry = dailyMap.get(dayKey) || { prompt: 0, completion: 0 };
-        dayEntry.prompt += pt;
-        dayEntry.completion += ct;
-        dailyMap.set(dayKey, dayEntry);
+        const day = dailyMap.get(dayKey) || { prompt: 0, completion: 0, cost: 0 };
+        day.prompt += pt;
+        day.completion += ct;
+        day.cost += cost;
+        dailyMap.set(dayKey, day);
 
-        const modelEntry = modelMap.get(model) || {
-          model,
-          requests: 0,
-          promptTokens: 0,
-          completionTokens: 0,
-          totalTokens: 0,
-          avgLatencyMs: 0,
+        const m = modelMap.get(model) || {
+          model, requests: 0, promptTokens: 0, completionTokens: 0, totalTokens: 0, avgLatencyMs: 0, cost: 0,
         };
-        modelEntry.requests++;
-        modelEntry.promptTokens += pt;
-        modelEntry.completionTokens += ct;
-        modelEntry.totalTokens += tt;
-        modelEntry.avgLatencyMs += lat;
-        modelMap.set(model, modelEntry);
+        m.requests++;
+        m.promptTokens += pt;
+        m.completionTokens += ct;
+        m.totalTokens += tt;
+        m.avgLatencyMs += lat;
+        m.cost += cost;
+        modelMap.set(model, m);
+
+        if (row.api_key_id) {
+          const k = keyUsageMap.get(row.api_key_id) || {
+            keyId: row.api_key_id,
+            keyName: keyLookup.get(row.api_key_id)?.name || "Unknown",
+            keyPrefix: keyLookup.get(row.api_key_id)?.key_prefix || "...",
+            requests: 0,
+            promptTokens: 0,
+            completionTokens: 0,
+            totalTokens: 0,
+            cost: 0,
+          };
+          k.requests++;
+          k.promptTokens += pt;
+          k.completionTokens += ct;
+          k.totalTokens += tt;
+          k.cost += cost;
+          keyUsageMap.set(row.api_key_id, k);
+        }
       }
 
       for (const entry of modelMap.values()) {
-        if (entry.requests > 0) {
-          entry.avgLatencyMs = Math.round(entry.avgLatencyMs / entry.requests);
-        }
+        if (entry.requests > 0) entry.avgLatencyMs = Math.round(entry.avgLatencyMs / entry.requests);
       }
 
       setStats({
-        totalTokens,
-        promptTokens,
-        completionTokens,
+        totalTokens, promptTokens, completionTokens,
         totalRequests: rows.length,
         avgLatencyMs: latencyCount > 0 ? Math.round(totalLatency / latencyCount) : 0,
+        totalCost,
       });
-
-      setDaily(
-        Array.from(dailyMap.entries()).map(([date, d]) => ({
-          date,
-          prompt: d.prompt,
-          completion: d.completion,
-        }))
-      );
-
-      setModels(
-        Array.from(modelMap.values()).sort((a, b) => b.totalTokens - a.totalTokens)
-      );
+      setDaily(Array.from(dailyMap.entries()).map(([date, d]) => ({ date, ...d })));
+      setModels(Array.from(modelMap.values()).sort((a, b) => b.totalTokens - a.totalTokens));
+      setKeys(Array.from(keyUsageMap.values()).sort((a, b) => b.totalTokens - a.totalTokens));
     } catch (err) {
       console.error("Failed to fetch usage:", err);
     } finally {
@@ -172,9 +188,7 @@ export default function UsagePage() {
     }
   }, [user, period]);
 
-  useEffect(() => {
-    fetchUsage();
-  }, [fetchUsage]);
+  useEffect(() => { fetchUsage(); }, [fetchUsage]);
 
   const maxDaily = Math.max(...daily.map((d) => d.prompt + d.completion), 1);
 
@@ -193,70 +207,50 @@ export default function UsagePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              Monitor your API usage and token consumption
-            </p>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">Monitor your API usage and token consumption</p>
           </div>
         </div>
 
         {/* Period Filter */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value as Period)}
-              className="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="week">Last 7 days</option>
-              <option value="month">This month</option>
-              <option value="quarter">Last 3 months</option>
-            </select>
-          </div>
+        <div className="flex items-center gap-2 mb-8">
+          <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as Period)}
+            className="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="week">Last 7 days</option>
+            <option value="month">This month</option>
+            <option value="quarter">Last 3 months</option>
+          </select>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <StatCard label="Total Tokens" value={formatNumber(stats.totalTokens)} />
           <StatCard label="Input Tokens" value={formatNumber(stats.promptTokens)} valueClass="text-blue-400" />
           <StatCard label="Output Tokens" value={formatNumber(stats.completionTokens)} valueClass="text-green-400" />
           <StatCard label="Requests" value={formatNumber(stats.totalRequests)} />
           <StatCard label="Avg Latency" value={`${formatNumber(stats.avgLatencyMs)}ms`} />
+          <StatCard label="Total Cost" value={formatCost(stats.totalCost)} valueClass="text-purple-400" />
         </div>
 
         {/* Daily Chart */}
         {daily.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-              Daily Token Usage
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Daily Token Usage</h2>
             <div className="space-y-3">
-              {daily.map((day) => {
-                const promptPct = (day.prompt / maxDaily) * 100;
-                const compPct = (day.completion / maxDaily) * 100;
-                return (
-                  <div key={day.date} className="flex items-center gap-4">
-                    <div className="w-16 text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
-                      {formatDate(day.date)}
-                    </div>
-                    <div className="flex-1 h-7 bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden flex">
-                      <div
-                        className="h-full bg-blue-500/70 transition-all"
-                        style={{ width: `${promptPct}%` }}
-                        title={`Input: ${formatNumber(day.prompt)}`}
-                      />
-                      <div
-                        className="h-full bg-green-500/70 transition-all"
-                        style={{ width: `${compPct}%` }}
-                        title={`Output: ${formatNumber(day.completion)}`}
-                      />
-                    </div>
-                    <div className="w-20 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0">
-                      {formatNumber(day.prompt + day.completion)}
-                    </div>
+              {daily.map((day) => (
+                <div key={day.date} className="flex items-center gap-4">
+                  <div className="w-16 text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">{formatDate(day.date)}</div>
+                  <div className="flex-1 h-7 bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden flex">
+                    <div className="h-full bg-blue-500/70 transition-all" style={{ width: `${(day.prompt / maxDaily) * 100}%` }} title={`Input: ${formatNumber(day.prompt)}`} />
+                    <div className="h-full bg-green-500/70 transition-all" style={{ width: `${(day.completion / maxDaily) * 100}%` }} title={`Output: ${formatNumber(day.completion)}`} />
                   </div>
-                );
-              })}
+                  <div className="w-20 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0">{formatNumber(day.prompt + day.completion)}</div>
+                  <div className="w-20 text-sm text-purple-400 text-right flex-shrink-0 font-medium">{formatCost(day.cost)}</div>
+                </div>
+              ))}
             </div>
             <div className="flex gap-6 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
@@ -271,12 +265,48 @@ export default function UsagePage() {
           </div>
         )}
 
+        {/* Usage by API Key */}
+        {keys.length > 0 && (
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by API Key</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                    <th className="pb-3 font-medium">Key</th>
+                    <th className="pb-3 font-medium">Requests</th>
+                    <th className="pb-3 font-medium">Input</th>
+                    <th className="pb-3 font-medium">Output</th>
+                    <th className="pb-3 font-medium">Total</th>
+                    <th className="pb-3 font-medium">Cost</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {keys.map((k, i) => (
+                    <tr key={k.keyId} className={i < keys.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
+                      <td className="py-4">
+                        <div>
+                          <div className="text-gray-900 dark:text-white font-medium">{k.keyName}</div>
+                          <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded">{k.keyPrefix}</code>
+                        </div>
+                      </td>
+                      <td className="py-4 text-gray-600 dark:text-gray-300">{formatNumber(k.requests)}</td>
+                      <td className="py-4 text-blue-400">{formatNumber(k.promptTokens)}</td>
+                      <td className="py-4 text-green-400">{formatNumber(k.completionTokens)}</td>
+                      <td className="py-4 text-gray-900 dark:text-white font-medium">{formatNumber(k.totalTokens)}</td>
+                      <td className="py-4 text-purple-400 font-medium">{formatCost(k.cost)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Model Breakdown */}
         {models.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Usage by Model
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by Model</h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -286,24 +316,19 @@ export default function UsagePage() {
                     <th className="pb-3 font-medium">Input</th>
                     <th className="pb-3 font-medium">Output</th>
                     <th className="pb-3 font-medium">Total</th>
+                    <th className="pb-3 font-medium">Cost</th>
                     <th className="pb-3 font-medium">Avg Latency</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {models.map((m, i) => (
-                    <tr
-                      key={m.model}
-                      className={i < models.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}
-                    >
-                      <td className="py-4">
-                        <code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">
-                          {m.model}
-                        </code>
-                      </td>
+                    <tr key={m.model} className={i < models.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
+                      <td className="py-4"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">{m.model}</code></td>
                       <td className="py-4 text-gray-600 dark:text-gray-300">{formatNumber(m.requests)}</td>
                       <td className="py-4 text-blue-400">{formatNumber(m.promptTokens)}</td>
                       <td className="py-4 text-green-400">{formatNumber(m.completionTokens)}</td>
                       <td className="py-4 text-gray-900 dark:text-white font-medium">{formatNumber(m.totalTokens)}</td>
+                      <td className="py-4 text-purple-400 font-medium">{formatCost(m.cost)}</td>
                       <td className="py-4 text-gray-500 dark:text-gray-400">{formatNumber(m.avgLatencyMs)}ms</td>
                     </tr>
                   ))}
@@ -318,9 +343,7 @@ export default function UsagePage() {
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
             <BarChart3 className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No usage yet</h3>
-            <p className="text-gray-400 dark:text-gray-500">
-              Make API requests and your usage will appear here.
-            </p>
+            <p className="text-gray-400 dark:text-gray-500">Make API requests and your usage will appear here.</p>
           </div>
         )}
       </div>
@@ -328,15 +351,7 @@ export default function UsagePage() {
   );
 }
 
-function StatCard({
-  label,
-  value,
-  valueClass = "text-gray-900 dark:text-white",
-}: {
-  label: string;
-  value: string;
-  valueClass?: string;
-}) {
+function StatCard({ label, value, valueClass = "text-gray-900 dark:text-white" }: { label: string; value: string; valueClass?: string }) {
   return (
     <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5">
       <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</div>

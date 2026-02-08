@@ -24,12 +24,12 @@ export default function DashboardPage() {
 
       {/* Welcome text beneath the orb */}
       <div className="mt-6 text-center welcome-fade-in-delay">
-        <h1 className="text-3xl md:text-4xl font-light text-gray-300 tracking-tight">
+        <h1 className="text-3xl md:text-4xl font-light text-gray-600 dark:text-gray-300 tracking-tight">
           {greeting}, {displayName}
         </h1>
       </div>
 
-      <p className="mt-3 text-sm text-gray-500 welcome-fade-in-delay-2">
+      <p className="mt-3 text-sm text-gray-400 dark:text-gray-500 welcome-fade-in-delay-2">
         Your workers are standing by.
       </p>
     </div>

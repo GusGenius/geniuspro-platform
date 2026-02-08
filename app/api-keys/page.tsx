@@ -16,6 +16,17 @@ interface ApiKeyRow {
   created_at: string;
 }
 
+/** Map raw model IDs to friendly display names + colors */
+const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
+  "geniuspro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
+  "geniuspro-superintelligence-v1": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
+  "geniuspro-voice": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
+};
+
+function getModelBadge(model: string): { label: string; color: string } {
+  return MODEL_DISPLAY[model] || { label: model, color: "bg-gray-500/20 text-gray-400" };
+}
+
 export default function ApiKeysPage() {
   const { user } = useAuth();
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
@@ -26,6 +37,7 @@ export default function ApiKeysPage() {
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [keyModels, setKeyModels] = useState<Record<string, string[]>>({});
 
   const fetchKeys = useCallback(async () => {
     if (!user) return;
@@ -42,6 +54,29 @@ export default function ApiKeysPage() {
         return;
       }
       setKeys(data || []);
+
+      // Fetch distinct models used per key
+      if (data && data.length > 0) {
+        const keyIds = data.map((k) => k.id);
+        const { data: usageRows } = await supabase
+          .from("usage_logs")
+          .select("api_key_id, model")
+          .in("api_key_id", keyIds);
+
+        if (usageRows) {
+          const modelMap: Record<string, Set<string>> = {};
+          for (const row of usageRows) {
+            if (!row.model) continue;
+            if (!modelMap[row.api_key_id]) modelMap[row.api_key_id] = new Set();
+            modelMap[row.api_key_id].add(row.model);
+          }
+          const result: Record<string, string[]> = {};
+          for (const [keyId, models] of Object.entries(modelMap)) {
+            result[keyId] = Array.from(models);
+          }
+          setKeyModels(result);
+        }
+      }
     } catch (err) {
       console.error("Failed to fetch keys:", err);
       setError("Failed to load API keys");
@@ -112,7 +147,7 @@ export default function ApiKeysPage() {
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      // Clipboard may fail in some contexts
+      // Clipboard may not be available
     }
   };
 
@@ -138,8 +173,7 @@ export default function ApiKeysPage() {
     if (mins < 60) return `${mins}m ago`;
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `${hrs}h ago`;
-    const days = Math.floor(hrs / 24);
-    return `${days}d ago`;
+    return `${Math.floor(hrs / 24)}d ago`;
   };
 
   if (loading) {
@@ -163,7 +197,7 @@ export default function ApiKeysPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
           >
             <Plus className="w-4 h-4" />
             Create Key
@@ -180,18 +214,89 @@ export default function ApiKeysPage() {
         {/* Keys List */}
         <div className="space-y-4">
           {keys.length === 0 ? (
-            <EmptyState onCreateClick={() => setShowCreateModal(true)} />
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
+              <Key className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No API Keys</h3>
+              <p className="text-gray-400 dark:text-gray-500 mb-6">Create your first API key to get started</p>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Create Key
+              </button>
+            </div>
           ) : (
             keys.map((key) => (
-              <KeyCard
+              <div
                 key={key.id}
-                apiKey={key}
-                copiedId={copiedId}
-                onCopy={handleCopy}
-                onDelete={handleDeleteKey}
-                formatDate={formatDate}
-                timeAgo={timeAgo}
-              />
+                className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-medium text-gray-900 dark:text-white">{key.name}</h3>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          key.is_active
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-gray-500/20 text-gray-400"
+                        }`}
+                      >
+                        {key.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-3">
+                      <code className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded font-mono">
+                        {key.key_prefix}
+                      </code>
+                      <button
+                        onClick={() => handleCopy(key.key_prefix, key.id)}
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        title="Copy prefix"
+                      >
+                        {copiedId === key.id ? (
+                          <Check className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Model badges */}
+                    {keyModels[key.id] && keyModels[key.id].length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {keyModels[key.id].map((model) => {
+                          const badge = getModelBadge(model);
+                          return (
+                            <span
+                              key={model}
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${badge.color}`}
+                            >
+                              {badge.label}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-400 dark:text-gray-500">
+                      <span>Created {formatDate(key.created_at)}</span>
+                      <span>Last used {timeAgo(key.last_used_at)}</span>
+                      {key.rate_limit_rpm && <span>{key.rate_limit_rpm} RPM</span>}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleDeleteKey(key.id)}
+                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                    title="Delete key"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             ))
           )}
         </div>
@@ -199,207 +304,84 @@ export default function ApiKeysPage() {
 
       {/* Create Modal */}
       {showCreateModal && (
-        <CreateModal
-          name={newKeyName}
-          setName={setNewKeyName}
-          secret={newKeySecret}
-          creating={creating}
-          error={error}
-          copiedId={copiedId}
-          onCreate={handleCreateKey}
-          onCopy={handleCopy}
-          onClose={handleCloseModal}
-        />
-      )}
-    </div>
-  );
-}
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl w-full max-w-md">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {newKeySecret ? "API Key Created" : "Create API Key"}
+              </h2>
+            </div>
 
-/* ---------- Sub-components ---------- */
+            <div className="p-6">
+              {newKeySecret ? (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-2 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-yellow-600 dark:text-yellow-300">
+                      <strong>Save this key!</strong> You won&apos;t be able to see it again.
+                    </p>
+                  </div>
 
-function EmptyState({ onCreateClick }: { onCreateClick: () => void }) {
-  return (
-    <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
-      <Key className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-      <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No API Keys</h3>
-      <p className="text-gray-400 dark:text-gray-500 mb-4">Create your first API key to get started</p>
-      <button
-        onClick={onCreateClick}
-        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
-      >
-        <Plus className="w-4 h-4" />
-        Create Key
-      </button>
-    </div>
-  );
-}
-
-function KeyCard({
-  apiKey,
-  copiedId,
-  onCopy,
-  onDelete,
-  formatDate,
-  timeAgo,
-}: {
-  apiKey: ApiKeyRow;
-  copiedId: string | null;
-  onCopy: (text: string, id: string) => void;
-  onDelete: (id: string) => void;
-  formatDate: (iso: string) => string;
-  timeAgo: (iso: string | null) => string;
-}) {
-  return (
-    <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className="font-medium text-gray-900 dark:text-white">{apiKey.name}</h3>
-            <span
-              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                apiKey.is_active
-                  ? "bg-green-500/15 text-green-500"
-                  : "bg-gray-500/15 text-gray-400"
-              }`}
-            >
-              {apiKey.is_active ? "Active" : "Inactive"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 mb-3">
-            <code className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded font-mono">
-              {apiKey.key_prefix}
-            </code>
-            <button
-              onClick={() => onCopy(apiKey.key_prefix, apiKey.id)}
-              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
-              title="Copy prefix"
-            >
-              {copiedId === apiKey.id ? (
-                <Check className="w-3.5 h-3.5 text-green-500" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-400 dark:text-gray-500">
-            <span>Created {formatDate(apiKey.created_at)}</span>
-            <span>Last used {timeAgo(apiKey.last_used_at)}</span>
-            {apiKey.rate_limit_rpm && <span>{apiKey.rate_limit_rpm} RPM</span>}
-          </div>
-        </div>
-
-        <button
-          onClick={() => onDelete(apiKey.id)}
-          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-          title="Delete key"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function CreateModal({
-  name,
-  setName,
-  secret,
-  creating,
-  error,
-  copiedId,
-  onCreate,
-  onCopy,
-  onClose,
-}: {
-  name: string;
-  setName: (v: string) => void;
-  secret: string | null;
-  creating: boolean;
-  error: string | null;
-  copiedId: string | null;
-  onCreate: () => void;
-  onCopy: (text: string, id: string) => void;
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl w-full max-w-md">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {secret ? "API Key Created" : "Create API Key"}
-          </h2>
-        </div>
-
-        <div className="p-6">
-          {secret ? (
-            <div className="space-y-4">
-              <div className="flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-                <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-amber-600 dark:text-amber-300">
-                  <strong>Save this key!</strong> You won&apos;t be able to see it again.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Your API Key
-                </label>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-sm text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all font-mono">
-                    {secret}
-                  </code>
-                  <button
-                    onClick={() => onCopy(secret, "new")}
-                    className="p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
-                  >
-                    {copiedId === "new" ? (
-                      <Check className="w-5 h-5 text-green-500" />
-                    ) : (
-                      <Copy className="w-5 h-5" />
-                    )}
-                  </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Your API Key
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 text-sm text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all font-mono">
+                        {newKeySecret}
+                      </code>
+                      <button
+                        onClick={() => handleCopy(newKeySecret, "new")}
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
+                      >
+                        {copiedId === "new" ? (
+                          <Check className="w-5 h-5 text-green-400" />
+                        ) : (
+                          <Copy className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                    Key Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newKeyName}
+                    onChange={(e) => setNewKeyName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleCreateKey()}
+                    placeholder="e.g., Production Key"
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    autoFocus
+                  />
+                  {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
+                </div>
+              )}
             </div>
-          ) : (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Key Name
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onCreate()}
-                placeholder="e.g., Production Key"
-                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
-              {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
-            </div>
-          )}
-        </div>
 
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            {secret ? "Done" : "Cancel"}
-          </button>
-          {!secret && (
-            <button
-              onClick={onCreate}
-              disabled={!name.trim() || creating}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {creating ? "Creating..." : "Create Key"}
-            </button>
-          )}
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
+              <button
+                onClick={handleCloseModal}
+                className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
+              >
+                {newKeySecret ? "Done" : "Cancel"}
+              </button>
+              {!newKeySecret && (
+                <button
+                  onClick={handleCreateKey}
+                  disabled={!newKeyName.trim() || creating}
+                  className="px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {creating ? "Creating..." : "Create Key"}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

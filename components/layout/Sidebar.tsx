@@ -9,6 +9,8 @@ import {
   Key,
   BarChart3,
   BookOpen,
+  CreditCard,
+  MessageSquare,
   Sun,
   Moon,
   LogOut,
@@ -47,7 +49,6 @@ export default function Sidebar() {
         document.documentElement.classList.remove("dark");
       }
     } else {
-      // Default to dark mode
       setTheme("dark");
       document.documentElement.classList.add("dark");
     }
@@ -61,11 +62,11 @@ export default function Sidebar() {
       if (mobile) {
         setIsExpanded(false);
         setIsMobileMenuOpen(false);
-        document.documentElement.style.setProperty('--sidebar-width', '0px');
+        document.documentElement.style.setProperty("--sidebar-width", "0px");
       } else {
         setIsExpanded(false);
         setIsMobileMenuOpen(false);
-        document.documentElement.style.setProperty('--sidebar-width', '60px');
+        document.documentElement.style.setProperty("--sidebar-width", "60px");
       }
     };
 
@@ -81,14 +82,14 @@ export default function Sidebar() {
   const handleMouseEnter = () => {
     if (!isMobile) {
       setIsExpanded(true);
-      document.documentElement.style.setProperty('--sidebar-width', '200px');
+      document.documentElement.style.setProperty("--sidebar-width", "200px");
     }
   };
 
   const handleMouseLeave = () => {
     if (!isMobile) {
       setIsExpanded(false);
-      document.documentElement.style.setProperty('--sidebar-width', '60px');
+      document.documentElement.style.setProperty("--sidebar-width", "60px");
     }
   };
 
@@ -107,13 +108,14 @@ export default function Sidebar() {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "API Keys", href: "/api-keys", icon: Key },
     { name: "Usage", href: "/usage", icon: BarChart3 },
+    { name: "Billing", href: "/billing", icon: CreditCard },
     { name: "Docs", href: "/docs", icon: BookOpen },
+    { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true },
   ];
 
   const isActive = (href: string) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
-    }
+    if (href === "/dashboard") return pathname === "/dashboard";
+    if (href.startsWith("http")) return false;
     return pathname?.startsWith(href);
   };
 
@@ -121,7 +123,7 @@ export default function Sidebar() {
   if (isMobile) {
     return (
       <>
-        <div className="fixed top-0 left-0 right-0 z-40 h-14 bg-gray-900/95 backdrop-blur-xl border-b border-gray-700 flex items-center justify-between px-3">
+        <div className="fixed top-0 left-0 right-0 z-40 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-3">
           <Link href="/dashboard" className="flex items-center">
             <Image
               src="/logo.avif"
@@ -135,10 +137,14 @@ export default function Sidebar() {
 
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2.5 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2.5 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -149,20 +155,24 @@ export default function Sidebar() {
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
-            <aside className="fixed right-0 top-0 h-full w-72 bg-gray-900 shadow-2xl z-50 flex flex-col border-l border-gray-700 overflow-hidden">
-              <div className="flex h-14 items-center justify-between px-4 border-b border-gray-700 flex-shrink-0">
-                <h2 className="text-lg font-semibold text-white">Menu</h2>
+            <aside className="fixed right-0 top-0 h-full w-72 bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col border-l border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="flex h-14 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Menu
+                </h2>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg text-gray-400 hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {user?.email && (
-                <div className="px-4 py-2 border-b border-gray-700 flex-shrink-0">
-                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {user.email}
+                  </p>
                 </div>
               )}
 
@@ -171,39 +181,63 @@ export default function Sidebar() {
                   {navigation.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(item.href);
+                    const cls = `flex items-center py-3 px-3 rounded-lg transition-all duration-300 min-h-[44px] ${
+                      active
+                        ? "bg-blue-500/15 text-blue-400 border-r-2 border-blue-400"
+                        : "text-gray-500 dark:text-gray-400 hover:bg-blue-500/20 hover:text-gray-900 dark:hover:text-white"
+                    }`;
                     return (
                       <li key={item.name}>
-                        <Link
-                          href={item.href}
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className={`flex items-center py-3 px-3 rounded-lg transition-all duration-300 min-h-[44px] ${
-                            active
-                              ? "bg-blue-500/15 text-blue-400 border-r-2 border-blue-400"
-                              : "text-gray-400 hover:bg-blue-500/20 hover:text-white"
-                          }`}
-                        >
-                          <Icon className="w-5 h-5 flex-shrink-0" />
-                          <span className="text-sm font-medium ml-3">{item.name}</span>
-                        </Link>
+                        {"external" in item && item.external ? (
+                          <a
+                            href={item.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cls}
+                          >
+                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium ml-3">
+                              {item.name}
+                            </span>
+                          </a>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={cls}
+                          >
+                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium ml-3">
+                              {item.name}
+                            </span>
+                          </Link>
+                        )}
                       </li>
                     );
                   })}
                 </ul>
               </nav>
 
-              <div className="border-t border-gray-700 flex-shrink-0 p-2">
+              <div className="border-t border-gray-200 dark:border-gray-700 flex-shrink-0 p-2">
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={toggleTheme}
-                    className="flex flex-col items-center justify-center py-3 px-2 rounded-lg text-gray-400 hover:bg-blue-500/20 hover:text-white transition-all min-h-[44px]"
+                    className="flex flex-col items-center justify-center py-3 px-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-blue-500/20 hover:text-gray-900 dark:hover:text-white transition-all min-h-[44px]"
                   >
-                    {theme === "dark" ? <Sun className="w-5 h-5 mb-1" /> : <Moon className="w-5 h-5 mb-1" />}
-                    <span className="text-xs font-medium">{theme === "dark" ? "Light" : "Dark"}</span>
+                    {theme === "dark" ? (
+                      <Sun className="w-5 h-5 mb-1" />
+                    ) : (
+                      <Moon className="w-5 h-5 mb-1" />
+                    )}
+                    <span className="text-xs font-medium">
+                      {theme === "dark" ? "Light" : "Dark"}
+                    </span>
                   </button>
 
                   <button
                     onClick={handleLogout}
-                    className="flex flex-col items-center justify-center py-3 px-2 rounded-lg text-gray-400 hover:bg-blue-500/20 hover:text-white transition-all min-h-[44px]"
+                    className="flex flex-col items-center justify-center py-3 px-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-blue-500/20 hover:text-gray-900 dark:hover:text-white transition-all min-h-[44px]"
                   >
                     <LogOut className="w-5 h-5 mb-1" />
                     <span className="text-xs font-medium">Logout</span>
@@ -219,16 +253,18 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 h-screen bg-gray-900 transition-all duration-300 ${
+      className={`fixed left-0 top-0 z-50 h-screen bg-white dark:bg-gray-900 transition-all duration-300 ${
         isExpanded ? "w-[200px]" : "w-[60px]"
-      } flex flex-col border-r border-gray-700 overflow-hidden`}
+      } flex flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {/* Logo */}
-      <div className={`flex h-16 items-center border-b border-gray-700 transition-all duration-300 ${
-        isExpanded ? "justify-start px-4" : "justify-center px-0"
-      }`}>
+      <div
+        className={`flex h-16 items-center border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${
+          isExpanded ? "justify-start px-4" : "justify-center px-0"
+        }`}
+      >
         <Image
           src="/logo.avif"
           alt="GeniusPro Logo"
@@ -240,71 +276,81 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className={`flex-1 overflow-y-auto py-4 transition-all duration-300 ${
-        isExpanded ? 'px-2' : 'px-0'
-      }`}>
+      <nav
+        className={`flex-1 overflow-y-auto py-4 transition-all duration-300 ${
+          isExpanded ? "px-2" : "px-0"
+        }`}
+      >
         <ul className="space-y-1">
           {navigation.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
+            const cls = `flex items-center py-2.5 rounded-lg transition-all duration-300 ${
+              isExpanded ? "px-3 gap-3" : "px-0 justify-center gap-0"
+            } ${
+              active
+                ? "bg-blue-500/15 text-blue-400 border-l-2 border-blue-400"
+                : "text-gray-500 dark:text-gray-400 hover:bg-blue-500/20 hover:text-gray-900 dark:hover:text-white"
+            }`;
+            const label = (
+              <span
+                className={`text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden ${
+                  isExpanded ? "opacity-100 w-auto" : "w-0 opacity-0"
+                }`}
+              >
+                {item.name}
+              </span>
+            );
             return (
               <li key={item.name}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center py-2.5 rounded-lg transition-all duration-300 ${
-                    isExpanded ? 'px-3 gap-3' : 'px-0 justify-center gap-0'
-                  } ${
-                    active
-                      ? "bg-blue-500/15 text-blue-400 border-l-2 border-blue-400"
-                      : "text-gray-400 hover:bg-blue-500/20 hover:text-white"
-                  }`}
-                  title={!isExpanded ? item.name : ''}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className={`text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden ${
-                    isExpanded ? 'opacity-100 w-auto' : 'w-0 opacity-0'
-                  }`}>
-                    {item.name}
-                  </span>
-                </Link>
+                {"external" in item && item.external ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cls}
+                    title={!isExpanded ? item.name : ""}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {label}
+                  </a>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={cls}
+                    title={!isExpanded ? item.name : ""}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {label}
+                  </Link>
+                )}
               </li>
             );
           })}
         </ul>
       </nav>
 
-      {/* Theme Toggle & Logout */}
-      <div className={`border-t border-gray-700 space-y-1 transition-all duration-300 flex-shrink-0 mt-auto ${
-        isExpanded ? 'p-2' : 'py-2 px-0'
-      }`}>
-        <button
-          onClick={toggleTheme}
-          className={`flex items-center py-2.5 rounded-lg w-full text-gray-400 hover:bg-blue-500/20 hover:text-white transition-all duration-300 ${
-            isExpanded ? 'px-3 gap-3' : 'px-0 justify-center gap-0'
-          }`}
-          title={!isExpanded ? (theme === "dark" ? "Light Mode" : "Dark Mode") : ''}
-        >
-          {theme === "dark" ? <Sun className="w-5 h-5 flex-shrink-0" /> : <Moon className="w-5 h-5 flex-shrink-0" />}
-          <span className={`text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden ${
-            isExpanded ? 'opacity-100 w-auto' : 'w-0 opacity-0'
-          }`}>
-            {theme === "dark" ? "Light Mode" : "Dark Mode"}
-          </span>
-        </button>
-
+      {/* Logout */}
+      <div
+        className={`border-t border-gray-200 dark:border-gray-700 transition-all duration-300 flex-shrink-0 mt-auto py-4 ${
+          isExpanded ? "px-2" : "px-0"
+        }`}
+      >
         <button
           onClick={handleLogout}
-          className={`flex items-center justify-center py-2.5 rounded-lg w-full text-gray-400 hover:bg-blue-500/20 hover:text-white transition-all duration-300 min-h-[44px] ${
-            isExpanded ? 'px-3 gap-3' : 'px-0 gap-0'
+          className={`flex items-center py-2.5 rounded-lg w-full text-gray-500 dark:text-gray-400 hover:bg-blue-500/20 hover:text-gray-900 dark:hover:text-white transition-all duration-300 ${
+            isExpanded ? "px-3 gap-3" : "px-0 justify-center gap-0"
           }`}
-          title={!isExpanded ? "Logout" : ''}
+          title={!isExpanded ? "Logout" : ""}
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
-          {isExpanded && (
-            <span className="text-sm font-medium transition-all duration-300 whitespace-nowrap">
-              Logout
-            </span>
-          )}
+          <span
+            className={`text-sm font-medium transition-all duration-300 whitespace-nowrap overflow-hidden ${
+              isExpanded ? "opacity-100 w-auto" : "w-0 opacity-0"
+            }`}
+          >
+            Logout
+          </span>
         </button>
       </div>
     </aside>
