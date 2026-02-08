@@ -60,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
           style={{ marginLeft: "var(--sidebar-width, 0px)" }}
         >
           {!isMobile && <Header />}
-          <main className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 pt-14 md:pt-10">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-900 pt-14 md:pt-10">
             {children}
           </main>
         </div>

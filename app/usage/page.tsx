@@ -208,8 +208,8 @@ export default function UsagePage() {
   }
 
   return (
-    <div className="min-h-full p-4 sm:p-6 md:p-10 overflow-x-hidden">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-full p-4 sm:p-6 md:p-10 w-full max-w-full overflow-x-hidden">
+      <div className="max-w-6xl mx-auto w-full">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
@@ -277,24 +277,24 @@ export default function UsagePage() {
         {keys.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by API Key</h2>
-            <div className="-mx-4 sm:mx-0 overflow-x-auto">
-              <table className="w-full min-w-[480px]">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px]">
                 <thead>
                   <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                    <th className="pb-3 pl-4 sm:pl-0 font-medium">Key</th>
+                    <th className="pb-3 font-medium">Key</th>
                     <th className="pb-3 font-medium">Requests</th>
                     <th className="pb-3 font-medium">Input</th>
                     <th className="pb-3 font-medium">Output</th>
                     <th className="pb-3 font-medium">Total</th>
-                    <th className="pb-3 pr-4 sm:pr-0 font-medium">Cost</th>
+                    <th className="pb-3 font-medium">Cost</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {keys.map((k, i) => (
                     <tr key={k.keyId} className={i < keys.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
-                      <td className="py-3 sm:py-4 pl-4 sm:pl-0">
+                      <td className="py-3 sm:py-4 pr-3">
                         <div>
-                          <div className="text-gray-900 dark:text-white font-medium">{k.keyName}</div>
+                          <div className="text-gray-900 dark:text-white font-medium truncate max-w-[120px] sm:max-w-none">{k.keyName}</div>
                           <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded">{k.keyPrefix}</code>
                         </div>
                       </td>
@@ -302,7 +302,7 @@ export default function UsagePage() {
                       <td className="py-3 sm:py-4 text-blue-400">{formatNumber(k.promptTokens)}</td>
                       <td className="py-3 sm:py-4 text-green-400">{formatNumber(k.completionTokens)}</td>
                       <td className="py-3 sm:py-4 text-gray-900 dark:text-white font-medium">{formatNumber(k.totalTokens)}</td>
-                      <td className="py-3 sm:py-4 pr-4 sm:pr-0 text-purple-400 font-medium">{formatCost(k.cost)}</td>
+                      <td className="py-3 sm:py-4 text-purple-400 font-medium">{formatCost(k.cost)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -315,29 +315,29 @@ export default function UsagePage() {
         {models.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by Model</h2>
-            <div className="-mx-4 sm:mx-0 overflow-x-auto">
-              <table className="w-full min-w-[560px]">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[480px]">
                 <thead>
                   <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                    <th className="pb-3 pl-4 sm:pl-0 font-medium">Model</th>
+                    <th className="pb-3 font-medium">Model</th>
                     <th className="pb-3 font-medium">Requests</th>
                     <th className="pb-3 font-medium">Input</th>
                     <th className="pb-3 font-medium">Output</th>
                     <th className="pb-3 font-medium">Total</th>
                     <th className="pb-3 font-medium">Cost</th>
-                    <th className="pb-3 pr-4 sm:pr-0 font-medium">Avg Latency</th>
+                    <th className="pb-3 font-medium">Latency</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {models.map((m, i) => (
                     <tr key={m.model} className={i < models.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
-                      <td className="py-3 sm:py-4 pl-4 sm:pl-0"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{getModelLabel(m.model)}</code></td>
+                      <td className="py-3 sm:py-4 pr-3"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{getModelLabel(m.model)}</code></td>
                       <td className="py-3 sm:py-4 text-gray-600 dark:text-gray-300">{formatNumber(m.requests)}</td>
                       <td className="py-3 sm:py-4 text-blue-400">{formatNumber(m.promptTokens)}</td>
                       <td className="py-3 sm:py-4 text-green-400">{formatNumber(m.completionTokens)}</td>
                       <td className="py-3 sm:py-4 text-gray-900 dark:text-white font-medium">{formatNumber(m.totalTokens)}</td>
                       <td className="py-3 sm:py-4 text-purple-400 font-medium">{formatCost(m.cost)}</td>
-                      <td className="py-3 sm:py-4 pr-4 sm:pr-0 text-gray-500 dark:text-gray-400">{formatNumber(m.avgLatencyMs)}ms</td>
+                      <td className="py-3 sm:py-4 text-gray-500 dark:text-gray-400">{formatNumber(m.avgLatencyMs)}ms</td>
                     </tr>
                   ))}
                 </tbody>
@@ -348,10 +348,10 @@ export default function UsagePage() {
 
         {/* Empty State */}
         {stats.totalRequests === 0 && (
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
-            <BarChart3 className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No usage yet</h3>
-            <p className="text-gray-400 dark:text-gray-500">Make API requests and your usage will appear here.</p>
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-8 sm:p-12 text-center">
+            <BarChart3 className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">No usage yet</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-500">Make API requests and your usage will appear here.</p>
           </div>
         )}
       </div>
