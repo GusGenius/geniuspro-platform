@@ -4,11 +4,17 @@
  */
 
 export const PRICING = {
-  "geniuspro-superintelligence-v1": {
+  "gp-agi-1.2": {
     input: 4.0, // $4 per 1M input tokens
     output: 20.0, // $20 per 1M output tokens
     label: "Superintelligence",
-    description: "Smart router that picks the best model for each task",
+    description: "Superintelligence (regular surface)",
+  },
+  "gp-coding-agi-1.2": {
+    input: 4.0, // $4 per 1M input tokens
+    output: 20.0, // $20 per 1M output tokens
+    label: "Coding Superintelligence",
+    description: "Coding Superintelligence (Cursor surface)",
   },
   "geniuspro-coder-v1": {
     input: 1.0, // $1 per 1M input tokens
@@ -20,6 +26,13 @@ export const PRICING = {
     perMinute: 0.05, // $0.05 per minute
     label: "Voice",
     description: "Voice synthesis and recognition",
+  },
+  // Legacy model id kept for historical usage logs / old clients.
+  "geniuspro-superintelligence-v1": {
+    input: 4.0,
+    output: 20.0,
+    label: "Legacy Superintelligence",
+    description: "Deprecated model id — use gp-agi-1.2",
   },
 } as const;
 

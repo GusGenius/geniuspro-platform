@@ -6,7 +6,10 @@ import {
   API_BASE_URL_SUPERINTELLIGENCE,
   API_BASE_URL_CODING_SUPERINTELLIGENCE,
   API_BASE_URL_GATEWAY,
+  MODEL_CODING_SUPERINTELLIGENCE,
   MODEL_SUPERINTELLIGENCE,
+  MODEL_CODER,
+  MODEL_VOICE,
 } from "@/components/docs/docs-constants";
 
 type Props = {
@@ -65,15 +68,15 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
             <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{API_BASE_URL_CODING_SUPERINTELLIGENCE}</code>
           </div>
 
-          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden md:col-span-2">
+          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">Model (router)</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">GeniusPro Superintelligence Model</div>
               <button
-                onClick={() => onCopyText(MODEL_SUPERINTELLIGENCE, "model-name")}
+                onClick={() => onCopyText(MODEL_SUPERINTELLIGENCE, "model-si")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
-                title="Copy model name"
+                title="Copy model id"
               >
-                {copiedText === "model-name" ? (
+                {copiedText === "model-si" ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
                   <Copy className="w-4 h-4" />
@@ -81,6 +84,24 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
               </button>
             </div>
             <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_SUPERINTELLIGENCE}</code>
+          </div>
+
+          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400">Coding Superintelligence Model</div>
+              <button
+                onClick={() => onCopyText(MODEL_CODING_SUPERINTELLIGENCE, "model-coding")}
+                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
+                title="Copy model id"
+              >
+                {copiedText === "model-coding" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_CODING_SUPERINTELLIGENCE}</code>
           </div>
 
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden md:col-span-2">
@@ -100,7 +121,7 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
             </div>
             <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{API_BASE_URL_GATEWAY}</code>
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              Use this for <span className="font-mono">geniuspro-coder-v1</span> and <span className="font-mono">geniuspro-voice</span>.
+              Use this for <span className="font-mono">{MODEL_CODER}</span> and <span className="font-mono">{MODEL_VOICE}</span>.
             </p>
           </div>
         </div>

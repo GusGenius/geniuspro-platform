@@ -42,8 +42,10 @@ type CreatableApiKeyProfile = Exclude<ApiKeyProfile, "universal">;
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
   "geniuspro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
-  "geniuspro-superintelligence-v1": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
+  "gp-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
+  "gp-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
   "geniuspro-voice": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
+  "geniuspro-superintelligence-v1": { label: "Legacy Superintelligence", color: "bg-gray-500/20 text-gray-400" },
 };
 
 function getModelBadge(model: string): { label: string; color: string } {
