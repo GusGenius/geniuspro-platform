@@ -5,9 +5,7 @@ import { CreditCard, Loader2, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { calculateCost, formatCost } from "@/lib/pricing";
-import { loadStripe } from "@stripe/stripe-js";
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+// Stripe checkout is handled via server-side session URL redirect
 
 function getMonthStart(): string {
   const now = new Date();
@@ -77,20 +75,12 @@ export default function BillingPage() {
   const handleAddCredits = async () => {
     setProcessingStripe(true);
     try {
-      const stripe = await stripePromise;
-      if (!stripe) {
-        alert("Stripe is not configured. Please contact support.");
-        setProcessingStripe(false);
-        return;
-      }
-
-      // Create checkout session for credit pack
       const response = await fetch("/api/stripe/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "credits",
-          amount: 100, // $100 credit pack
+          amount: 100,
           userId: user?.id,
         }),
       });
@@ -99,15 +89,12 @@ export default function BillingPage() {
         throw new Error("Failed to create checkout session");
       }
 
-      const { sessionId } = await response.json();
-      if (!stripe) {
-        throw new Error("Stripe not initialized");
+      const { url } = await response.json();
+      if (!url) {
+        throw new Error("No checkout URL returned");
       }
-      const { error } = await stripe.redirectToCheckout({ sessionId });
 
-      if (error) {
-        throw error;
-      }
+      window.location.href = url;
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to start checkout. Please try again.";
       console.error("Stripe checkout error:", err);

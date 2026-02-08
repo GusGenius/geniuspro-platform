@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
             amount: amount.toString(),
           },
         });
-        return NextResponse.json({ sessionId: session.id });
+        return NextResponse.json({ url: session.url });
       }
     } else if (plan === "pro") {
       priceId = process.env.STRIPE_PRO_PRICE_ID || "";
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ sessionId: session.id });
+    return NextResponse.json({ url: session.url });
   } catch (error: any) {
     console.error("Stripe checkout error:", error);
     return NextResponse.json(
