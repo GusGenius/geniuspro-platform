@@ -10,11 +10,30 @@ interface ApiKeyRow {
   id: string;
   name: string;
   key_prefix: string;
+  profile: string;
   is_active: boolean;
   rate_limit_rpm: number | null;
   last_used_at: string | null;
   created_at: string;
 }
+
+const PROFILE_DISPLAY: Record<string, { label: string; color: string; hint: string }> = {
+  universal: {
+    label: "Universal",
+    color: "bg-gray-500/20 text-gray-400",
+    hint: "Works everywhere (gateway + superintelligence).",
+  },
+  openai_compat: {
+    label: "OpenAI-compatible",
+    color: "bg-blue-500/20 text-blue-400",
+    hint: "Use with https://api.geniuspro.io/v1 endpoints.",
+  },
+  coding_superintelligence: {
+    label: "Coding Superintelligence",
+    color: "bg-purple-500/20 text-purple-400",
+    hint: "Use with /super-intelligence/v1/coding/* endpoints (Cursor).",
+  },
+};
 
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
@@ -33,6 +52,7 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
+  const [newKeyProfile, setNewKeyProfile] = useState<keyof typeof PROFILE_DISPLAY>("coding_superintelligence");
   const [newKeySecret, setNewKeySecret] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -44,7 +64,7 @@ export default function ApiKeysPage() {
     try {
       const { data, error: fetchError } = await supabase
         .from("api_keys")
-        .select("id, name, key_prefix, is_active, rate_limit_rpm, last_used_at, created_at")
+        .select("id, name, key_prefix, profile, is_active, rate_limit_rpm, last_used_at, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -102,6 +122,7 @@ export default function ApiKeysPage() {
       const { error: insertError } = await supabase.from("api_keys").insert({
         user_id: user.id,
         name: newKeyName.trim(),
+        profile: newKeyProfile,
         key_hash: hash,
         key_prefix: prefix,
         is_active: true,
@@ -154,6 +175,7 @@ export default function ApiKeysPage() {
   const handleCloseModal = () => {
     setShowCreateModal(false);
     setNewKeyName("");
+    setNewKeyProfile("coding_superintelligence");
     setNewKeySecret(null);
     setError(null);
   };
@@ -244,6 +266,14 @@ export default function ApiKeysPage() {
                         }`}
                       >
                         {key.is_active ? "Active" : "Inactive"}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                          PROFILE_DISPLAY[key.profile]?.color || "bg-gray-500/20 text-gray-400"
+                        }`}
+                        title={PROFILE_DISPLAY[key.profile]?.hint || "Profile"}
+                      >
+                        {PROFILE_DISPLAY[key.profile]?.label || key.profile}
                       </span>
                     </div>
 
@@ -357,6 +387,23 @@ export default function ApiKeysPage() {
                     className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
+
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2 mt-4">
+                    Profile
+                  </label>
+                  <select
+                    value={newKeyProfile}
+                    onChange={(e) => setNewKeyProfile(e.target.value as keyof typeof PROFILE_DISPLAY)}
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="coding_superintelligence">Coding Superintelligence (Cursor)</option>
+                    <option value="openai_compat">OpenAI-compatible (Gateway /v1)</option>
+                    <option value="universal">Universal</option>
+                  </select>
+                  <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+                    {PROFILE_DISPLAY[newKeyProfile].hint}
+                  </p>
+
                   {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
                 </div>
               )}
