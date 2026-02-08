@@ -1,10 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { BarChart3, Calendar, Loader2 } from "lucide-react";
+import { BarChart3, Calendar, ChevronDown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import { calculateCost, formatCost } from "@/lib/pricing";
+import { calculateCost, formatCost, PRICING } from "@/lib/pricing";
+
+/** Map raw model IDs to branded display names */
+function getModelLabel(model: string): string {
+  const pricing = PRICING[model as keyof typeof PRICING];
+  if (pricing) return pricing.label;
+  return "Superintelligence";
+}
 
 interface UsageStats {
   totalTokens: number;
@@ -214,15 +221,18 @@ export default function UsagePage() {
         {/* Period Filter */}
         <div className="flex items-center gap-2 mb-8">
           <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value as Period)}
-            className="px-3 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="week">Last 7 days</option>
-            <option value="month">This month</option>
-            <option value="quarter">Last 3 months</option>
-          </select>
+          <div className="relative">
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value as Period)}
+              className="appearance-none pl-3 pr-9 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            >
+              <option value="week">Last 7 days</option>
+              <option value="month">This month</option>
+              <option value="quarter">Last 3 months</option>
+            </select>
+            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -323,7 +333,7 @@ export default function UsagePage() {
                 <tbody className="text-sm">
                   {models.map((m, i) => (
                     <tr key={m.model} className={i < models.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
-                      <td className="py-4"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">{m.model}</code></td>
+                      <td className="py-4"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">{getModelLabel(m.model)}</code></td>
                       <td className="py-4 text-gray-600 dark:text-gray-300">{formatNumber(m.requests)}</td>
                       <td className="py-4 text-blue-400">{formatNumber(m.promptTokens)}</td>
                       <td className="py-4 text-green-400">{formatNumber(m.completionTokens)}</td>

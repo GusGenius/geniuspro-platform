@@ -77,7 +77,7 @@ console.log(response.choices[0].message.content);`;
         {/* Quick Start */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Zap className="w-5 h-5 text-yellow-400" />
+            <Zap className="w-5 h-5 text-blue-400" />
             Quick Start
           </h2>
           
@@ -161,7 +161,7 @@ console.log(response.choices[0].message.content);`;
         {/* Code Examples */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-purple-400" />
+            <Terminal className="w-5 h-5 text-blue-400" />
             Code Examples
           </h2>
           
@@ -295,7 +295,7 @@ console.log(response.choices[0].message.content);`;
         {/* Pricing */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-green-400" />
+            <DollarSign className="w-5 h-5 text-blue-400" />
             Pricing
           </h2>
           
@@ -342,7 +342,7 @@ console.log(response.choices[0].message.content);`;
         {/* Rate Limits */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <Gauge className="w-5 h-5 text-orange-400" />
+            <Gauge className="w-5 h-5 text-blue-400" />
             Rate Limits
           </h2>
           
@@ -360,7 +360,7 @@ console.log(response.choices[0].message.content);`;
         {/* API Reference */}
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-orange-400" />
+            <BookOpen className="w-5 h-5 text-blue-400" />
             API Reference
           </h2>
           
