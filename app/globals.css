@@ -76,9 +76,16 @@ h1, h2, h3, h4, h5, h6 {
   background: hsl(var(--foreground) / 0.3);
 }
 
-/* Sidebar width variable */
+/* Sidebar width variable — default desktop */
 :root {
   --sidebar-width: 60px;
+}
+
+/* On mobile, sidebar collapses to a top bar so margin must be 0 */
+@media (max-width: 767px) {
+  :root {
+    --sidebar-width: 0px !important;
+  }
 }
 
 /* Animation utilities */

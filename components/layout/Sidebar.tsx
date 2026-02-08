@@ -255,7 +255,7 @@ export default function Sidebar() {
     <aside
       className={`fixed left-0 top-0 z-50 h-screen bg-white dark:bg-gray-900 transition-all duration-300 ${
         isExpanded ? "w-[200px]" : "w-[60px]"
-      } flex flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden`}
+      } flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden hidden md:flex`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >

@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "./Sidebar";
 import SidebarProvider from "./SidebarContext";
@@ -20,22 +20,12 @@ export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useAuth();
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!loading && !user && protectedRoutes.includes(pathname || "")) {
       router.push("/login");
     }
   }, [loading, user, pathname, router]);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
 
   // Bare pages (no sidebar/header)
   if (bareRoutes.includes(pathname || "")) {
@@ -59,7 +49,9 @@ export default function Layout({ children }: LayoutProps) {
           className="flex-1 flex flex-col transition-all duration-300"
           style={{ marginLeft: "var(--sidebar-width, 0px)" }}
         >
-          {!isMobile && <Header />}
+          <div className="hidden md:block">
+            <Header />
+          </div>
           <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-50 dark:bg-gray-900 pt-14 md:pt-10">
             {children}
           </main>
