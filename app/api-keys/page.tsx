@@ -188,7 +188,7 @@ export default function ApiKeysPage() {
     <div className="min-h-full p-6 md:p-10">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">API Keys</h1>
             <p className="text-gray-500 dark:text-gray-400 mt-1">
@@ -197,7 +197,7 @@ export default function ApiKeysPage() {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             Create Key
@@ -230,14 +230,14 @@ export default function ApiKeysPage() {
             keys.map((key) => (
               <div
                 key={key.id}
-                className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors"
+                className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-medium text-gray-900 dark:text-white">{key.name}</h3>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
+                      <h3 className="font-medium text-gray-900 dark:text-white truncate">{key.name}</h3>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
                           key.is_active
                             ? "bg-green-500/20 text-green-400"
                             : "bg-gray-500/20 text-gray-400"
@@ -248,12 +248,12 @@ export default function ApiKeysPage() {
                     </div>
 
                     <div className="flex items-center gap-2 mb-3">
-                      <code className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded font-mono">
+                      <code className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded font-mono truncate">
                         {key.key_prefix}
                       </code>
                       <button
                         onClick={() => handleCopy(key.key_prefix, key.id)}
-                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex-shrink-0"
                         title="Copy prefix"
                       >
                         {copiedId === key.id ? (
@@ -281,7 +281,7 @@ export default function ApiKeysPage() {
                       </div>
                     )}
 
-                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-400 dark:text-gray-500">
+                    <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-1 text-xs sm:text-sm text-gray-400 dark:text-gray-500">
                       <span>Created {formatDate(key.created_at)}</span>
                       <span>Last used {timeAgo(key.last_used_at)}</span>
                       {key.rate_limit_rpm && <span>{key.rate_limit_rpm} RPM</span>}
@@ -290,7 +290,7 @@ export default function ApiKeysPage() {
 
                   <button
                     onClick={() => handleDeleteKey(key.id)}
-                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
                     title="Delete key"
                   >
                     <Trash2 className="w-4 h-4" />

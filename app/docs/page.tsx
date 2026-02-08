@@ -250,40 +250,59 @@ console.log(response.choices[0].message.content);`;
         <section className="mb-12">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Available Models</h2>
           
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+          {/* Card layout for mobile, table for desktop */}
+          <div className="space-y-3 sm:hidden">
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-superintelligence-v1</code>
+              <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">200K tokens</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Smart router that automatically selects the best model for each task. Optimized for complex reasoning, analysis, and general-purpose tasks.</p>
+            </div>
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-coder-v1</code>
+              <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">32K tokens</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Optimized for coding tasks. Based on Qwen3-Coder. Best for code generation, debugging, and technical documentation.</p>
+            </div>
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-voice</code>
+              <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">N/A</div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Voice synthesis and recognition. Optimized for audio processing, transcription, and text-to-speech tasks.</p>
+            </div>
+          </div>
+
+          <div className="hidden sm:block bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50">
-                  <th className="px-6 py-4 font-medium">Model</th>
-                  <th className="px-6 py-4 font-medium">Context</th>
-                  <th className="px-6 py-4 font-medium">Description</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium">Model</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium">Context</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium">Description</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-superintelligence-v1</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-superintelligence-v1</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">200K tokens</td>
-                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">200K tokens</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">
                     Smart router that automatically selects the best model (including Opus 4.6, GPT-4o, etc.) for each task. Optimized for complex reasoning, analysis, and general-purpose tasks.
                   </td>
                 </tr>
                 <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-coder-v1</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-coder-v1</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">32K tokens</td>
-                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">32K tokens</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">
                     Optimized for coding tasks. Based on Qwen3-Coder. Best for code generation, debugging, and technical documentation.
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-voice</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-voice</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">N/A</td>
-                  <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">N/A</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">
                     Voice synthesis and recognition. Optimized for audio processing, transcription, and text-to-speech tasks.
                   </td>
                 </tr>
@@ -299,40 +318,64 @@ console.log(response.choices[0].message.content);`;
             Pricing
           </h2>
           
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
-            <table className="w-full">
+          {/* Card layout for mobile, table for desktop */}
+          <div className="space-y-3 sm:hidden">
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-superintelligence-v1</code>
+              <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
+                <div><span className="text-gray-500 dark:text-gray-400">Input:</span> <span className="text-gray-600 dark:text-gray-300">$4.00/1M</span></div>
+                <div><span className="text-gray-500 dark:text-gray-400">Output:</span> <span className="text-gray-600 dark:text-gray-300">$20.00/1M</span></div>
+              </div>
+            </div>
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-coder-v1</code>
+              <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
+                <div><span className="text-gray-500 dark:text-gray-400">Input:</span> <span className="text-gray-600 dark:text-gray-300">$1.00/1M</span></div>
+                <div><span className="text-gray-500 dark:text-gray-400">Output:</span> <span className="text-gray-600 dark:text-gray-300">$8.00/1M</span></div>
+              </div>
+            </div>
+            <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+              <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-voice</code>
+              <div className="mt-3 text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Per minute:</span> <span className="text-gray-600 dark:text-gray-300">$0.05</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden sm:block bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl overflow-x-auto">
+            <table className="w-full min-w-[500px]">
               <thead>
                 <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900/50">
-                  <th className="px-6 py-4 font-medium">Model</th>
-                  <th className="px-6 py-4 font-medium">Input (per 1M tokens)</th>
-                  <th className="px-6 py-4 font-medium">Output (per 1M tokens)</th>
-                  <th className="px-6 py-4 font-medium">Other</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium">Model</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium whitespace-nowrap">Input (per 1M)</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium whitespace-nowrap">Output (per 1M)</th>
+                  <th className="px-4 lg:px-6 py-4 font-medium">Other</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-superintelligence-v1</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-superintelligence-v1</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">$4.00</td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">$20.00</td>
-                  <td className="px-6 py-4 text-gray-400">—</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">$4.00</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">$20.00</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-400">—</td>
                 </tr>
                 <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-coder-v1</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-coder-v1</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">$1.00</td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">$8.00</td>
-                  <td className="px-6 py-4 text-gray-400">—</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">$1.00</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">$8.00</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-400">—</td>
                 </tr>
                 <tr className="hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-                  <td className="px-6 py-4">
-                    <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">geniuspro-voice</code>
+                  <td className="px-4 lg:px-6 py-4">
+                    <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">geniuspro-voice</code>
                   </td>
-                  <td className="px-6 py-4 text-gray-400">—</td>
-                  <td className="px-6 py-4 text-gray-400">—</td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-gray-300">$0.05 / minute</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-400">—</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-400">—</td>
+                  <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">$0.05 / minute</td>
                 </tr>
               </tbody>
             </table>

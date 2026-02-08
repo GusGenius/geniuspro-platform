@@ -247,18 +247,18 @@ export default function UsagePage() {
 
         {/* Daily Chart */}
         {daily.length > 0 && (
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Daily Token Usage</h2>
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Daily Token Usage</h2>
             <div className="space-y-3">
               {daily.map((day) => (
-                <div key={day.date} className="flex items-center gap-4">
-                  <div className="w-16 text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">{formatDate(day.date)}</div>
+                <div key={day.date} className="flex items-center gap-2 sm:gap-4">
+                  <div className="w-12 sm:w-16 text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">{formatDate(day.date)}</div>
                   <div className="flex-1 h-7 bg-gray-200 dark:bg-gray-900 rounded-lg overflow-hidden flex">
                     <div className="h-full bg-blue-500/70 transition-all" style={{ width: `${(day.prompt / maxDaily) * 100}%` }} title={`Input: ${formatNumber(day.prompt)}`} />
                     <div className="h-full bg-green-500/70 transition-all" style={{ width: `${(day.completion / maxDaily) * 100}%` }} title={`Output: ${formatNumber(day.completion)}`} />
                   </div>
-                  <div className="w-20 text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0">{formatNumber(day.prompt + day.completion)}</div>
-                  <div className="w-20 text-sm text-purple-400 text-right flex-shrink-0 font-medium">{formatCost(day.cost)}</div>
+                  <div className="w-14 sm:w-20 text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-right flex-shrink-0">{formatNumber(day.prompt + day.completion)}</div>
+                  <div className="hidden sm:block w-20 text-sm text-purple-400 text-right flex-shrink-0 font-medium">{formatCost(day.cost)}</div>
                 </div>
               ))}
             </div>
@@ -277,34 +277,34 @@ export default function UsagePage() {
 
         {/* Usage by API Key */}
         {keys.length > 0 && (
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-8">
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by API Key</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="-mx-4 sm:mx-0 overflow-x-auto">
+              <table className="w-full min-w-[480px]">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                    <th className="pb-3 font-medium">Key</th>
+                  <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                    <th className="pb-3 pl-4 sm:pl-0 font-medium">Key</th>
                     <th className="pb-3 font-medium">Requests</th>
                     <th className="pb-3 font-medium">Input</th>
                     <th className="pb-3 font-medium">Output</th>
                     <th className="pb-3 font-medium">Total</th>
-                    <th className="pb-3 font-medium">Cost</th>
+                    <th className="pb-3 pr-4 sm:pr-0 font-medium">Cost</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {keys.map((k, i) => (
                     <tr key={k.keyId} className={i < keys.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
-                      <td className="py-4">
+                      <td className="py-3 sm:py-4 pl-4 sm:pl-0">
                         <div>
                           <div className="text-gray-900 dark:text-white font-medium">{k.keyName}</div>
                           <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded">{k.keyPrefix}</code>
                         </div>
                       </td>
-                      <td className="py-4 text-gray-600 dark:text-gray-300">{formatNumber(k.requests)}</td>
-                      <td className="py-4 text-blue-400">{formatNumber(k.promptTokens)}</td>
-                      <td className="py-4 text-green-400">{formatNumber(k.completionTokens)}</td>
-                      <td className="py-4 text-gray-900 dark:text-white font-medium">{formatNumber(k.totalTokens)}</td>
-                      <td className="py-4 text-purple-400 font-medium">{formatCost(k.cost)}</td>
+                      <td className="py-3 sm:py-4 text-gray-600 dark:text-gray-300">{formatNumber(k.requests)}</td>
+                      <td className="py-3 sm:py-4 text-blue-400">{formatNumber(k.promptTokens)}</td>
+                      <td className="py-3 sm:py-4 text-green-400">{formatNumber(k.completionTokens)}</td>
+                      <td className="py-3 sm:py-4 text-gray-900 dark:text-white font-medium">{formatNumber(k.totalTokens)}</td>
+                      <td className="py-3 sm:py-4 pr-4 sm:pr-0 text-purple-400 font-medium">{formatCost(k.cost)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -315,31 +315,31 @@ export default function UsagePage() {
 
         {/* Model Breakdown */}
         {models.length > 0 && (
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by Model</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="-mx-4 sm:mx-0 overflow-x-auto">
+              <table className="w-full min-w-[560px]">
                 <thead>
-                  <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                    <th className="pb-3 font-medium">Model</th>
+                  <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                    <th className="pb-3 pl-4 sm:pl-0 font-medium">Model</th>
                     <th className="pb-3 font-medium">Requests</th>
                     <th className="pb-3 font-medium">Input</th>
                     <th className="pb-3 font-medium">Output</th>
                     <th className="pb-3 font-medium">Total</th>
                     <th className="pb-3 font-medium">Cost</th>
-                    <th className="pb-3 font-medium">Avg Latency</th>
+                    <th className="pb-3 pr-4 sm:pr-0 font-medium">Avg Latency</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
                   {models.map((m, i) => (
                     <tr key={m.model} className={i < models.length - 1 ? "border-b border-gray-200/50 dark:border-gray-700/50" : ""}>
-                      <td className="py-4"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs">{getModelLabel(m.model)}</code></td>
-                      <td className="py-4 text-gray-600 dark:text-gray-300">{formatNumber(m.requests)}</td>
-                      <td className="py-4 text-blue-400">{formatNumber(m.promptTokens)}</td>
-                      <td className="py-4 text-green-400">{formatNumber(m.completionTokens)}</td>
-                      <td className="py-4 text-gray-900 dark:text-white font-medium">{formatNumber(m.totalTokens)}</td>
-                      <td className="py-4 text-purple-400 font-medium">{formatCost(m.cost)}</td>
-                      <td className="py-4 text-gray-500 dark:text-gray-400">{formatNumber(m.avgLatencyMs)}ms</td>
+                      <td className="py-3 sm:py-4 pl-4 sm:pl-0"><code className="text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{getModelLabel(m.model)}</code></td>
+                      <td className="py-3 sm:py-4 text-gray-600 dark:text-gray-300">{formatNumber(m.requests)}</td>
+                      <td className="py-3 sm:py-4 text-blue-400">{formatNumber(m.promptTokens)}</td>
+                      <td className="py-3 sm:py-4 text-green-400">{formatNumber(m.completionTokens)}</td>
+                      <td className="py-3 sm:py-4 text-gray-900 dark:text-white font-medium">{formatNumber(m.totalTokens)}</td>
+                      <td className="py-3 sm:py-4 text-purple-400 font-medium">{formatCost(m.cost)}</td>
+                      <td className="py-3 sm:py-4 pr-4 sm:pr-0 text-gray-500 dark:text-gray-400">{formatNumber(m.avgLatencyMs)}ms</td>
                     </tr>
                   ))}
                 </tbody>

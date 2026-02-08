@@ -106,11 +106,11 @@ export default function Sidebar() {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true },
     { name: "API Keys", href: "/api-keys", icon: Key },
+    { name: "Docs", href: "/docs", icon: BookOpen },
     { name: "Usage", href: "/usage", icon: BarChart3 },
     { name: "Billing", href: "/billing", icon: CreditCard },
-    { name: "Docs", href: "/docs", icon: BookOpen },
-    { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true },
   ];
 
   const isActive = (href: string) => {
