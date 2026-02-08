@@ -33,8 +33,10 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">GeniusPro Superintelligence Base URL</div>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Superintelligence Base URL
+              </div>
               <button
                 onClick={() => onCopyText(API_BASE_URL_SUPERINTELLIGENCE, "base-url-si")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -51,8 +53,10 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
           </div>
 
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">GeniusPro Coding Superintelligence Base URL</div>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Coding Superintelligence Base URL
+              </div>
               <button
                 onClick={() => onCopyText(API_BASE_URL_CODING_SUPERINTELLIGENCE, "base-url-coding")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -69,8 +73,10 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
           </div>
 
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">GeniusPro Superintelligence Model</div>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Superintelligence Model
+              </div>
               <button
                 onClick={() => onCopyText(MODEL_SUPERINTELLIGENCE, "model-si")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -87,8 +93,10 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
           </div>
 
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">Coding Superintelligence Model</div>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Coding Superintelligence Model
+              </div>
               <button
                 onClick={() => onCopyText(MODEL_CODING_SUPERINTELLIGENCE, "model-coding")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -105,8 +113,10 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
           </div>
 
           <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden md:col-span-2">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-sm text-gray-500 dark:text-gray-400">Gateway Base URL (coder + voice)</div>
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Gateway Base URL (Coder + Voice)
+              </div>
               <button
                 onClick={() => onCopyText(API_BASE_URL_GATEWAY, "base-url-gateway")}
                 className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -123,6 +133,46 @@ export function QuickStartSection({ icon: Icon, copiedText, onCopyText }: Props)
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
               Use this for <span className="font-mono">{MODEL_CODER}</span> and <span className="font-mono">{MODEL_VOICE}</span>.
             </p>
+          </div>
+
+          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Coder Model
+              </div>
+              <button
+                onClick={() => onCopyText(MODEL_CODER, "model-coder")}
+                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
+                title="Copy model id"
+              >
+                {copiedText === "model-coder" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_CODER}</code>
+          </div>
+
+          <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 leading-snug flex-1 min-w-0">
+                GeniusPro Voice Model
+              </div>
+              <button
+                onClick={() => onCopyText(MODEL_VOICE, "model-voice")}
+                className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
+                title="Copy model id"
+              >
+                {copiedText === "model-voice" ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{MODEL_VOICE}</code>
           </div>
         </div>
       </div>

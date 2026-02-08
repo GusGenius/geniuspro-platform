@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Key, Plus, Copy, Trash2, Check, Loader2, AlertTriangle } from "lucide-react";
+
+import { ProfileSelect, type SelectOption } from "@/components/ui/profile-select";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { generateApiKey, hashApiKey, getKeyPrefix } from "@/lib/api-keys/generate";
@@ -17,18 +19,23 @@ interface ApiKeyRow {
   created_at: string;
 }
 
-type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "universal";
+type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "universal";
 
 const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
     label: "GeniusPro Superintelligence",
     color: "bg-blue-500/20 text-blue-400",
-    hint: "Use with https://api.geniuspro.io/superintelligence/v1 (and /v1 for coder + voice).",
+    hint: "Use with https://api.geniuspro.io/superintelligence/v1.",
   },
   coding_superintelligence: {
     label: "GeniusPro Coding Superintelligence",
     color: "bg-purple-500/20 text-purple-400",
     hint: "Use with https://api.geniuspro.io/coding-superintelligence/v1 (Cursor).",
+  },
+  gateway: {
+    label: "GeniusPro Gateway (Coder + Voice)",
+    color: "bg-emerald-500/20 text-emerald-400",
+    hint: "Use with https://api.geniuspro.io/v1 for geniuspro-coder-v1 and geniuspro-voice.",
   },
   universal: {
     label: "Legacy Universal",
@@ -58,12 +65,30 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyProfile, setNewKeyProfile] = useState<CreatableApiKeyProfile>("coding_superintelligence");
+  const [newKeyProfile, setNewKeyProfile] = useState<CreatableApiKeyProfile>("openai_compat");
   const [newKeySecret, setNewKeySecret] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [keyModels, setKeyModels] = useState<Record<string, string[]>>({});
+
+  const profileOptions: readonly SelectOption<CreatableApiKeyProfile>[] = [
+    {
+      value: "openai_compat",
+      label: PROFILE_DISPLAY.openai_compat.label,
+      hint: PROFILE_DISPLAY.openai_compat.hint,
+    },
+    {
+      value: "coding_superintelligence",
+      label: `${PROFILE_DISPLAY.coding_superintelligence.label} (Cursor)`,
+      hint: PROFILE_DISPLAY.coding_superintelligence.hint,
+    },
+    {
+      value: "gateway",
+      label: PROFILE_DISPLAY.gateway.label,
+      hint: PROFILE_DISPLAY.gateway.hint,
+    },
+  ] as const;
 
   const fetchKeys = useCallback(async () => {
     if (!user) return;
@@ -181,7 +206,7 @@ export default function ApiKeysPage() {
   const handleCloseModal = () => {
     setShowCreateModal(false);
     setNewKeyName("");
-    setNewKeyProfile("coding_superintelligence");
+    setNewKeyProfile("openai_compat");
     setNewKeySecret(null);
     setError(null);
   };
@@ -397,14 +422,11 @@ export default function ApiKeysPage() {
                   <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2 mt-4">
                     Profile
                   </label>
-                  <select
+                  <ProfileSelect
                     value={newKeyProfile}
-                    onChange={(e) => setNewKeyProfile(e.target.value as CreatableApiKeyProfile)}
-                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="coding_superintelligence">GeniusPro Coding Superintelligence (Cursor)</option>
-                    <option value="openai_compat">GeniusPro Superintelligence</option>
-                  </select>
+                    onChange={setNewKeyProfile}
+                    options={profileOptions}
+                  />
                   <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
                     {PROFILE_DISPLAY[newKeyProfile].hint}
                   </p>
