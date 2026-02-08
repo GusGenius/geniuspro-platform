@@ -30,7 +30,7 @@ export default function DashboardPage() {
       </div>
 
       <p className="mt-3 text-sm text-gray-400 dark:text-gray-500 welcome-fade-in-delay-2">
-        Your workers are standing by.
+        Your superintelligence is standing by.
       </p>
     </div>
   );
