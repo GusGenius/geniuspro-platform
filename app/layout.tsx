@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Layout from "@/components/layout/Layout";
 import { AuthProvider } from "@/lib/auth/auth-context";
@@ -6,6 +6,11 @@ import { AuthProvider } from "@/lib/auth/auth-context";
 export const metadata: Metadata = {
   title: "GeniusPro Platform",
   description: "GeniusPro AI Developer Platform",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

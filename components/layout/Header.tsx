@@ -41,7 +41,13 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-10 min-h-[40px] max-h-[40px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 z-40">
+    <header
+      className="fixed top-0 h-10 min-h-[40px] max-h-[40px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 z-40"
+      style={{
+        left: "var(--sidebar-width, 0px)",
+        width: "calc(100% - var(--sidebar-width, 0px))",
+      }}
+    >
       <div className="h-full flex items-center justify-end px-5 gap-2">
         {/* Theme Toggle */}
         <button

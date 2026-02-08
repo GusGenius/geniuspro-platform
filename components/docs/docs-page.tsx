@@ -16,7 +16,7 @@ export default function DocsPage() {
   const { copiedCode, copiedText, copyCode, copyText } = useCopy();
 
   return (
-    <div className="min-h-full p-6 md:p-10 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-full p-4 sm:p-6 md:p-10 w-full max-w-full overflow-x-hidden">
       <div className="max-w-4xl mx-auto w-full">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Documentation</h1>

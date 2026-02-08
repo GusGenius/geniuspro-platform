@@ -32,7 +32,6 @@ import {
 export default function Sidebar() {
   const { isExpanded, setIsExpanded } = useSidebar();
   const [theme, setTheme] = useState<Theme>("dark");
-  const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { signOut, user } = useAuth();
@@ -90,42 +89,17 @@ export default function Sidebar() {
   }, []);
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth < 768;
-      setIsMobile(mobile);
-
-      if (mobile) {
-        setIsExpanded(false);
-        setIsMobileMenuOpen(false);
-        document.documentElement.style.setProperty("--sidebar-width", "0px");
-      } else {
-        setIsExpanded(false);
-        setIsMobileMenuOpen(false);
-        document.documentElement.style.setProperty("--sidebar-width", "60px");
-      }
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, [setIsExpanded]);
-
-  useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
   const handleMouseEnter = () => {
-    if (!isMobile) {
-      setIsExpanded(true);
-      document.documentElement.style.setProperty("--sidebar-width", "200px");
-    }
+    setIsExpanded(true);
+    document.documentElement.style.setProperty("--sidebar-width", "200px");
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile) {
-      setIsExpanded(false);
-      document.documentElement.style.setProperty("--sidebar-width", "60px");
-    }
+    setIsExpanded(false);
+    document.documentElement.style.setProperty("--sidebar-width", "60px");
   };
 
   const toggleTheme = () => {
@@ -150,10 +124,10 @@ export default function Sidebar() {
     return pathname?.startsWith(href);
   };
 
-  // Mobile navigation
-  if (isMobile) {
-    return (
-      <>
+  return (
+    <>
+      {/* Mobile navigation */}
+      <div className="md:hidden">
         <div className="fixed top-0 left-0 right-0 z-40 h-14 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-3">
           <Link href="/dashboard" className="flex items-center">
             <Image
@@ -292,18 +266,16 @@ export default function Sidebar() {
             </aside>
           </>
         )}
-      </>
-    );
-  }
+      </div>
 
-  return (
-    <aside
-      className={`fixed left-0 top-0 z-50 h-screen bg-white dark:bg-gray-900 transition-all duration-300 ${
-        isExpanded ? "w-[200px]" : "w-[60px]"
-      } flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden hidden md:flex`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+      {/* Desktop navigation */}
+      <aside
+        className={`fixed left-0 top-0 z-50 h-screen bg-white dark:bg-gray-900 transition-all duration-300 ${
+          isExpanded ? "w-[200px]" : "w-[60px]"
+        } flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden hidden md:flex`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
       {/* Logo */}
       <div
         className={`flex h-16 items-center border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${
@@ -408,6 +380,7 @@ export default function Sidebar() {
           </span>
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

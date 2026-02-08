@@ -46,8 +46,8 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
         <Sidebar />
         <div
-          className="flex-1 flex flex-col transition-all duration-300"
-          style={{ marginLeft: "var(--sidebar-width, 0px)" }}
+          className="flex-1 flex flex-col transition-all duration-300 w-full min-w-0"
+          style={{ paddingLeft: "var(--sidebar-width, 0px)" }}
         >
           <div className="hidden md:block">
             <Header />
