@@ -5,11 +5,11 @@ export const MODEL_VOICE = "geniuspro-voice";
 
 // Superintelligence — regular surface
 export const API_BASE_URL_SUPERINTELLIGENCE = "https://api.geniuspro.io/superintelligence/v1";
-export const MODEL_SUPERINTELLIGENCE = "gp-agi-1.2";
+export const MODEL_SUPERINTELLIGENCE = "GeniusPro-agi-1.2";
 
 // Coding Superintelligence — Cursor surface
 export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/coding-superintelligence/v1";
-export const MODEL_CODING_SUPERINTELLIGENCE = "gp-coding-agi-1.2";
+export const MODEL_CODING_SUPERINTELLIGENCE = "geniuspro-coding-agi-1.2";
 
 export const AUTH_HEADER_EXAMPLE = "Authorization: Bearer YOUR_API_KEY";
 

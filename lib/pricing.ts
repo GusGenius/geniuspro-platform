@@ -4,13 +4,13 @@
  */
 
 export const PRICING = {
-  "gp-agi-1.2": {
+  "GeniusPro-agi-1.2": {
     input: 4.0, // $4 per 1M input tokens
     output: 20.0, // $20 per 1M output tokens
     label: "Superintelligence",
     description: "Superintelligence (regular surface)",
   },
-  "gp-coding-agi-1.2": {
+  "geniuspro-coding-agi-1.2": {
     input: 4.0, // $4 per 1M input tokens
     output: 20.0, // $20 per 1M output tokens
     label: "Coding Superintelligence",
@@ -32,7 +32,20 @@ export const PRICING = {
     input: 4.0,
     output: 20.0,
     label: "Legacy Superintelligence",
-    description: "Deprecated model id — use gp-agi-1.2",
+    description: "Deprecated model id — use GeniusPro-agi-1.2",
+  },
+  // Aliases kept for backwards compatibility with early adopters.
+  "gp-agi-1.2": {
+    input: 4.0,
+    output: 20.0,
+    label: "Legacy Superintelligence (Alias)",
+    description: "Alias — use GeniusPro-agi-1.2",
+  },
+  "gp-coding-agi-1.2": {
+    input: 4.0,
+    output: 20.0,
+    label: "Legacy Coding Superintelligence (Alias)",
+    description: "Alias — use geniuspro-coding-agi-1.2",
   },
 } as const;
 

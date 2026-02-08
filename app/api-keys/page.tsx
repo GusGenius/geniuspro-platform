@@ -49,10 +49,12 @@ type CreatableApiKeyProfile = Exclude<ApiKeyProfile, "universal">;
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
   "geniuspro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
-  "gp-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
-  "gp-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
+  "GeniusPro-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
+  "geniuspro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
   "geniuspro-voice": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
   "geniuspro-superintelligence-v1": { label: "Legacy Superintelligence", color: "bg-gray-500/20 text-gray-400" },
+  "gp-agi-1.2": { label: "Legacy Superintelligence (Alias)", color: "bg-gray-500/20 text-gray-400" },
+  "gp-coding-agi-1.2": { label: "Legacy Coding Superintelligence (Alias)", color: "bg-gray-500/20 text-gray-400" },
 };
 
 function getModelBadge(model: string): { label: string; color: string } {
@@ -312,17 +314,6 @@ export default function ApiKeysPage() {
                       <code className="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded font-mono truncate">
                         {key.key_prefix}
                       </code>
-                      <button
-                        onClick={() => handleCopy(key.key_prefix, key.id)}
-                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors flex-shrink-0"
-                        title="Copy prefix"
-                      >
-                        {copiedId === key.id ? (
-                          <Check className="w-4 h-4 text-green-400" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
                     </div>
 
                     {/* Model badges */}
