@@ -187,9 +187,11 @@ console.log(response.choices[0].message.content);`;
                   )}
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-max min-w-full">
-                  <code className="text-gray-700 dark:text-gray-300">{curlExample}</code>
+              <div className="overflow-x-hidden sm:overflow-x-auto">
+                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-full">
+                  <code className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap sm:whitespace-pre break-words">
+                    {curlExample}
+                  </code>
                 </pre>
               </div>
             </div>
@@ -215,9 +217,11 @@ console.log(response.choices[0].message.content);`;
                   )}
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-max min-w-full">
-                  <code className="text-gray-700 dark:text-gray-300">{pythonExample}</code>
+              <div className="overflow-x-hidden sm:overflow-x-auto">
+                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-full">
+                  <code className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap sm:whitespace-pre break-words">
+                    {pythonExample}
+                  </code>
                 </pre>
               </div>
             </div>
@@ -243,9 +247,11 @@ console.log(response.choices[0].message.content);`;
                   )}
                 </button>
               </div>
-              <div className="overflow-x-auto">
-                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-max min-w-full">
-                  <code className="text-gray-700 dark:text-gray-300">{jsExample}</code>
+              <div className="overflow-x-hidden sm:overflow-x-auto">
+                <pre className="p-3 sm:p-4 text-[11px] sm:text-sm bg-gray-50 dark:bg-gray-900/30 w-full">
+                  <code className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap sm:whitespace-pre break-words">
+                    {jsExample}
+                  </code>
                 </pre>
               </div>
             </div>

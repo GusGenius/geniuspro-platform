@@ -277,7 +277,51 @@ export default function UsagePage() {
         {keys.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by API Key</h2>
-            <div className="overflow-x-auto">
+            {/* Mobile card layout */}
+            <div className="space-y-3 sm:hidden">
+              {keys.map((k) => (
+                <div
+                  key={k.keyId}
+                  className="bg-gray-200/60 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {k.keyName}
+                      </div>
+                      <code className="mt-1 inline-block text-[11px] text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded break-all">
+                        {k.keyPrefix}
+                      </code>
+                    </div>
+                    <div className="text-sm font-semibold text-purple-400 flex-shrink-0">
+                      {formatCost(k.cost)}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Requests</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{formatNumber(k.requests)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Total</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{formatNumber(k.totalTokens)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Input</div>
+                      <div className="text-sm font-medium text-blue-400">{formatNumber(k.promptTokens)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Output</div>
+                      <div className="text-sm font-medium text-green-400">{formatNumber(k.completionTokens)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table layout */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full min-w-[420px]">
                 <thead>
                   <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
@@ -315,7 +359,50 @@ export default function UsagePage() {
         {models.length > 0 && (
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Usage by Model</h2>
-            <div className="overflow-x-auto">
+            {/* Mobile card layout */}
+            <div className="space-y-3 sm:hidden">
+              {models.map((m) => (
+                <div
+                  key={m.model}
+                  className="bg-gray-200/60 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <code className="text-[11px] text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded break-all">
+                      {getModelLabel(m.model)}
+                    </code>
+                    <div className="text-sm font-semibold text-purple-400 flex-shrink-0">
+                      {formatCost(m.cost)}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Requests</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{formatNumber(m.requests)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Latency</div>
+                      <div className="text-sm font-medium text-gray-600 dark:text-gray-300">{formatNumber(m.avgLatencyMs)}ms</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Input</div>
+                      <div className="text-sm font-medium text-blue-400">{formatNumber(m.promptTokens)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Output</div>
+                      <div className="text-sm font-medium text-green-400">{formatNumber(m.completionTokens)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400">Total</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">{formatNumber(m.totalTokens)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table layout */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full min-w-[480px]">
                 <thead>
                   <tr className="text-left text-xs sm:text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
