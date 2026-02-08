@@ -103,7 +103,7 @@ export default function BillingPage() {
       if (!stripe) {
         throw new Error("Stripe not initialized");
       }
-      const { error } = await (stripe as ReturnType<typeof loadStripe> & { redirectToCheckout: (opts: { sessionId: string }) => Promise<{ error: Error | null }> }).redirectToCheckout({ sessionId });
+      const { error } = await stripe.redirectToCheckout({ sessionId });
 
       if (error) {
         throw error;
