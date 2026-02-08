@@ -17,23 +17,27 @@ interface ApiKeyRow {
   created_at: string;
 }
 
-const PROFILE_DISPLAY: Record<string, { label: string; color: string; hint: string }> = {
-  universal: {
-    label: "Universal",
-    color: "bg-gray-500/20 text-gray-400",
-    hint: "Works everywhere (gateway + superintelligence).",
-  },
+type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "universal";
+
+const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
-    label: "OpenAI-compatible",
+    label: "GeniusPro Superintelligence",
     color: "bg-blue-500/20 text-blue-400",
-    hint: "Use with https://api.geniuspro.io/v1 endpoints.",
+    hint: "Use with https://api.geniuspro.io/superintelligence/v1 (and /v1 for coder + voice).",
   },
   coding_superintelligence: {
-    label: "Coding Superintelligence",
+    label: "GeniusPro Coding Superintelligence",
     color: "bg-purple-500/20 text-purple-400",
-    hint: "Use with /super-intelligence/v1/coding/* endpoints (Cursor).",
+    hint: "Use with https://api.geniuspro.io/coding-superintelligence/v1 (Cursor).",
+  },
+  universal: {
+    label: "Legacy Universal",
+    color: "bg-gray-500/20 text-gray-400",
+    hint: "Deprecated. Rotate this key to one of the two profiles.",
   },
 };
+
+type CreatableApiKeyProfile = Exclude<ApiKeyProfile, "universal">;
 
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
@@ -52,7 +56,7 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyProfile, setNewKeyProfile] = useState<keyof typeof PROFILE_DISPLAY>("coding_superintelligence");
+  const [newKeyProfile, setNewKeyProfile] = useState<CreatableApiKeyProfile>("coding_superintelligence");
   const [newKeySecret, setNewKeySecret] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -269,11 +273,11 @@ export default function ApiKeysPage() {
                       </span>
                       <span
                         className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                          PROFILE_DISPLAY[key.profile]?.color || "bg-gray-500/20 text-gray-400"
+                          PROFILE_DISPLAY[(key.profile as ApiKeyProfile) || "universal"]?.color || "bg-gray-500/20 text-gray-400"
                         }`}
-                        title={PROFILE_DISPLAY[key.profile]?.hint || "Profile"}
+                        title={PROFILE_DISPLAY[(key.profile as ApiKeyProfile) || "universal"]?.hint || "Profile"}
                       >
-                        {PROFILE_DISPLAY[key.profile]?.label || key.profile}
+                        {PROFILE_DISPLAY[(key.profile as ApiKeyProfile) || "universal"]?.label || key.profile}
                       </span>
                     </div>
 
@@ -393,12 +397,11 @@ export default function ApiKeysPage() {
                   </label>
                   <select
                     value={newKeyProfile}
-                    onChange={(e) => setNewKeyProfile(e.target.value as keyof typeof PROFILE_DISPLAY)}
+                    onChange={(e) => setNewKeyProfile(e.target.value as CreatableApiKeyProfile)}
                     className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="coding_superintelligence">Coding Superintelligence (Cursor)</option>
-                    <option value="openai_compat">OpenAI-compatible (Gateway /v1)</option>
-                    <option value="universal">Universal</option>
+                    <option value="coding_superintelligence">GeniusPro Coding Superintelligence (Cursor)</option>
+                    <option value="openai_compat">GeniusPro Superintelligence</option>
                   </select>
                   <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
                     {PROFILE_DISPLAY[newKeyProfile].hint}
