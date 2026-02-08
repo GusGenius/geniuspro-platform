@@ -20,6 +20,7 @@ import {
 import { useSidebar } from "./SidebarContext";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 
 export default function Sidebar() {
   const { isExpanded, setIsExpanded } = useSidebar();
@@ -36,6 +37,29 @@ export default function Sidebar() {
       router.push("/login");
     } catch (error) {
       console.error("Failed to logout:", error);
+    }
+  };
+
+  const handleChatClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.access_token && session?.refresh_token) {
+        const handoffUrl =
+          `https://chat.geniuspro.io/auth/handoff#access_token=${encodeURIComponent(session.access_token)}` +
+          `&refresh_token=${encodeURIComponent(session.refresh_token)}` +
+          `&redirect=${encodeURIComponent("/dashboard")}`;
+        window.open(handoffUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
+      window.open("https://chat.geniuspro.io", "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("Failed to get session for chat handoff:", error);
+      window.open("https://chat.geniuspro.io", "_blank", "noopener,noreferrer");
     }
   };
 
@@ -106,7 +130,7 @@ export default function Sidebar() {
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true },
+    { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true, handoff: true },
     { name: "API Keys", href: "/api-keys", icon: Key },
     { name: "Docs", href: "/docs", icon: BookOpen },
     { name: "Usage", href: "/usage", icon: BarChart3 },
@@ -188,7 +212,20 @@ export default function Sidebar() {
                     }`;
                     return (
                       <li key={item.name}>
-                        {"external" in item && item.external ? (
+                        {"handoff" in item && item.handoff ? (
+                          <button
+                            onClick={(e) => {
+                              handleChatClick(e);
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className={cls}
+                          >
+                            <Icon className="w-5 h-5 flex-shrink-0" />
+                            <span className="text-sm font-medium ml-3">
+                              {item.name}
+                            </span>
+                          </button>
+                        ) : "external" in item && item.external ? (
                           <a
                             href={item.href}
                             target="_blank"
@@ -303,7 +340,16 @@ export default function Sidebar() {
             );
             return (
               <li key={item.name}>
-                {"external" in item && item.external ? (
+                {"handoff" in item && item.handoff ? (
+                  <button
+                    onClick={handleChatClick}
+                    className={cls}
+                    title={!isExpanded ? item.name : ""}
+                  >
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    {label}
+                  </button>
+                ) : "external" in item && item.external ? (
                   <a
                     href={item.href}
                     target="_blank"

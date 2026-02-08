@@ -66,30 +66,30 @@ const response = await openai.chat.completions.create({
 console.log(response.choices[0].message.content);`;
 
   return (
-    <div className="min-h-full p-4 sm:p-6 md:p-10 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-full p-6 md:p-10 w-full max-w-full overflow-x-hidden">
       <div className="max-w-4xl mx-auto w-full">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Documentation</h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Learn how to integrate with the GeniusPro API</p>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Documentation</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Learn how to integrate with the GeniusPro API</p>
         </div>
 
         {/* Quick Start */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Zap className="w-5 h-5 text-blue-400" />
             Quick Start
           </h2>
           
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6 space-y-4">
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300">
+            <p className="text-gray-600 dark:text-gray-300">
               GeniusPro API is OpenAI-compatible. You can use the official OpenAI SDKs by simply changing the base URL.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Base URL</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Base URL</div>
                   <button
                     onClick={() => copyText(baseUrl, "base-url")}
                     className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -102,11 +102,11 @@ console.log(response.choices[0].message.content);`;
                     )}
                   </button>
                 </div>
-                <code className="text-blue-500 dark:text-blue-400 font-mono text-xs sm:text-sm break-all">{baseUrl}</code>
+                <code className="text-blue-500 dark:text-blue-400 font-mono text-sm break-all">{baseUrl}</code>
               </div>
               <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 relative group overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Model</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Model</div>
                   <button
                     onClick={() => copyText(modelName, "model-name")}
                     className="p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -119,25 +119,25 @@ console.log(response.choices[0].message.content);`;
                     )}
                   </button>
                 </div>
-                <code className="text-green-600 dark:text-green-400 font-mono text-xs sm:text-sm break-all">{modelName}</code>
+                <code className="text-green-600 dark:text-green-400 font-mono text-sm break-all">{modelName}</code>
               </div>
             </div>
           </div>
         </section>
 
         {/* Authentication */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <Code className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Code className="w-5 h-5 text-blue-400" />
             Authentication
           </h2>
           
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               Authenticate using your API key in the Authorization header:
             </p>
             
-            <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 font-mono text-xs sm:text-sm relative group overflow-x-auto">
+            <div className="bg-gray-200 dark:bg-gray-900 rounded-lg p-3 sm:p-4 font-mono text-sm relative group overflow-x-auto">
               <button
                 onClick={() => copyText(authHeader, "auth-header")}
                 className="absolute top-2 right-2 p-1.5 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white flex-shrink-0"
@@ -159,9 +159,9 @@ console.log(response.choices[0].message.content);`;
         </section>
 
         {/* Code Examples */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <Terminal className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Terminal className="w-5 h-5 text-blue-400" />
             Code Examples
           </h2>
           
@@ -259,8 +259,8 @@ console.log(response.choices[0].message.content);`;
         </section>
 
         {/* Available Models */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Available Models</h2>
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Available Models</h2>
           
           {/* Card layout for mobile, table for desktop */}
           <div className="space-y-3 sm:hidden">
@@ -324,9 +324,9 @@ console.log(response.choices[0].message.content);`;
         </section>
 
         {/* Pricing */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-blue-400" />
             Pricing
           </h2>
           
@@ -395,14 +395,14 @@ console.log(response.choices[0].message.content);`;
         </section>
 
         {/* Rate Limits */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <Gauge className="w-5 h-5 text-blue-400" />
             Rate Limits
           </h2>
           
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               By default, API keys have a rate limit of <strong className="text-gray-900 dark:text-white">120 requests per minute (RPM)</strong>. 
               This limit applies per API key and helps ensure fair usage across all users.
             </p>
@@ -413,9 +413,9 @@ console.log(response.choices[0].message.content);`;
         </section>
 
         {/* API Reference */}
-        <section className="mb-8 sm:mb-12">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 flex items-center gap-2">
-            <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-blue-400" />
             API Reference
           </h2>
           

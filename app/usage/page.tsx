@@ -208,12 +208,12 @@ export default function UsagePage() {
   }
 
   return (
-    <div className="min-h-full p-4 sm:p-6 md:p-10 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-full p-6 md:p-10 w-full max-w-full overflow-x-hidden">
       <div className="max-w-6xl mx-auto w-full">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Monitor your API usage and token consumption</p>
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Usage</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Monitor your API usage and token consumption</p>
         </div>
 
         {/* Period Filter */}
