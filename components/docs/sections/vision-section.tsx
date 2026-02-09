@@ -6,6 +6,8 @@ import {
   CURL_VISION_SEGMENT_IMAGE_POINTS,
   CURL_VISION_SEGMENT_IMAGE_BOX,
   PYTHON_VISION_EXAMPLE,
+  CURL_VISION_ANALYZE_HOME_PHOTO,
+  PYTHON_VISION_ANALYZE_HOME_PHOTO,
 } from "@/components/docs/docs-constants";
 
 type Props = {
@@ -98,12 +100,63 @@ export function VisionSection({
 
         <div>
           <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-            Python Example
+            4. Home Photo Analysis — Roofline Detection
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+            Specialized endpoint for analyzing home photos to detect rooflines and suggest product placements (gutters, rain chains, tanks). Returns normalized coordinates for Unity/AR applications.
+          </p>
+          <CodeExampleCard
+            title="POST /vision/v1/analyze-home-photo"
+            code={CURL_VISION_ANALYZE_HOME_PHOTO}
+            copyId="curl-vision-home-photo"
+            copiedCode={copiedCode}
+            onCopy={onCopyCode}
+          />
+          <div className="mt-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 text-xs">
+            <p className="text-gray-600 dark:text-gray-400 mb-2"><strong>Response format:</strong></p>
+            <pre className="text-xs overflow-x-auto">
+{`{
+  "success": true,
+  "rooflines": [
+    {
+      "id": "roof1",
+      "points": [[0.1, 0.3], [0.5, 0.28], [0.9, 0.32]]
+    }
+  ],
+  "suggested_gutters": [
+    {"roofline_id": "roof1", "style": "k-style"}
+  ],
+  "suggested_rain_chains": [
+    {"position": [0.1, 0.3], "connects_to": "roof1"}
+  ],
+  "suggested_tank": {"position": [0.92, 0.9]},
+  "ground_level": 0.9
+}`}
+            </pre>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Python Example — Image Segmentation
           </h3>
           <CodeExampleCard
             title="Using the Vision API with Python"
             code={PYTHON_VISION_EXAMPLE}
             copyId="python-vision"
+            copiedCode={copiedCode}
+            onCopy={onCopyCode}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+            Python Example — Home Photo Analysis
+          </h3>
+          <CodeExampleCard
+            title="Analyzing home photos with Python"
+            code={PYTHON_VISION_ANALYZE_HOME_PHOTO}
+            copyId="python-vision-home-photo"
             copiedCode={copiedCode}
             onCopy={onCopyCode}
           />

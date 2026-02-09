@@ -127,3 +127,22 @@ print(result["masks"])  # Segmentation masks
 print(result["boxes"])  # Bounding boxes
 print(result["scores"])  # Confidence scores`;
 
+export const CURL_VISION_ANALYZE_HOME_PHOTO = `curl -X POST https://api.geniuspro.io/vision/v1/analyze-home-photo \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -F "image=@home_photo.jpg"`;
+
+export const PYTHON_VISION_ANALYZE_HOME_PHOTO = `import requests
+
+url = "https://api.geniuspro.io/vision/v1/analyze-home-photo"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+
+with open("home_photo.jpg", "rb") as f:
+    files = {"image": f}
+    response = requests.post(url, headers=headers, files=files)
+
+result = response.json()
+print(result["rooflines"])  # Detected rooflines with points
+print(result["suggested_rain_chains"])  # Rain chain positions
+print(result["suggested_tank"])  # Tank position
+print(result["ground_level"])  # Ground level Y coordinate`;
+
