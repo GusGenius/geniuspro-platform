@@ -7,6 +7,7 @@ import { AuthenticationSection } from "@/components/docs/sections/authentication
 import { AvailableModelsSection } from "@/components/docs/sections/available-models-section";
 import { CodeExamplesSection } from "@/components/docs/sections/code-examples-section";
 import { CodingSuperintelligenceSection } from "@/components/docs/sections/coding-superintelligence-section";
+import { VisionSection } from "@/components/docs/sections/vision-section";
 import { PricingSection } from "@/components/docs/sections/pricing-section";
 import { QuickStartSection } from "@/components/docs/sections/quick-start-section";
 import { RateLimitsSection } from "@/components/docs/sections/rate-limits-section";
@@ -65,6 +66,12 @@ export default function DocsPage() {
           </div>
 
           <CodingSuperintelligenceSection
+            icon={Terminal}
+            copiedCode={copiedCode}
+            onCopyCode={copyCode}
+          />
+
+          <VisionSection
             icon={Terminal}
             copiedCode={copiedCode}
             onCopyCode={copyCode}

@@ -4,10 +4,12 @@ import {
   API_BASE_URL_CODING_SUPERINTELLIGENCE,
   API_BASE_URL_GATEWAY,
   API_BASE_URL_SUPERINTELLIGENCE,
+  API_BASE_URL_VISION,
   MODEL_CODER,
   MODEL_CODING_SUPERINTELLIGENCE,
   MODEL_SUPERINTELLIGENCE,
   MODEL_VOICE,
+  MODEL_VISION,
 } from "@/components/docs/docs-constants";
 
 export function AvailableModelsSection() {
@@ -35,6 +37,11 @@ export function AvailableModelsSection() {
           <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_VOICE}</code>
           <div className="text-xs text-gray-600 dark:text-gray-300 mt-2">N/A</div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Voice synthesis and recognition on the gateway. Use with <span className="font-mono break-all">{API_BASE_URL_GATEWAY}</span>.</p>
+        </div>
+        <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+          <code className="text-cyan-500 dark:text-cyan-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_VISION}</code>
+          <div className="text-xs text-gray-600 dark:text-gray-300 mt-2">Image/Video</div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">SAM 3 image and video segmentation. Use with <span className="font-mono break-all">{API_BASE_URL_VISION}</span>.</p>
         </div>
       </div>
 
@@ -75,13 +82,22 @@ export function AvailableModelsSection() {
                 Lightweight coding model on the gateway. Base URL: <span className="font-mono">{API_BASE_URL_GATEWAY}</span>
               </td>
             </tr>
-            <tr className="hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
+            <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4">
                 <code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_VOICE}</code>
               </td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">N/A</td>
               <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">
                 Voice synthesis and recognition on the gateway. Base URL: <span className="font-mono">{API_BASE_URL_GATEWAY}</span>
+              </td>
+            </tr>
+            <tr className="hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
+              <td className="px-4 lg:px-6 py-4">
+                <code className="text-cyan-500 dark:text-cyan-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_VISION}</code>
+              </td>
+              <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300 whitespace-nowrap">Image/Video</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">
+                SAM 3 image and video segmentation. Base URL: <span className="font-mono">{API_BASE_URL_VISION}</span>
               </td>
             </tr>
           </tbody>

@@ -11,6 +11,10 @@ export const MODEL_SUPERINTELLIGENCE = "GeniusPro-agi-1.2";
 export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/coding-superintelligence/v1";
 export const MODEL_CODING_SUPERINTELLIGENCE = "GeniusPro-coding-agi-1.2";
 
+// Vision Service — SAM 3 segmentation
+export const API_BASE_URL_VISION = "https://api.geniuspro.io/vision/v1";
+export const MODEL_VISION = "GeniusPro-vision-sam3";
+
 export const AUTH_HEADER_EXAMPLE = "Authorization: Bearer YOUR_API_KEY";
 
 export const CURL_SUPERINTELLIGENCE_EXAMPLE = `curl https://api.geniuspro.io/superintelligence/v1/chat/completions \\
@@ -91,4 +95,35 @@ export const CURL_MEMORY_SAVE_SNIPPET_EXAMPLE = `curl https://api.geniuspro.io/c
 
 export const CURL_MEMORY_LIST_SNIPPETS_EXAMPLE = `curl "https://api.geniuspro.io/coding-superintelligence/v1/memory/snippets?project_slug=my-project&limit=20" \\
   -H "Authorization: Bearer YOUR_API_KEY"`;
+
+export const CURL_VISION_SEGMENT_IMAGE_TEXT = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -F "image=@image.jpg" \\
+  -F "text_prompt=a red car"`;
+
+export const CURL_VISION_SEGMENT_IMAGE_POINTS = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -F "image=@image.jpg" \\
+  -F "input_points=[[320,240]]" \\
+  -F "input_labels=[1]"`;
+
+export const CURL_VISION_SEGMENT_IMAGE_BOX = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
+  -F "image=@image.jpg" \\
+  -F "input_box=[100,100,500,400]"`;
+
+export const PYTHON_VISION_EXAMPLE = `import requests
+
+url = "https://api.geniuspro.io/vision/v1/segment-image"
+headers = {"Authorization": "Bearer YOUR_API_KEY"}
+
+with open("image.jpg", "rb") as f:
+    files = {"image": f}
+    data = {"text_prompt": "a red car"}
+    response = requests.post(url, headers=headers, files=files, data=data)
+
+result = response.json()
+print(result["masks"])  # Segmentation masks
+print(result["boxes"])  # Bounding boxes
+print(result["scores"])  # Confidence scores`;
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Key, Plus, Copy, Trash2, Check, Loader2, AlertTriangle } from "lucide-react";
 
-import { ProfileSelect, type SelectOption } from "@/components/ui/profile-select";
+import { type SelectOption } from "@/components/ui/profile-select";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { generateApiKey, hashApiKey, getKeyPrefix } from "@/lib/api-keys/generate";
@@ -19,7 +19,7 @@ interface ApiKeyRow {
   created_at: string;
 }
 
-type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "universal";
+type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "vision" | "universal";
 
 const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
@@ -37,6 +37,11 @@ const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hin
     color: "bg-emerald-500/20 text-emerald-400",
     hint: "Use with https://api.geniuspro.io/v1 for GeniusPro-coder-v1 and GeniusPro-voice-v1.",
   },
+  vision: {
+    label: "GeniusPro Vision (SAM 3)",
+    color: "bg-cyan-500/20 text-cyan-400",
+    hint: "Use with https://api.geniuspro.io/vision/v1 for image and video segmentation.",
+  },
   universal: {
     label: "Legacy Universal",
     color: "bg-gray-500/20 text-gray-400",
@@ -52,6 +57,7 @@ const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
   "GeniusPro-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
   "GeniusPro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
   "GeniusPro-voice-v1": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
+  "GeniusPro-vision-sam3": { label: "Vision SAM 3", color: "bg-cyan-500/20 text-cyan-400" },
 };
 
 function getModelBadge(model: string): { label: string; color: string } {
@@ -64,8 +70,8 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
-  const [newKeyProfile, setNewKeyProfile] = useState<CreatableApiKeyProfile>("openai_compat");
-  const [newKeySecret, setNewKeySecret] = useState<string | null>(null);
+  const [newKeyProfiles, setNewKeyProfiles] = useState<Set<CreatableApiKeyProfile>>(new Set(["openai_compat"]));
+  const [newKeySecrets, setNewKeySecrets] = useState<Array<{ profile: string; key: string }>>([]);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +92,11 @@ export default function ApiKeysPage() {
       value: "gateway",
       label: PROFILE_DISPLAY.gateway.label,
       hint: PROFILE_DISPLAY.gateway.hint,
+    },
+    {
+      value: "vision",
+      label: PROFILE_DISPLAY.vision.label,
+      hint: PROFILE_DISPLAY.vision.hint,
     },
   ] as const;
 
@@ -140,31 +151,42 @@ export default function ApiKeysPage() {
   }, [fetchKeys]);
 
   const handleCreateKey = async () => {
-    if (!user || !newKeyName.trim()) return;
+    if (!user || !newKeyName.trim() || newKeyProfiles.size === 0) return;
     setCreating(true);
     setError(null);
 
     try {
-      const plainKey = generateApiKey();
-      const hash = await hashApiKey(plainKey);
-      const prefix = getKeyPrefix(plainKey);
+      const createdKeys: Array<{ profile: string; key: string }> = [];
+      
+      // Create one key per selected profile
+      for (const profile of Array.from(newKeyProfiles)) {
+        const plainKey = generateApiKey();
+        const hash = await hashApiKey(plainKey);
+        const prefix = getKeyPrefix(plainKey);
 
-      const { error: insertError } = await supabase.from("api_keys").insert({
-        user_id: user.id,
-        name: newKeyName.trim(),
-        profile: newKeyProfile,
-        key_hash: hash,
-        key_prefix: prefix,
-        is_active: true,
-      });
+        const keyName = newKeyProfiles.size > 1 
+          ? `${newKeyName.trim()} (${PROFILE_DISPLAY[profile].label})`
+          : newKeyName.trim();
 
-      if (insertError) {
-        setError(insertError.message);
-        setCreating(false);
-        return;
+        const { error: insertError } = await supabase.from("api_keys").insert({
+          user_id: user.id,
+          name: keyName,
+          profile: profile,
+          key_hash: hash,
+          key_prefix: prefix,
+          is_active: true,
+        });
+
+        if (insertError) {
+          setError(`Failed to create key for ${PROFILE_DISPLAY[profile].label}: ${insertError.message}`);
+          setCreating(false);
+          return;
+        }
+
+        createdKeys.push({ profile, key: plainKey });
       }
 
-      setNewKeySecret(plainKey);
+      setNewKeySecrets(createdKeys);
       await fetchKeys();
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to create key";
@@ -205,9 +227,21 @@ export default function ApiKeysPage() {
   const handleCloseModal = () => {
     setShowCreateModal(false);
     setNewKeyName("");
-    setNewKeyProfile("openai_compat");
-    setNewKeySecret(null);
+    setNewKeyProfiles(new Set(["openai_compat"]));
+    setNewKeySecrets([]);
     setError(null);
+  };
+
+  const toggleProfile = (profile: CreatableApiKeyProfile) => {
+    setNewKeyProfiles((prev) => {
+      const next = new Set(prev);
+      if (next.has(profile)) {
+        next.delete(profile);
+      } else {
+        next.add(profile);
+      }
+      return next;
+    });
   };
 
   const formatDate = (iso: string) =>
@@ -362,35 +396,38 @@ export default function ApiKeysPage() {
             </div>
 
             <div className="p-6">
-              {newKeySecret ? (
+              {newKeySecrets.length > 0 ? (
                 <div className="space-y-4">
                   <div className="flex items-start gap-2 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
                     <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-600 dark:text-yellow-300">
-                      <strong>Save this key!</strong> You won&apos;t be able to see it again.
+                      <strong>Save these keys!</strong> You won&apos;t be able to see them again.
+                      {newKeySecrets.length > 1 && " One key was created for each selected service."}
                     </p>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      Your API Key
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all font-mono">
-                        {newKeySecret}
-                      </code>
-                      <button
-                        onClick={() => handleCopy(newKeySecret, "new")}
-                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
-                      >
-                        {copiedId === "new" ? (
-                          <Check className="w-5 h-5 text-green-400" />
-                        ) : (
-                          <Copy className="w-5 h-5" />
-                        )}
-                      </button>
+                  {newKeySecrets.map(({ profile, key }, idx) => (
+                    <div key={profile}>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        {PROFILE_DISPLAY[profile as ApiKeyProfile].label} API Key
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-sm text-green-600 dark:text-green-400 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all font-mono">
+                          {key}
+                        </code>
+                        <button
+                          onClick={() => handleCopy(key, `new-${idx}`)}
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
+                        >
+                          {copiedId === `new-${idx}` ? (
+                            <Check className="w-5 h-5 text-green-400" />
+                          ) : (
+                            <Copy className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
               ) : (
                 <div>
@@ -407,17 +444,49 @@ export default function ApiKeysPage() {
                     autoFocus
                   />
 
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2 mt-4">
-                    Profile
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-3 mt-4">
+                    Select Services
                   </label>
-                  <ProfileSelect
-                    value={newKeyProfile}
-                    onChange={setNewKeyProfile}
-                    options={profileOptions}
-                  />
-                  <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                    {PROFILE_DISPLAY[newKeyProfile].hint}
-                  </p>
+                  <div className="space-y-3">
+                    {profileOptions.map((option) => {
+                      const isSelected = newKeyProfiles.has(option.value);
+                      return (
+                        <label
+                          key={option.value}
+                          className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                            isSelected
+                              ? "bg-blue-500/10 border-blue-500/30 dark:bg-blue-500/10 dark:border-blue-500/30"
+                              : "bg-gray-100/50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800/70"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleProfile(option.value)}
+                            className="mt-0.5 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${PROFILE_DISPLAY[option.value as ApiKeyProfile].color}`}>
+                                {option.label}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {option.hint}
+                            </p>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {newKeyProfiles.size === 0 && (
+                    <p className="mt-2 text-xs text-red-400">Please select at least one service.</p>
+                  )}
+                  {newKeyProfiles.size > 1 && (
+                    <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+                      Multiple keys will be created (one per selected service).
+                    </p>
+                  )}
 
                   {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
                 </div>
@@ -431,13 +500,13 @@ export default function ApiKeysPage() {
               >
                 {newKeySecret ? "Done" : "Cancel"}
               </button>
-              {!newKeySecret && (
+              {newKeySecrets.length === 0 && (
                 <button
                   onClick={handleCreateKey}
-                  disabled={!newKeyName.trim() || creating}
+                  disabled={!newKeyName.trim() || creating || newKeyProfiles.size === 0}
                   className="px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {creating ? "Creating..." : "Create Key"}
+                  {creating ? `Creating ${newKeyProfiles.size} key${newKeyProfiles.size > 1 ? "s" : ""}...` : `Create Key${newKeyProfiles.size > 1 ? "s" : ""}`}
                 </button>
               )}
             </div>

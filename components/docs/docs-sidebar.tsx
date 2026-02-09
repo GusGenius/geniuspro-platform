@@ -21,6 +21,7 @@ const SECTION_GROUPS: SectionGroup[] = [
     label: "Endpoints",
     items: [
       { id: "coding-superintelligence", label: "Coding Superintelligence" },
+      { id: "vision", label: "Vision Service" },
     ],
   },
   {
