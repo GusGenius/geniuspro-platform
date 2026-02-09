@@ -391,7 +391,7 @@ export default function ApiKeysPage() {
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl w-full max-w-md">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {newKeySecret ? "API Key Created" : "Create API Key"}
+                {newKeySecrets.length > 0 ? "API Key Created" : "Create API Key"}
               </h2>
             </div>
 
@@ -498,7 +498,7 @@ export default function ApiKeysPage() {
                 onClick={handleCloseModal}
                 className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm"
               >
-                {newKeySecret ? "Done" : "Cancel"}
+                {newKeySecrets.length > 0 ? "Done" : "Cancel"}
               </button>
               {newKeySecrets.length === 0 && (
                 <button
