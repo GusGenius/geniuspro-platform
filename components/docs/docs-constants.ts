@@ -3,6 +3,7 @@ export const API_BASE_URL = "https://api.geniuspro.io/v1";
 
 // Recommended models (call GET /v1/models for full list)
 export const MODEL_AGI = "geniuspro-agi-1.2";
+export const MODEL_CODE_AGI = "geniuspro-code-agi-1.2";
 export const MODEL_CLAUDE = "claude-sonnet-4.5";
 export const MODEL_CLAUDE_OPUS = "claude-opus-4.6";
 export const MODEL_GPT = "gpt-5.2";
@@ -11,11 +12,6 @@ export const MODEL_GEMINI = "gemini-3-pro";
 export const MODEL_DEEPSEEK = "deepseek-chat";
 export const MODEL_MINIMAX = "minimax-m2.5";
 export const MODEL_DEVSTRAL = "devstral-2";
-
-// Gateway — legacy (remote server)
-export const API_BASE_URL_GATEWAY = "https://api.geniuspro.io/v1";
-export const MODEL_CODER = "GeniusPro-coder-v1";
-export const MODEL_VOICE = "GeniusPro-voice-v1";
 
 // Coding Superintelligence — legacy (remote server, being phased out)
 export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/coding-superintelligence/v1";

@@ -13,7 +13,8 @@ export type PricingRow = {
 
 export const PRICING_ROWS: PricingRow[] = [
   // GeniusPro — smart routing
-  { model: "geniuspro-agi-1.2", input: "~$0.28–0.30", output: "~$0.42–1.20", color: "text-blue-500 dark:text-blue-400", other: "Smart routing" },
+  { model: "geniuspro-agi-1.2", input: "~$0.28–0.30", output: "~$0.42–1.20", color: "text-blue-500 dark:text-blue-400", other: "Chat routing" },
+  { model: "geniuspro-code-agi-1.2", input: "~$0.30–12", output: "~$1.20–48", color: "text-emerald-500 dark:text-emerald-400", other: "Coding routing" },
   // Anthropic
   { model: "claude-opus-4.6", input: "$5.00", output: "$25.00", color: "text-blue-500 dark:text-blue-400", other: "Flagship" },
   { model: "claude-sonnet-4.5", input: "$3.00", output: "$15.00", color: "text-blue-500 dark:text-blue-400" },
@@ -49,7 +50,4 @@ export const PRICING_ROWS: PricingRow[] = [
   { model: "minimax-m2.5", input: "$0.30", output: "$1.20", color: "text-amber-500 dark:text-amber-400", other: "Cost-effective" },
   { model: "minimax-m2.5-lightning", input: "~$0.15", output: "~$0.60", color: "text-amber-500 dark:text-amber-400", other: "Fast" },
   { model: "minimax-m2", input: "~$0.20", output: "~$0.80", color: "text-amber-500 dark:text-amber-400" },
-  // Gateway (legacy)
-  { model: "GeniusPro-coder-v1", input: "$1.00", output: "$8.00", color: "text-green-600 dark:text-green-400" },
-  { model: "GeniusPro-voice-v1", input: "—", output: "—", other: "$0.05 / minute", color: "text-purple-500 dark:text-purple-400" },
 ];

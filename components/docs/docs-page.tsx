@@ -3,6 +3,7 @@
 import { BookOpen, Zap, Terminal, Code, DollarSign, Gauge } from "lucide-react";
 
 import { ApiReferenceSection } from "@/components/docs/sections/api-reference-section";
+import { CursorSetupSection } from "@/components/docs/sections/cursor-setup-section";
 import { SmartRoutingSection } from "@/components/docs/sections/smart-routing-section";
 import { AuthenticationSection } from "@/components/docs/sections/authentication-section";
 import { AvailableModelsSection } from "@/components/docs/sections/available-models-section";
@@ -43,6 +44,12 @@ export default function DocsPage() {
 
           <QuickStartSection
             icon={Zap}
+            copiedText={copiedText}
+            onCopyText={copyText}
+          />
+
+          <CursorSetupSection
+            icon={Terminal}
             copiedText={copiedText}
             onCopyText={copyText}
           />

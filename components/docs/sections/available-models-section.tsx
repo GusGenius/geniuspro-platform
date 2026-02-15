@@ -2,9 +2,9 @@
 
 import {
   API_BASE_URL,
-  API_BASE_URL_GATEWAY,
   API_BASE_URL_VISION,
   MODEL_AGI,
+  MODEL_CODE_AGI,
   MODEL_CLAUDE,
   MODEL_CLAUDE_OPUS,
   MODEL_GPT,
@@ -13,8 +13,6 @@ import {
   MODEL_DEEPSEEK,
   MODEL_MINIMAX,
   MODEL_DEVSTRAL,
-  MODEL_CODER,
-  MODEL_VOICE,
   MODEL_VISION,
 } from "@/components/docs/docs-constants";
 
@@ -29,14 +27,18 @@ export function AvailableModelsSection() {
       <div className="space-y-3 sm:hidden">
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_AGI}</code>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Auto-routes to DeepSeek or MiniMax. See Smart Routing.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart routing: fast for simple, upgrades for complex. See Smart Routing.</p>
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_CLAUDE_OPUS}</code>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Anthropic flagship. Best for coding & agents.</p>
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
-          <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_GPT_CODEX}</code>
+          <code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_CODE_AGI}</code>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart routing for coding. See Cursor Setup.</p>
+        </div>
+        <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+          <code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_GPT_CODEX}</code>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">OpenAI agentic coding model.</p>
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
@@ -66,7 +68,7 @@ export function AvailableModelsSection() {
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_AGI}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">GeniusPro</td>
-              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Auto-routes to DeepSeek (simple) or MiniMax (complex). See Smart Routing.</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Smart routing: fast for simple, upgrades for complex. See Smart Routing.</td>
             </tr>
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CLAUDE_OPUS}</code></td>
@@ -82,6 +84,11 @@ export function AvailableModelsSection() {
               <td className="px-4 lg:px-6 py-4"><code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_GPT}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">OpenAI</td>
               <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Frontier general-purpose.</td>
+            </tr>
+            <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
+              <td className="px-4 lg:px-6 py-4"><code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CODE_AGI}</code></td>
+              <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">GeniusPro</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Smart routing for coding. See Cursor Setup.</td>
             </tr>
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_GPT_CODEX}</code></td>
@@ -107,16 +114,6 @@ export function AvailableModelsSection() {
               <td className="px-4 lg:px-6 py-4"><code className="text-green-600 dark:text-green-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_DEVSTRAL}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">Mistral</td>
               <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Open-source code agent.</td>
-            </tr>
-            <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-              <td className="px-4 lg:px-6 py-4"><code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CODER}</code></td>
-              <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">Gateway</td>
-              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Legacy. Base: <span className="font-mono">{API_BASE_URL_GATEWAY}</span></td>
-            </tr>
-            <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
-              <td className="px-4 lg:px-6 py-4"><code className="text-purple-500 dark:text-purple-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_VOICE}</code></td>
-              <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">Gateway</td>
-              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Voice synthesis. Base: <span className="font-mono">{API_BASE_URL_GATEWAY}</span></td>
             </tr>
             <tr className="hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-cyan-500 dark:text-cyan-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_VISION}</code></td>

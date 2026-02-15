@@ -16,17 +16,6 @@ export const PRICING = {
     label: "Coding Superintelligence",
     description: "Coding Superintelligence (Cursor surface)",
   },
-  "GeniusPro-coder-v1": {
-    input: 1.0, // $1 per 1M input tokens
-    output: 8.0, // $8 per 1M output tokens
-    label: "Coder",
-    description: "Optimized for coding tasks",
-  },
-  "GeniusPro-voice-v1": {
-    perMinute: 0.05, // $0.05 per minute
-    label: "Voice",
-    description: "Voice synthesis and recognition",
-  },
 } as const;
 
 /** Calculate cost for a request given model, input tokens, output tokens */

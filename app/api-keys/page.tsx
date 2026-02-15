@@ -18,7 +18,7 @@ interface ApiKeyRow {
   created_at: string;
 }
 
-type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "vision" | "gutter" | "universal";
+type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "vision" | "gutter" | "universal";
 
 const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
@@ -30,11 +30,6 @@ const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hin
     label: "GeniusPro Coding Superintelligence",
     color: "bg-purple-500/20 text-purple-400",
     hint: "Use with https://api.geniuspro.io/coding-superintelligence/v1 (Cursor).",
-  },
-  gateway: {
-    label: "GeniusPro Gateway (Coder + Voice)",
-    color: "bg-emerald-500/20 text-emerald-400",
-    hint: "Use with https://api.geniuspro.io/v1 for GeniusPro-coder-v1 and GeniusPro-voice-v1.",
   },
   vision: {
     label: "GeniusPro Vision (SAM 3)",
@@ -55,10 +50,8 @@ const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hin
 
 /** Map raw model IDs to friendly display names + colors */
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
-  "GeniusPro-coder-v1": { label: "Coder", color: "bg-blue-500/20 text-blue-400" },
   "GeniusPro-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
   "GeniusPro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
-  "GeniusPro-voice-v1": { label: "Voice", color: "bg-amber-500/20 text-amber-400" },
   "GeniusPro-vision-sam3": { label: "Vision SAM 3", color: "bg-cyan-500/20 text-cyan-400" },
 };
 

@@ -13,6 +13,7 @@ const SECTION_GROUPS: SectionGroup[] = [
     label: "Getting Started",
     items: [
       { id: "quick-start", label: "Quick Start" },
+      { id: "cursor-setup", label: "Cursor Setup" },
       { id: "authentication", label: "Authentication" },
       { id: "code-examples", label: "Code Examples" },
     ],

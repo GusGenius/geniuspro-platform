@@ -4,11 +4,9 @@ import { Check, Copy, Key, ArrowRight } from "lucide-react";
 
 import {
   API_BASE_URL,
-  API_BASE_URL_GATEWAY,
   MODEL_AGI,
+  MODEL_CODE_AGI,
   MODEL_GPT_CODEX,
-  MODEL_CODER,
-  MODEL_VOICE,
 } from "@/components/docs/docs-constants";
 
 type Props = {
@@ -127,7 +125,7 @@ export function QuickStartSection({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Auto-routes simple prompts to DeepSeek, complex ones (summarization, memory, long conversations) to MiniMax. Use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
+              Smart routing: fast for simple prompts, upgrades for complex ones (summarization, memory, long conversations). Use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
@@ -156,7 +154,7 @@ export function QuickStartSection({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              GPT-5.3 Codex for agentic coding. Same base URL as chat.
+              Smart routing for coding: fast for simple edits, upgrades for complex tasks. Same base URL as chat.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
@@ -167,47 +165,8 @@ export function QuickStartSection({
               />
               <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
-                value={MODEL_GPT_CODEX}
+                value={MODEL_CODE_AGI}
                 id="model-coding"
-                copiedText={copiedText}
-                onCopy={onCopyText}
-                color="green"
-              />
-            </div>
-          </div>
-
-          {/* Gateway */}
-          <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Gateway (Coder + Voice)
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Lightweight coding model (32K context) and voice synthesis/recognition.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <CopyChip
-                value={API_BASE_URL_GATEWAY}
-                id="base-url-gw"
-                copiedText={copiedText}
-                onCopy={onCopyText}
-              />
-              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
-              <CopyChip
-                value={MODEL_CODER}
-                id="model-coder"
-                copiedText={copiedText}
-                onCopy={onCopyText}
-                color="green"
-              />
-              <span className="text-gray-300 dark:text-gray-600 self-center text-xs">
-                /
-              </span>
-              <CopyChip
-                value={MODEL_VOICE}
-                id="model-voice"
                 copiedText={copiedText}
                 onCopy={onCopyText}
                 color="green"
