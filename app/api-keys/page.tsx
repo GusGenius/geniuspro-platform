@@ -360,7 +360,7 @@ export default function ApiKeysPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-600 dark:text-yellow-300">
                       <strong>Save this key!</strong> You won&apos;t be able to see it again. Use it with{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">https://api.geniuspro.io/v1</code> — pick the model in each request.
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">https://api.geniuspro.io/v1</code> — use <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-agi-1.2</code> for smart routing or pick a specific model.
                     </p>
                   </div>
 
@@ -400,7 +400,7 @@ export default function ApiKeysPage() {
                     autoFocus
                   />
                   <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">api.geniuspro.io/v1</code>. Choose the model (claude-sonnet-4.5, gpt-5.3-codex, etc.) in each API request.
+                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">api.geniuspro.io/v1</code>. Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-agi-1.2</code> for smart routing, or pick a specific model (gpt-5.3-codex, etc.) per request.
                   </p>
 
                   {error && <p className="mt-3 text-sm text-red-400">{error}</p>}

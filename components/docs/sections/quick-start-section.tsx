@@ -5,7 +5,7 @@ import { Check, Copy, Key, ArrowRight } from "lucide-react";
 import {
   API_BASE_URL,
   API_BASE_URL_GATEWAY,
-  MODEL_CLAUDE,
+  MODEL_AGI,
   MODEL_GPT_CODEX,
   MODEL_CODER,
   MODEL_VOICE,
@@ -127,7 +127,7 @@ export function QuickStartSection({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Claude, GPT, Gemini &mdash; use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
+              Auto-routes simple prompts to DeepSeek, complex ones (summarization, memory, long conversations) to MiniMax. Use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
@@ -138,8 +138,8 @@ export function QuickStartSection({
               />
               <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
-                value={MODEL_CLAUDE}
-                id="model-claude"
+                value={MODEL_AGI}
+                id="model-agi"
                 copiedText={copiedText}
                 onCopy={onCopyText}
                 color="green"

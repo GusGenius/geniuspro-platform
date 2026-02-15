@@ -2,6 +2,7 @@
 export const API_BASE_URL = "https://api.geniuspro.io/v1";
 
 // Recommended models (call GET /v1/models for full list)
+export const MODEL_AGI = "geniuspro-agi-1.2";
 export const MODEL_CLAUDE = "claude-sonnet-4.5";
 export const MODEL_CLAUDE_OPUS = "claude-opus-4.6";
 export const MODEL_GPT = "gpt-5.2";
@@ -29,7 +30,7 @@ export const CURL_SUPERINTELLIGENCE_EXAMPLE = `curl https://api.geniuspro.io/v1/
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "${MODEL_CLAUDE}",
+    "model": "${MODEL_AGI}",
     "messages": [
       {"role": "user", "content": "Explain quantum computing"}
     ]
@@ -43,7 +44,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="${MODEL_CLAUDE}",
+    model="${MODEL_AGI}",
     messages=[
         {"role": "user", "content": "Explain quantum computing"}
     ]
@@ -59,7 +60,7 @@ const openai = new OpenAI({
 });
 
 const response = await openai.chat.completions.create({
-  model: "${MODEL_CLAUDE}",
+  model: "${MODEL_AGI}",
   messages: [{ role: "user", content: "Explain quantum computing" }],
 });
 

@@ -4,6 +4,7 @@ import {
   API_BASE_URL,
   API_BASE_URL_GATEWAY,
   API_BASE_URL_VISION,
+  MODEL_AGI,
   MODEL_CLAUDE,
   MODEL_CLAUDE_OPUS,
   MODEL_GPT,
@@ -26,6 +27,10 @@ export function AvailableModelsSection() {
       </p>
 
       <div className="space-y-3 sm:hidden">
+        <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+          <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_AGI}</code>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Auto-routes to DeepSeek or MiniMax. See Smart Routing.</p>
+        </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_CLAUDE_OPUS}</code>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Anthropic flagship. Best for coding & agents.</p>
@@ -58,6 +63,11 @@ export function AvailableModelsSection() {
             </tr>
           </thead>
           <tbody>
+            <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
+              <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_AGI}</code></td>
+              <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">GeniusPro</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Auto-routes to DeepSeek (simple) or MiniMax (complex). See Smart Routing.</td>
+            </tr>
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CLAUDE_OPUS}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">Anthropic</td>
