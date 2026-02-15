@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Zap, Terminal, Code, DollarSign, Gauge } from "lucide-react";
+import { BookOpen, Zap, Terminal, Code, Gauge } from "lucide-react";
 
 import { ApiReferenceSection } from "@/components/docs/sections/api-reference-section";
 import { CursorSetupSection } from "@/components/docs/sections/cursor-setup-section";
@@ -10,7 +10,6 @@ import { AvailableModelsSection } from "@/components/docs/sections/available-mod
 import { CodeExamplesSection } from "@/components/docs/sections/code-examples-section";
 import { CodingSuperintelligenceSection } from "@/components/docs/sections/coding-superintelligence-section";
 import { VisionSection } from "@/components/docs/sections/vision-section";
-import { PricingSection } from "@/components/docs/sections/pricing-section";
 import { QuickStartSection } from "@/components/docs/sections/quick-start-section";
 import { RateLimitsSection } from "@/components/docs/sections/rate-limits-section";
 import { DocsSidebar, DocsMobileNav } from "@/components/docs/docs-sidebar";
@@ -95,8 +94,6 @@ export default function DocsPage() {
           <GeniusProModelsSection icon={Zap} />
 
           <AvailableModelsSection />
-
-          <PricingSection icon={DollarSign} />
 
           <RateLimitsSection icon={Gauge} />
 

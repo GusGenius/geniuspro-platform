@@ -30,7 +30,6 @@ const SECTION_GROUPS: SectionGroup[] = [
     items: [
       { id: "geniuspro-models", label: "GeniusPro Models" },
       { id: "available-models", label: "Available Models" },
-      { id: "pricing", label: "Pricing" },
       { id: "rate-limits", label: "Rate Limits" },
       { id: "api-reference", label: "API Reference" },
     ],

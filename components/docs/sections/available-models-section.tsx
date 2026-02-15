@@ -1,5 +1,6 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 import {
   API_BASE_URL,
   API_BASE_URL_VISION,
@@ -18,12 +19,15 @@ import {
 
 export function AvailableModelsSection() {
   return (
-    <section id="available-models" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Available Models</h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        Call <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">GET {API_BASE_URL}/models</code> for the full list. All models use base URL <span className="font-mono">{API_BASE_URL}</span>.
-      </p>
-
+    <CollapsibleSection
+      id="available-models"
+      title="Available Models"
+      description={
+        <>
+          Call <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">GET {API_BASE_URL}/models</code> for the full list. All models use base URL <span className="font-mono">{API_BASE_URL}</span>.
+        </>
+      }
+    >
       <div className="space-y-3 sm:hidden">
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_AGI}</code>
@@ -123,7 +127,7 @@ export function AvailableModelsSection() {
           </tbody>
         </table>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }
 

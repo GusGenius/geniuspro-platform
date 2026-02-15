@@ -18,13 +18,22 @@ export const PRICING = {
   },
 } as const;
 
+/** Normalize model id for lookup (API logs may use lowercase) */
+function normalizeModel(model: string): keyof typeof PRICING | null {
+  const lower = model.toLowerCase();
+  if (lower === "geniuspro-agi-1.2") return "GeniusPro-agi-1.2";
+  if (lower === "geniuspro-coding-agi-1.2") return "GeniusPro-coding-agi-1.2";
+  return model in PRICING ? (model as keyof typeof PRICING) : null;
+}
+
 /** Calculate cost for a request given model, input tokens, output tokens */
 export function calculateCost(
   model: string,
   inputTokens: number,
   outputTokens: number
 ): number {
-  const pricing = PRICING[model as keyof typeof PRICING];
+  const key = normalizeModel(model);
+  const pricing = key ? PRICING[key] : null;
   if (!pricing) return 0;
 
   if ("perMinute" in pricing) {
@@ -46,5 +55,6 @@ export function formatCost(cost: number): string {
 
 /** Get pricing for a model */
 export function getModelPricing(model: string) {
-  return PRICING[model as keyof typeof PRICING] || null;
+  const key = normalizeModel(model);
+  return key ? PRICING[key] : null;
 }

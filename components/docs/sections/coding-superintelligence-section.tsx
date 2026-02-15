@@ -1,6 +1,7 @@
 "use client";
 
 import { CodeExampleCard } from "@/components/docs/code-example-card";
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 import {
   CURL_CODING_CHAT_EXAMPLE,
   CURL_CODING_ONBOARDING_EXAMPLE,
@@ -21,15 +22,12 @@ export function CodingSuperintelligenceSection({
   onCopyCode,
 }: Props) {
   return (
-    <section id="coding-superintelligence" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Coding Superintelligence
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
-        Endpoints optimized for Cursor coding workflows.
-      </p>
-
+    <CollapsibleSection
+      id="coding-superintelligence"
+      title="Coding Superintelligence"
+      icon={Icon}
+      description="Endpoints optimized for Cursor coding workflows."
+    >
       {/* Feature pills */}
       <div className="flex flex-wrap gap-2 mb-6">
         {[
@@ -113,6 +111,6 @@ export function CodingSuperintelligenceSection({
           </div>
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }

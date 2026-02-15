@@ -1,6 +1,7 @@
 "use client";
 
 import { CodeExampleCard } from "@/components/docs/code-example-card";
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 import {
   CURL_VISION_SEGMENT_IMAGE_TEXT,
   CURL_VISION_SEGMENT_IMAGE_POINTS,
@@ -22,15 +23,12 @@ export function VisionSection({
   onCopyCode,
 }: Props) {
   return (
-    <section id="vision" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Vision Service (SAM 3)
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
-        Image and video segmentation using Meta&apos;s Segment Anything Model 3 (SAM 3) with text prompts, points, and bounding boxes.
-      </p>
-
+    <CollapsibleSection
+      id="vision"
+      title="Vision Service (SAM 3)"
+      icon={Icon}
+      description="Image and video segmentation using Meta's Segment Anything Model 3 (SAM 3) with text prompts, points, and bounding boxes."
+    >
       {/* Feature pills */}
       <div className="flex flex-wrap gap-2 mb-6">
         {[
@@ -171,6 +169,6 @@ export function VisionSection({
           </p>
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }

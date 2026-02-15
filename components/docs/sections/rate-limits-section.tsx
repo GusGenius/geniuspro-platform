@@ -1,17 +1,14 @@
 "use client";
 
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
+
 type Props = {
   icon: React.ComponentType<{ className?: string }>;
 };
 
 export function RateLimitsSection({ icon: Icon }: Props) {
   return (
-    <section id="rate-limits" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Rate Limits
-      </h2>
-
+    <CollapsibleSection id="rate-limits" title="Rate Limits" icon={Icon}>
       <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           By default, API keys have a rate limit of{" "}
@@ -22,7 +19,7 @@ export function RateLimitsSection({ icon: Icon }: Props) {
           Rate limits can be adjusted for Pro and Enterprise plans. Contact support for custom rate limits.
         </p>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }
 

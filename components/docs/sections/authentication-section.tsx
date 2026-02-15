@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
-
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 import { AUTH_HEADER_EXAMPLE } from "@/components/docs/docs-constants";
 
 type Props = {
@@ -12,15 +12,12 @@ type Props = {
 
 export function AuthenticationSection({ icon: Icon, copiedText, onCopyText }: Props) {
   return (
-    <section id="authentication" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Authentication
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
-        Every request requires your API key in the header.
-      </p>
-
+    <CollapsibleSection
+      id="authentication"
+      title="Authentication"
+      icon={Icon}
+      description="Every request requires your API key in the header."
+    >
       <div className="mb-6">
         <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Key management</h3>
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
@@ -59,7 +56,7 @@ export function AuthenticationSection({ icon: Icon, copiedText, onCopyText }: Pr
           </div>
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }
 

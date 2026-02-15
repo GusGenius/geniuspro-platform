@@ -4,13 +4,13 @@ import { useState, useEffect, useCallback } from "react";
 import { BarChart3, Calendar, ChevronDown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import { calculateCost, formatCost, PRICING } from "@/lib/pricing";
+import { calculateCost, formatCost, getModelPricing } from "@/lib/pricing";
 
 /** Map raw model IDs to branded display names */
 function getModelLabel(model: string): string {
-  const pricing = PRICING[model as keyof typeof PRICING];
+  const pricing = getModelPricing(model);
   if (pricing) return pricing.label;
-  return "Superintelligence";
+  return model || "Unknown";
 }
 
 interface UsageStats {

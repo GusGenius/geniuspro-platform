@@ -172,7 +172,9 @@ export default function BillingPage() {
           <div className="text-sm text-gray-500 dark:text-gray-400">
             <p className="mb-2">Credits never expire</p>
             <p className="mb-2">Automatic deduction from your balance</p>
-            <p>View detailed usage and costs on the <a href="/usage" className="text-blue-500 dark:text-blue-400 hover:underline">Usage</a> page</p>
+            <p>
+              View the full <a href="/pricing" className="text-blue-500 dark:text-blue-400 hover:underline">pricing table</a> and detailed usage on the <a href="/usage" className="text-blue-500 dark:text-blue-400 hover:underline">Usage</a> page
+            </p>
           </div>
         </div>
       </div>

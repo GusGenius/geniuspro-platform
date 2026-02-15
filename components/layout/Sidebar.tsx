@@ -10,6 +10,7 @@ import {
   BarChart3,
   BookOpen,
   CreditCard,
+  DollarSign,
   MessageSquare,
   Sun,
   Moon,
@@ -115,6 +116,7 @@ export default function Sidebar() {
     { name: "API Keys", href: "/api-keys", icon: Key },
     { name: "Docs", href: "/docs", icon: BookOpen },
     { name: "Usage", href: "/usage", icon: BarChart3 },
+    { name: "Pricing", href: "/pricing", icon: DollarSign },
     { name: "Billing", href: "/billing", icon: CreditCard },
   ];
 

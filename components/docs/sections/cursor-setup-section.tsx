@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 
 import {
   API_BASE_URL,
@@ -17,15 +18,18 @@ type Props = {
 
 export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props) {
   return (
-    <section id="cursor-setup" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Cursor Setup for Coding
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        Configure Cursor to use GeniusPro for the best coding experience. Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> (our coding model) or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> for maximum capability.
-      </p>
-
+    <CollapsibleSection
+      id="cursor-setup"
+      title="Cursor Setup for Coding"
+      icon={Icon}
+      description={
+        <>
+          Configure Cursor to use GeniusPro for the best coding experience. Use{" "}
+          <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> (our coding model) or{" "}
+          <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> for maximum capability.
+        </>
+      }
+    >
       <div className="space-y-6">
         <div>
           <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Step 1: Get your API key</h3>
@@ -90,6 +94,6 @@ export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props
           </p>
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }

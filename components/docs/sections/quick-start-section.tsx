@@ -8,6 +8,7 @@ import {
   MODEL_CODE_AGI,
   MODEL_GPT_CODEX,
 } from "@/components/docs/docs-constants";
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 
 type Props = {
   icon: React.ComponentType<{ className?: string }>;
@@ -58,15 +59,12 @@ export function QuickStartSection({
   onCopyText,
 }: Props) {
   return (
-    <section id="quick-start" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        Quick Start
-      </h2>
-      <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
-        Get up and running in three steps.
-      </p>
-
+    <CollapsibleSection
+      id="quick-start"
+      title="Quick Start"
+      icon={Icon}
+      description="Get up and running in three steps."
+    >
       {/* Step 1 */}
       <div className="relative pl-8 pb-8 border-l-2 border-gray-200 dark:border-gray-700">
         <div className="absolute -left-3.5 top-0 w-7 h-7 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">
@@ -199,6 +197,6 @@ export function QuickStartSection({
           below for ready-to-run cURL, Python, and JavaScript snippets.
         </p>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }

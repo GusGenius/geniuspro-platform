@@ -1,6 +1,7 @@
 "use client";
 
 import { MODEL_AGI, MODEL_CODE_AGI } from "@/components/docs/docs-constants";
+import { CollapsibleSection } from "@/components/docs/collapsible-section";
 
 type Props = {
   icon: React.ComponentType<{ className?: string }>;
@@ -8,15 +9,17 @@ type Props = {
 
 export function GeniusProModelsSection({ icon: Icon }: Props) {
   return (
-    <section id="geniuspro-models" className="mb-12 scroll-mt-24">
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-        <Icon className="w-5 h-5 text-blue-400" />
-        GeniusPro Models
-      </h2>
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">{MODEL_AGI}</code> (chat) and <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">{MODEL_CODE_AGI}</code> (coding) are our flagship models. Use them with any OpenAI-compatible client.
-      </p>
-
+    <CollapsibleSection
+      id="geniuspro-models"
+      title="GeniusPro Models"
+      icon={Icon}
+      description={
+        <>
+          <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">{MODEL_AGI}</code> (chat) and{" "}
+          <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">{MODEL_CODE_AGI}</code> (coding) are our flagship models. Use them with any OpenAI-compatible client.
+        </>
+      }
+    >
       <div className="space-y-6">
         <div>
           <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Models</h3>
@@ -33,6 +36,6 @@ export function GeniusProModelsSection({ icon: Icon }: Props) {
           </p>
         </div>
       </div>
-    </section>
+    </CollapsibleSection>
   );
 }
