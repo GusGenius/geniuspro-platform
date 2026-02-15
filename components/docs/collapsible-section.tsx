@@ -17,7 +17,7 @@ export function CollapsibleSection({
   title,
   icon: Icon,
   description,
-  defaultOpen = true,
+  defaultOpen = false,
   children,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);

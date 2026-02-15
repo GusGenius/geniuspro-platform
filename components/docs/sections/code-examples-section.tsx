@@ -24,6 +24,7 @@ export function CodeExamplesSection({
       id="code-examples"
       title="Code Examples"
       icon={Icon}
+      defaultOpen={false}
       description={
         <>
           Ready-to-run examples using the Superintelligence endpoint. Replace{" "}

@@ -8,7 +8,7 @@ type Props = {
 
 export function ApiReferenceSection({ icon: Icon }: Props) {
   return (
-    <CollapsibleSection id="api-reference" title="API Reference" icon={Icon}>
+    <CollapsibleSection id="api-reference" title="API Reference" icon={Icon} defaultOpen={false}>
       <div className="space-y-3 sm:space-y-4">
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3 sm:p-5 hover:bg-gray-100 dark:hover:bg-gray-800/70 transition-colors">
           <div className="flex items-center gap-2 mb-1.5 sm:mb-2 flex-wrap">

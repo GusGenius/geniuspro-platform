@@ -22,6 +22,7 @@ export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props
       id="cursor-setup"
       title="Cursor Setup for Coding"
       icon={Icon}
+      defaultOpen={false}
       description={
         <>
           Configure Cursor to use GeniusPro for the best coding experience. Use{" "}

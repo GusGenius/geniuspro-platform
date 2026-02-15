@@ -17,6 +17,7 @@ export function AuthenticationSection({ icon: Icon, copiedText, onCopyText }: Pr
       title="Authentication"
       icon={Icon}
       description="Every request requires your API key in the header."
+      defaultOpen={false}
     >
       <div className="mb-6">
         <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Key management</h3>

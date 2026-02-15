@@ -64,6 +64,7 @@ export function QuickStartSection({
       title="Quick Start"
       icon={Icon}
       description="Get up and running in three steps."
+      defaultOpen={true}
     >
       {/* Step 1 */}
       <div className="relative pl-8 pb-8 border-l-2 border-gray-200 dark:border-gray-700">

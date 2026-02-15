@@ -22,6 +22,7 @@ export function AvailableModelsSection() {
     <CollapsibleSection
       id="available-models"
       title="Available Models"
+      defaultOpen={false}
       description={
         <>
           Call <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">GET {API_BASE_URL}/models</code> for the full list. All models use base URL <span className="font-mono">{API_BASE_URL}</span>.

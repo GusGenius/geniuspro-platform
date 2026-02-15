@@ -27,6 +27,7 @@ export function CodingSuperintelligenceSection({
       title="Coding Superintelligence"
       icon={Icon}
       description="Endpoints optimized for Cursor coding workflows."
+      defaultOpen={false}
     >
       {/* Feature pills */}
       <div className="flex flex-wrap gap-2 mb-6">

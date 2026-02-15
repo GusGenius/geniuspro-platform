@@ -28,6 +28,7 @@ export function VisionSection({
       title="Vision Service (SAM 3)"
       icon={Icon}
       description="Image and video segmentation using Meta's Segment Anything Model 3 (SAM 3) with text prompts, points, and bounding boxes."
+      defaultOpen={false}
     >
       {/* Feature pills */}
       <div className="flex flex-wrap gap-2 mb-6">

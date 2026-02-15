@@ -8,7 +8,7 @@ type Props = {
 
 export function RateLimitsSection({ icon: Icon }: Props) {
   return (
-    <CollapsibleSection id="rate-limits" title="Rate Limits" icon={Icon}>
+    <CollapsibleSection id="rate-limits" title="Rate Limits" icon={Icon} defaultOpen={false}>
       <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           By default, API keys have a rate limit of{" "}

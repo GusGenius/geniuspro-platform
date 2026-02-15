@@ -13,6 +13,7 @@ export function GeniusProModelsSection({ icon: Icon }: Props) {
       id="geniuspro-models"
       title="GeniusPro Models"
       icon={Icon}
+      defaultOpen={false}
       description={
         <>
           <code className="bg-gray-200 dark:bg-gray-800 px-1.5 py-0.5 rounded">{MODEL_AGI}</code> (chat) and{" "}
