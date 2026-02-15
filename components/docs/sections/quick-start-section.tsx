@@ -125,7 +125,7 @@ export function QuickStartSection({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Smart routing: fast for simple prompts, upgrades for complex ones (summarization, memory, long conversations). Use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
+              Our chat model. Use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
@@ -154,7 +154,7 @@ export function QuickStartSection({
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Smart routing for coding: fast for simple edits, upgrades for complex tasks. Same base URL as chat.
+              Our coding model. Same base URL as chat.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip

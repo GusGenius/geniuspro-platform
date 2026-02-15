@@ -4,7 +4,7 @@ import { BookOpen, Zap, Terminal, Code, DollarSign, Gauge } from "lucide-react";
 
 import { ApiReferenceSection } from "@/components/docs/sections/api-reference-section";
 import { CursorSetupSection } from "@/components/docs/sections/cursor-setup-section";
-import { SmartRoutingSection } from "@/components/docs/sections/smart-routing-section";
+import { GeniusProModelsSection } from "@/components/docs/sections/geniuspro-models-section";
 import { AuthenticationSection } from "@/components/docs/sections/authentication-section";
 import { AvailableModelsSection } from "@/components/docs/sections/available-models-section";
 import { CodeExamplesSection } from "@/components/docs/sections/code-examples-section";
@@ -92,7 +92,7 @@ export default function DocsPage() {
             </span>
           </div>
 
-          <SmartRoutingSection icon={Zap} />
+          <GeniusProModelsSection icon={Zap} />
 
           <AvailableModelsSection />
 

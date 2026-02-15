@@ -12,9 +12,9 @@ export type PricingRow = {
 };
 
 export const PRICING_ROWS: PricingRow[] = [
-  // GeniusPro — smart routing
-  { model: "geniuspro-agi-1.2", input: "~$0.28–0.30", output: "~$0.42–1.20", color: "text-blue-500 dark:text-blue-400", other: "Chat routing" },
-  { model: "geniuspro-code-agi-1.2", input: "~$0.30–12", output: "~$1.20–48", color: "text-emerald-500 dark:text-emerald-400", other: "Coding routing" },
+  // GeniusPro
+  { model: "geniuspro-agi-1.2", input: "~$0.28–0.30", output: "~$0.42–1.20", color: "text-blue-500 dark:text-blue-400", other: "Chat" },
+  { model: "geniuspro-code-agi-1.2", input: "~$0.30–12", output: "~$1.20–48", color: "text-emerald-500 dark:text-emerald-400", other: "Coding" },
   // Anthropic
   { model: "claude-opus-4.6", input: "$5.00", output: "$25.00", color: "text-blue-500 dark:text-blue-400", other: "Flagship" },
   { model: "claude-sonnet-4.5", input: "$3.00", output: "$15.00", color: "text-blue-500 dark:text-blue-400" },

@@ -28,7 +28,7 @@ const SECTION_GROUPS: SectionGroup[] = [
   {
     label: "Reference",
     items: [
-      { id: "smart-routing", label: "Smart Routing" },
+      { id: "geniuspro-models", label: "GeniusPro Models" },
       { id: "available-models", label: "Available Models" },
       { id: "pricing", label: "Pricing" },
       { id: "rate-limits", label: "Rate Limits" },

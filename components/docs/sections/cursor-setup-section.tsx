@@ -23,7 +23,7 @@ export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props
         Cursor Setup for Coding
       </h2>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        Configure Cursor to use GeniusPro for the best coding experience. Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> for smart coding (routes simple tasks to a fast tier, complex ones to {MODEL_GPT_CODEX}), or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> directly for maximum capability.
+        Configure Cursor to use GeniusPro for the best coding experience. Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> (our coding model) or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> for maximum capability.
       </p>
 
       <div className="space-y-6">
@@ -64,14 +64,14 @@ export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props
           </div>
           <ol start={5} className="list-decimal list-inside space-y-1 mt-3 text-sm text-gray-600 dark:text-gray-300">
             <li>Set API Key to your GeniusPro key</li>
-            <li>Select model: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> (smart coding) or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_AGI}</code> (chat)</li>
+            <li>Select model: <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> (coding) or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_AGI}</code> (chat)</li>
           </ol>
         </div>
 
         <div>
           <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Recommended model for coding</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-            Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> for Composer and Chat when coding. It routes simple edits to a fast tier and complex tasks (debug, refactor, multi-file) to {MODEL_GPT_CODEX}. For maximum capability on every request, use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> directly.
+            Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> for Composer and Chat when coding. For maximum capability on every request, use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> directly.
           </p>
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Quick reference</p>
@@ -86,7 +86,7 @@ export function CursorSetupSection({ icon: Icon, copiedText, onCopyText }: Props
         <div>
           <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Tiered setup (optional)</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            For cost optimization: use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> for most coding (smart routing). Switch to <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> when you need maximum capability for complex refactors or architectural work.
+            For cost optimization: use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_CODE_AGI}</code> for most coding. Switch to <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">{MODEL_GPT_CODEX}</code> when you need maximum capability for complex refactors or architectural work.
           </p>
         </div>
       </div>

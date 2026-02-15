@@ -27,7 +27,7 @@ export function AvailableModelsSection() {
       <div className="space-y-3 sm:hidden">
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_AGI}</code>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart routing: fast for simple, upgrades for complex. See Smart Routing.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">GeniusPro chat model.</p>
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_CLAUDE_OPUS}</code>
@@ -35,7 +35,7 @@ export function AvailableModelsSection() {
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_CODE_AGI}</code>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Smart routing for coding. See Cursor Setup.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">GeniusPro coding model.</p>
         </div>
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
           <code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-[10px] break-all inline-block">{MODEL_GPT_CODEX}</code>
@@ -68,7 +68,7 @@ export function AvailableModelsSection() {
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_AGI}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">GeniusPro</td>
-              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Smart routing: fast for simple, upgrades for complex. See Smart Routing.</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">GeniusPro chat model.</td>
             </tr>
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-blue-500 dark:text-blue-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CLAUDE_OPUS}</code></td>
@@ -88,7 +88,7 @@ export function AvailableModelsSection() {
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_CODE_AGI}</code></td>
               <td className="px-4 lg:px-6 py-4 text-gray-600 dark:text-gray-300">GeniusPro</td>
-              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">Smart routing for coding. See Cursor Setup.</td>
+              <td className="px-4 lg:px-6 py-4 text-gray-500 dark:text-gray-400">GeniusPro coding model.</td>
             </tr>
             <tr className="border-b border-gray-200/50 dark:border-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-800/30 transition-colors">
               <td className="px-4 lg:px-6 py-4"><code className="text-emerald-500 dark:text-emerald-400 bg-gray-200 dark:bg-gray-900 px-2 py-1 rounded text-xs whitespace-nowrap">{MODEL_GPT_CODEX}</code></td>
