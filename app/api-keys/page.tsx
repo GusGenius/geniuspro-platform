@@ -19,6 +19,9 @@ interface ApiKeyRow {
 }
 
 type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "vision" | "gutter" | "universal";
+const OPENAI_COMPAT_BASE_URL = "https://api.geniuspro.io/v1";
+const CHAT_MODEL_ID = "geniuspro-agi-1.2";
+const CODING_MODEL_ID = "geniuspro-code-agi-1.2";
 
 const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
@@ -353,7 +356,9 @@ export default function ApiKeysPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-600 dark:text-yellow-300">
                       <strong>Save this key!</strong> You won&apos;t be able to see it again. Use it with{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">https://api.geniuspro.io/v1</code> — use <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-agi-1.2</code> for chat or <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-code-agi-1.2</code> for coding, or pick a specific model.
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{OPENAI_COMPAT_BASE_URL}</code> — use{" "}
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CHAT_MODEL_ID}</code> for chat or{" "}
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CODING_MODEL_ID}</code> for coding, or pick a specific model.
                     </p>
                   </div>
 
@@ -377,6 +382,68 @@ export default function ApiKeysPage() {
                       </button>
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      API URL
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
+                        {OPENAI_COMPAT_BASE_URL}
+                      </code>
+                      <button
+                        onClick={() => handleCopy(OPENAI_COMPAT_BASE_URL, "new-url")}
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
+                        title="Copy API URL"
+                      >
+                        {copiedId === "new-url" ? (
+                          <Check className="w-5 h-5 text-green-400" />
+                        ) : (
+                          <Copy className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Models
+                    </label>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
+                          {CHAT_MODEL_ID}
+                        </code>
+                        <button
+                          onClick={() => handleCopy(CHAT_MODEL_ID, "new-chat-model")}
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
+                          title="Copy chat model"
+                        >
+                          {copiedId === "new-chat-model" ? (
+                            <Check className="w-5 h-5 text-green-400" />
+                          ) : (
+                            <Copy className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
+                          {CODING_MODEL_ID}
+                        </code>
+                        <button
+                          onClick={() => handleCopy(CODING_MODEL_ID, "new-coding-model")}
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
+                          title="Copy coding model"
+                        >
+                          {copiedId === "new-coding-model" ? (
+                            <Check className="w-5 h-5 text-green-400" />
+                          ) : (
+                            <Copy className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div>
@@ -393,7 +460,9 @@ export default function ApiKeysPage() {
                     autoFocus
                   />
                   <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">api.geniuspro.io/v1</code>. Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-agi-1.2</code> (chat) or <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">geniuspro-code-agi-1.2</code> (coding), or pick a specific model per request.
+                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{OPENAI_COMPAT_BASE_URL}</code>. Use{" "}
+                    <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CHAT_MODEL_ID}</code> (chat) or{" "}
+                    <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CODING_MODEL_ID}</code> (coding), or pick a specific model per request.
                   </p>
 
                   {error && <p className="mt-3 text-sm text-red-400">{error}</p>}

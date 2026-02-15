@@ -51,6 +51,7 @@ interface KeyBreakdown {
 }
 
 type Period = "week" | "month" | "quarter";
+const CHAT_USAGE_ENDPOINT = "/chat/completions";
 
 function getPeriodStart(period: Period): string {
   const now = new Date();
@@ -91,6 +92,7 @@ export default function UsagePage() {
         .from("usage_logs")
         .select("model, prompt_tokens, completion_tokens, total_tokens, response_time_ms, created_at, api_key_id")
         .eq("user_id", user.id)
+        .neq("endpoint", CHAT_USAGE_ENDPOINT)
         .gte("created_at", since)
         .order("created_at", { ascending: true });
 
