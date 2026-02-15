@@ -34,8 +34,8 @@ function CopyChip({
       ? "text-green-600 dark:text-green-400"
       : "text-blue-500 dark:text-blue-400";
   return (
-    <span className="inline-flex items-center gap-1.5 bg-gray-200 dark:bg-gray-900 rounded-lg px-2.5 py-1 group">
-      <code className={`font-mono text-sm ${colorClasses} break-all`}>
+    <span className="inline-flex max-w-full items-center gap-1.5 bg-gray-200 dark:bg-gray-900 rounded-lg px-2.5 py-1 group">
+      <code className={`font-mono text-xs sm:text-sm ${colorClasses} break-all`}>
         {value}
       </code>
       <button
@@ -64,7 +64,7 @@ export function QuickStartSection({
       title="Quick Start"
       icon={Icon}
       description="Get up and running in three steps."
-      defaultOpen={true}
+      defaultOpen={false}
     >
       {/* Step 1 */}
       <div className="relative pl-8 pb-8 border-l-2 border-gray-200 dark:border-gray-700">
@@ -88,9 +88,9 @@ export function QuickStartSection({
           </code>{" "}
           header for every request.
         </p>
-        <div className="bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3 inline-flex items-center gap-2">
+        <div className="bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3 inline-flex max-w-full flex-wrap items-center gap-2">
           <Key className="w-4 h-4 text-gray-400" />
-          <code className="text-sm text-gray-600 dark:text-gray-300">
+          <code className="text-sm text-gray-600 dark:text-gray-300 break-all">
             Authorization: Bearer{" "}
             <span className="text-blue-500 dark:text-blue-400">
               YOUR_API_KEY
@@ -133,7 +133,7 @@ export function QuickStartSection({
                 copiedText={copiedText}
                 onCopy={onCopyText}
               />
-              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
+              <ArrowRight className="hidden sm:block w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
                 value={MODEL_AGI}
                 id="model-agi"
@@ -162,7 +162,7 @@ export function QuickStartSection({
                 copiedText={copiedText}
                 onCopy={onCopyText}
               />
-              <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
+              <ArrowRight className="hidden sm:block w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
                 value={MODEL_CODE_AGI}
                 id="model-coding"
