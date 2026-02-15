@@ -59,14 +59,14 @@ export default function Sidebar() {
           `https://chat.geniuspro.io/auth/handoff#access_token=${encodeURIComponent(session.access_token)}` +
           `&refresh_token=${encodeURIComponent(session.refresh_token)}` +
           `&redirect=${encodeURIComponent("/dashboard")}`;
-        window.open(handoffUrl, "_blank", "noopener,noreferrer");
+        window.location.assign(handoffUrl);
         return;
       }
 
-      window.open("https://chat.geniuspro.io", "_blank", "noopener,noreferrer");
+      window.location.assign("https://chat.geniuspro.io");
     } catch (error) {
       console.error("Failed to get session for chat handoff:", error);
-      window.open("https://chat.geniuspro.io", "_blank", "noopener,noreferrer");
+      window.location.assign("https://chat.geniuspro.io");
     }
   };
 
