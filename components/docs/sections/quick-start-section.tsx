@@ -3,11 +3,10 @@
 import { Check, Copy, Key, ArrowRight } from "lucide-react";
 
 import {
-  API_BASE_URL_SUPERINTELLIGENCE,
-  API_BASE_URL_CODING_SUPERINTELLIGENCE,
+  API_BASE_URL,
   API_BASE_URL_GATEWAY,
-  MODEL_CODING_SUPERINTELLIGENCE,
-  MODEL_SUPERINTELLIGENCE,
+  MODEL_CLAUDE,
+  MODEL_GPT_CODEX,
   MODEL_CODER,
   MODEL_VOICE,
 } from "@/components/docs/docs-constants";
@@ -116,31 +115,31 @@ export function QuickStartSection({
         </p>
 
         <div className="space-y-3">
-          {/* Superintelligence */}
+          {/* Unified API (geniuspro-api) */}
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Superintelligence
+                Chat API (OpenAI-compatible)
               </span>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">
                 Recommended
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              General-purpose AI &mdash; 200K context, best for chat, reasoning, and generation.
+              Claude, GPT, Gemini &mdash; use with Cursor, OpenAI SDK, or any OpenAI-compatible client.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
-                value={API_BASE_URL_SUPERINTELLIGENCE}
-                id="base-url-si"
+                value={API_BASE_URL}
+                id="base-url-api"
                 copiedText={copiedText}
                 onCopy={onCopyText}
               />
               <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
-                value={MODEL_SUPERINTELLIGENCE}
-                id="model-si"
+                value={MODEL_CLAUDE}
+                id="model-claude"
                 copiedText={copiedText}
                 onCopy={onCopyText}
                 color="green"
@@ -148,30 +147,27 @@ export function QuickStartSection({
             </div>
           </div>
 
-          {/* Coding Superintelligence */}
+          {/* Coding */}
           <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                Coding Superintelligence
-              </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">
-                Cursor
+                Coding (Cursor)
               </span>
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-              Optimized for Cursor coding workflows &mdash; onboarding, tool-based routing, summarization.
+              GPT-5.3 Codex for agentic coding. Same base URL as chat.
             </p>
             <div className="flex flex-wrap gap-2">
               <CopyChip
-                value={API_BASE_URL_CODING_SUPERINTELLIGENCE}
+                value={API_BASE_URL}
                 id="base-url-coding"
                 copiedText={copiedText}
                 onCopy={onCopyText}
               />
               <ArrowRight className="w-4 h-4 text-gray-300 dark:text-gray-600 self-center flex-shrink-0" />
               <CopyChip
-                value={MODEL_CODING_SUPERINTELLIGENCE}
+                value={MODEL_GPT_CODEX}
                 id="model-coding"
                 copiedText={copiedText}
                 onCopy={onCopyText}

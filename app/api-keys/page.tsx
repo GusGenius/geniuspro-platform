@@ -19,13 +19,13 @@ interface ApiKeyRow {
   created_at: string;
 }
 
-type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "vision" | "universal";
+type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "gateway" | "vision" | "gutter" | "universal";
 
 const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
   openai_compat: {
-    label: "GeniusPro Superintelligence",
+    label: "GeniusPro API (Chat)",
     color: "bg-blue-500/20 text-blue-400",
-    hint: "Use with https://api.geniuspro.io/superintelligence/v1.",
+    hint: "Use with https://api.geniuspro.io/v1 for chat (OpenAI-compatible, Cursor).",
   },
   coding_superintelligence: {
     label: "GeniusPro Coding Superintelligence",
@@ -41,6 +41,11 @@ const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hin
     label: "GeniusPro Vision (SAM 3)",
     color: "bg-cyan-500/20 text-cyan-400",
     hint: "Use with https://api.geniuspro.io/vision/v1 for image and video segmentation.",
+  },
+  gutter: {
+    label: "Gutter Empire (Unity)",
+    color: "bg-fuchsia-500/20 text-fuchsia-400",
+    hint: "Use with https://api.geniuspro.io/gutter for Gutter Empire Unity app.",
   },
   universal: {
     label: "Legacy Universal",
@@ -97,6 +102,11 @@ export default function ApiKeysPage() {
       value: "vision",
       label: PROFILE_DISPLAY.vision.label,
       hint: PROFILE_DISPLAY.vision.hint,
+    },
+    {
+      value: "gutter",
+      label: PROFILE_DISPLAY.gutter.label,
+      hint: PROFILE_DISPLAY.gutter.hint,
     },
   ] as const;
 

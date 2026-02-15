@@ -1,15 +1,23 @@
-// Gateway (/v1) — lightweight models
+// Primary API — unified OpenAI-compatible (geniuspro-api on Vercel)
+export const API_BASE_URL = "https://api.geniuspro.io/v1";
+
+// Recommended models (call GET /v1/models for full list)
+export const MODEL_CLAUDE = "claude-sonnet-4.5";
+export const MODEL_CLAUDE_OPUS = "claude-opus-4.6";
+export const MODEL_GPT = "gpt-5.2";
+export const MODEL_GPT_CODEX = "gpt-5.3-codex";
+export const MODEL_GEMINI = "gemini-3-pro";
+export const MODEL_DEEPSEEK = "deepseek-chat";
+export const MODEL_MINIMAX = "minimax-m2.5";
+export const MODEL_DEVSTRAL = "devstral-2";
+
+// Gateway — legacy (remote server)
 export const API_BASE_URL_GATEWAY = "https://api.geniuspro.io/v1";
 export const MODEL_CODER = "GeniusPro-coder-v1";
 export const MODEL_VOICE = "GeniusPro-voice-v1";
 
-// Superintelligence — regular surface
-export const API_BASE_URL_SUPERINTELLIGENCE = "https://api.geniuspro.io/superintelligence/v1";
-export const MODEL_SUPERINTELLIGENCE = "GeniusPro-agi-1.2";
-
-// Coding Superintelligence — Cursor surface
+// Coding Superintelligence — legacy (remote server, being phased out)
 export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/coding-superintelligence/v1";
-export const MODEL_CODING_SUPERINTELLIGENCE = "GeniusPro-coding-agi-1.2";
 
 // Vision Service — SAM 3 segmentation
 export const API_BASE_URL_VISION = "https://api.geniuspro.io/vision/v1";
@@ -17,11 +25,11 @@ export const MODEL_VISION = "GeniusPro-vision-sam3";
 
 export const AUTH_HEADER_EXAMPLE = "Authorization: Bearer YOUR_API_KEY";
 
-export const CURL_SUPERINTELLIGENCE_EXAMPLE = `curl https://api.geniuspro.io/superintelligence/v1/chat/completions \\
+export const CURL_SUPERINTELLIGENCE_EXAMPLE = `curl https://api.geniuspro.io/v1/chat/completions \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "${MODEL_SUPERINTELLIGENCE}",
+    "model": "${MODEL_CLAUDE}",
     "messages": [
       {"role": "user", "content": "Explain quantum computing"}
     ]
@@ -31,11 +39,11 @@ export const PYTHON_SUPERINTELLIGENCE_EXAMPLE = `from openai import OpenAI
 
 client = OpenAI(
     api_key="YOUR_API_KEY",
-    base_url="https://api.geniuspro.io/superintelligence/v1"
+    base_url="https://api.geniuspro.io/v1"
 )
 
 response = client.chat.completions.create(
-    model="${MODEL_SUPERINTELLIGENCE}",
+    model="${MODEL_CLAUDE}",
     messages=[
         {"role": "user", "content": "Explain quantum computing"}
     ]
@@ -47,11 +55,11 @@ export const JS_SUPERINTELLIGENCE_EXAMPLE = `import OpenAI from "openai";
 
 const openai = new OpenAI({
   apiKey: "YOUR_API_KEY",
-  baseURL: "https://api.geniuspro.io/superintelligence/v1",
+  baseURL: "https://api.geniuspro.io/v1",
 });
 
 const response = await openai.chat.completions.create({
-  model: "${MODEL_SUPERINTELLIGENCE}",
+  model: "${MODEL_CLAUDE}",
   messages: [{ role: "user", content: "Explain quantum computing" }],
 });
 
@@ -145,4 +153,3 @@ print(result["rooflines"])  # Detected rooflines with points
 print(result["suggested_rain_chains"])  # Rain chain positions
 print(result["suggested_tank"])  # Tank position
 print(result["ground_level"])  # Ground level Y coordinate`;
-
