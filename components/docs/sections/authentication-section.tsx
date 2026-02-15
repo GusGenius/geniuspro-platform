@@ -21,6 +21,20 @@ export function AuthenticationSection({ icon: Icon, copiedText, onCopyText }: Pr
         Every request requires your API key in the header.
       </p>
 
+      <div className="mb-6">
+        <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2">Key management</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+          Manage keys at{" "}
+          <a
+            href="/api-keys"
+            className="text-blue-500 dark:text-blue-400 underline underline-offset-2 hover:text-blue-600"
+          >
+            API Keys
+          </a>
+          . You can create new keys, regenerate a key (invalidates the old one and shows the new key once), or delete keys. Keys are shown only once when created or regenerated—store them securely.
+        </p>
+      </div>
+
       <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-6">
         <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
           Add this header to all requests:
