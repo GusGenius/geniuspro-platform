@@ -26,10 +26,10 @@ export default function BillingPage() {
     setLoading(true);
 
     try {
-      // Fetch credits balance
+      // Fetch API credits balance (pay-per-go)
       const { data: profileData, error: profileError } = await supabase
         .from("user_profiles")
-        .select("credits_balance")
+        .select("api_credits_remaining_usd")
         .eq("id", user.id)
         .single();
 
@@ -37,7 +37,7 @@ export default function BillingPage() {
         console.error("Failed to fetch profile:", profileError);
       }
 
-      const balance = profileData?.credits_balance || 0;
+      const balance = Number(profileData?.api_credits_remaining_usd ?? 0);
       setCreditsBalance(balance);
 
       // Fetch this month's usage cost
