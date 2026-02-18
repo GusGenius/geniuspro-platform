@@ -301,7 +301,13 @@ export default function Sidebar() {
             alt="GeniusPro"
             width={40}
             height={40}
-            className="object-contain dark:brightness-0 dark:invert"
+            className="object-contain"
+            style={{
+              filter:
+                theme === "dark"
+                  ? "brightness(0.7) contrast(1.2) saturate(1.2)"
+                  : "brightness(0.85) contrast(1.1) saturate(1.1)",
+            }}
             priority
           />
         )}

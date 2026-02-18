@@ -7,7 +7,6 @@ import "./orb.css";
 interface OrbProps {
   size?: "small" | "medium" | "large";
   className?: string;
-  label?: string;
 }
 
 const OrbSizes = {
@@ -35,7 +34,7 @@ function useIsDark() {
   return isDark;
 }
 
-export function Orb({ size = "large", className, label = "G" }: OrbProps) {
+export function Orb({ size = "large", className }: OrbProps) {
   const sizeConfig = OrbSizes[size];
   const [mousePosition, setMousePosition] = React.useState({ x: 0, y: 0 });
   const orbRef = React.useRef<HTMLDivElement>(null);
@@ -308,26 +307,31 @@ export function Orb({ size = "large", className, label = "G" }: OrbProps) {
               opacity="0.4"
             />
 
-            {/* "G" Symbol - GeniusPro branding */}
+            {/* Cat icon - GeniusPro branding */}
             <foreignObject x="50" y="50" width="200" height="200">
               <div
+                xmlns="http://www.w3.org/1999/xhtml"
                 style={{
                   width: "100%",
                   height: "100%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontFamily: "'Google Sans Flex', system-ui, sans-serif",
-                  fontSize: "90px",
-                  fontWeight: 100,
-                  textTransform: "uppercase",
-                  color: c.label,
                   userSelect: "none",
-                  lineHeight: 1,
-                  letterSpacing: "-0.02em",
                 }}
               >
-                {label}
+                <img
+                  src="/geniuspro-cat.svg"
+                  alt="GeniusPro"
+                  style={{
+                    width: "140px",
+                    height: "140px",
+                    objectFit: "contain",
+                    filter: isDark
+                      ? "brightness(0.85) contrast(1.15) saturate(1.2)"
+                      : "brightness(0.75) contrast(1.1) saturate(1.1)",
+                  }}
+                />
               </div>
             </foreignObject>
 

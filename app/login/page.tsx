@@ -57,6 +57,20 @@ export default function LoginPage() {
         horizonPosition={0.4}
       />
 
+      {/* Header - Cat top left like landing page */}
+      <header className="absolute top-0 left-0 right-0 p-4 md:p-6 flex items-center z-30">
+        <a href="/" aria-label="GeniusPro Home" className="inline-flex items-center">
+          <Image
+            src="/geniuspro-cat.svg"
+            alt="GeniusPro"
+            width={52}
+            height={52}
+            className="object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]"
+            priority
+          />
+        </a>
+      </header>
+
       {/* Content */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-md">

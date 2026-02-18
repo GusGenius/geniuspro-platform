@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getGreeting } from "@/lib/utils";
-import { Orb } from "@/components/orb/Orb";
+import { Cat } from "@/components/cat/Cat";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -30,14 +30,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-full flex flex-col items-center justify-center -mt-10">
-      {/* Orb - Center of the universe */}
+      {/* Cat - Center of the universe */}
       <div className="welcome-fade-in">
-        <div className="orb-breathe">
-          <Orb size="large" />
-        </div>
+        <Cat size="large" />
       </div>
 
-      {/* Welcome text beneath the orb */}
+      {/* Welcome text beneath the cat */}
       <div className="mt-6 text-center welcome-fade-in-delay">
         <div className="space-y-2">
           <h1 className="text-3xl md:text-4xl font-light text-gray-600 dark:text-gray-300 tracking-tight">
