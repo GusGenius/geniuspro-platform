@@ -31,7 +31,6 @@ export function RouterSam3Config({ value, onChange }: Props) {
   );
 
   const parsedBlocksError = useMemo(() => {
-    if (!value.enabled) return null;
     const raw = value.blocksJson.trim();
     if (!raw) return null;
     try {
@@ -44,11 +43,7 @@ export function RouterSam3Config({ value, onChange }: Props) {
     } catch {
       return "Blocks JSON is invalid.";
     }
-  }, [value.blocksJson, value.enabled]);
-
-  function setEnabled(next: boolean) {
-    onChange({ ...value, enabled: next });
-  }
+  }, [value.blocksJson]);
 
   function updateTarget(index: number, next: Sam3Target) {
     const targets = [...value.targets];
@@ -87,7 +82,7 @@ export function RouterSam3Config({ value, onChange }: Props) {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            SAM 3 (Vision) step
+            SAM 3 (Vision) settings
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
             Configure what SAM 3 should look for using targets + prompt packs.
@@ -104,21 +99,8 @@ export function RouterSam3Config({ value, onChange }: Props) {
         </button>
       </div>
 
-      <label className="mt-4 flex items-center gap-2 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={value.enabled}
-          onChange={(e) => setEnabled(e.target.checked)}
-          className="rounded border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
-        />
-        <span className="text-sm text-gray-700 dark:text-gray-300">
-          Enable SAM 3 step for this router
-        </span>
-      </label>
-
-      {!value.enabled ? null : (
-        <>
-          <label className="mt-3 flex items-center gap-2 cursor-pointer">
+      <>
+        <label className="mt-4 flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={value.includeRaw}
@@ -233,7 +215,6 @@ export function RouterSam3Config({ value, onChange }: Props) {
             ) : null}
           </div>
         </>
-      )}
     </div>
   );
 }

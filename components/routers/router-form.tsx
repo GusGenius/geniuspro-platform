@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+import { ProfileSelect } from "@/components/ui/profile-select";
+
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { ModelsOrderEditor } from "@/components/routers/models-order-editor";
@@ -333,6 +335,47 @@ export function RouterForm({
           </div>
 
           <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+              First step (optional)
+            </label>
+            <ProfileSelect
+              value={sam3Config.enabled ? "sam3" : "none"}
+              onChange={(next) => {
+                const useSam3 = next === "sam3";
+                setSam3Config((prev) => ({
+                  ...prev,
+                  enabled: useSam3,
+                  ...(useSam3 && prev.targets.length === 0
+                    ? {
+                        targets: [
+                          { name: "rooflines", prompts: ["roof edge", "gutter line", "eaves"] },
+                          { name: "ground", prompts: ["ground", "grass", "lawn"] },
+                        ],
+                        blocksJson: JSON.stringify(
+                          [{ id: "dedupe_lines" }, { id: "filter_short_lines", min_span: 0.12 }],
+                          null,
+                          2
+                        ),
+                      }
+                    : {}),
+                }));
+              }}
+              options={[
+                { value: "none", label: "None (chat only)" },
+                { value: "sam3", label: "SAM 3 (Vision)" },
+              ]}
+              className="max-w-xs"
+            />
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              SAM 3 runs first on images, then passes results to your chat models.
+            </p>
+          </div>
+
+          {sam3Config.enabled && (
+            <RouterSam3Config value={sam3Config} onChange={setSam3Config} />
+          )}
+
+          <div className="mt-4">
             <ModelsOrderEditor
               label="Models"
               hint="order matters"
@@ -347,8 +390,6 @@ export function RouterForm({
               onChange={setFormModelIds}
             />
           </div>
-
-          <RouterSam3Config value={sam3Config} onChange={setSam3Config} />
 
           <RouterStepInstructions
             visible={formRoutingMode === "pipeline"}
