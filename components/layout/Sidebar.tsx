@@ -286,14 +286,25 @@ export default function Sidebar() {
           isExpanded ? "justify-start px-4" : "justify-center px-0"
         }`}
       >
-        <Image
-          src="/logo.avif"
-          alt="GeniusPro Logo"
-          width={isExpanded ? 140 : 40}
-          height={isExpanded ? 50 : 40}
-          className="object-contain"
-          priority
-        />
+        {isExpanded ? (
+          <Image
+            src="/logo.avif"
+            alt="GeniusPro Logo"
+            width={140}
+            height={50}
+            className="object-contain"
+            priority
+          />
+        ) : (
+          <Image
+            src="/geniuspro-cat.svg"
+            alt="GeniusPro"
+            width={40}
+            height={40}
+            className="object-contain dark:brightness-0 dark:invert"
+            priority
+          />
+        )}
       </div>
 
       {/* Navigation */}
