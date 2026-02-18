@@ -5,6 +5,8 @@ import { GitBranch, Plus, Trash2, Pencil, Check, Loader2, Copy } from "lucide-re
 
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
+import { ModelsOrderEditor } from "@/components/routers/models-order-editor";
+import { AVAILABLE_MODELS, getModelLabel as getModelLabelFromList } from "@/components/routers/available-models";
 
 interface RouterRow {
   id: string;
@@ -13,29 +15,9 @@ interface RouterRow {
   instructions: string;
   model_id: string;
   fallback_model_id: string | null;
+  model_ids?: string[] | null;
   created_at: string;
 }
-
-const AVAILABLE_MODELS = [
-  { id: "geniuspro-agi-1.2", label: "Superintelligence" },
-  { id: "geniuspro-code-agi-1.2", label: "Coding Superintelligence" },
-  { id: "gemini-3-pro", label: "Gemini 3 Pro" },
-  { id: "gemini-3-flash", label: "Gemini 3 Flash" },
-  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
-  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
-  { id: "gemini-nano-banana", label: "Gemini Nano Banana (Image)" },
-  { id: "gemini-nano-banana-pro", label: "Gemini Nano Banana Pro (Image)" },
-  { id: "claude-opus-4.6", label: "Claude Opus 4.6" },
-  { id: "claude-sonnet-4.5", label: "Claude Sonnet 4.5" },
-  { id: "claude-haiku-4.5", label: "Claude Haiku 4.5" },
-  { id: "gpt-5.2", label: "GPT 5.2" },
-  { id: "gpt-5.3-codex", label: "GPT 5.3 Codex" },
-  { id: "gpt-4o", label: "GPT-4o" },
-  { id: "gpt-4o-mini", label: "GPT-4o Mini" },
-  { id: "deepseek-v3", label: "DeepSeek V3" },
-  { id: "minimax-m2.5", label: "MiniMax M2.5" },
-  { id: "mistral-large-3", label: "Mistral Large 3" },
-];
 
 const API_BASE = "https://api.geniuspro.io/v1";
 
@@ -55,27 +37,60 @@ export default function RoutersPage() {
   const [formName, setFormName] = useState("");
   const [formSlug, setFormSlug] = useState("");
   const [formInstructions, setFormInstructions] = useState("");
-  const [formModelId, setFormModelId] = useState("gemini-3-flash");
-  const [formFallbackModelId, setFormFallbackModelId] = useState("");
+  const [formModelIds, setFormModelIds] = useState<string[]>(["gemini-3-flash"]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  function isMissingColumnError(err: unknown, column: string): boolean {
+    const msg =
+      typeof err === "object" && err !== null && "message" in err
+        ? String((err as { message?: unknown }).message ?? "")
+        : "";
+    return msg.toLowerCase().includes(`column user_routers.${column}`) && msg.toLowerCase().includes("does not exist");
+  }
+
+  function normalizeModelIds(input: Array<string | null | undefined>): string[] {
+    const out: string[] = [];
+    for (const v of input) {
+      if (typeof v !== "string") continue;
+      const trimmed = v.trim();
+      if (!trimmed) continue;
+      if (!out.includes(trimmed)) out.push(trimmed);
+    }
+    return out;
+  }
+
   const fetchRouters = useCallback(async () => {
     if (!user) return;
     try {
-      const { data, error: fetchError } = await supabase
+      const withModelIds = await supabase
         .from("user_routers")
-        .select("id, slug, name, instructions, model_id, fallback_model_id, created_at")
+        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, created_at")
         .eq("user_id", user.id)
         .order("name");
 
-      if (fetchError) {
-        console.error("Failed to fetch routers:", fetchError);
+      if (withModelIds.error) {
+        if (isMissingColumnError(withModelIds.error, "model_ids")) {
+          const legacy = await supabase
+            .from("user_routers")
+            .select("id, slug, name, instructions, model_id, fallback_model_id, created_at")
+            .eq("user_id", user.id)
+            .order("name");
+          if (legacy.error) {
+            console.error("Failed to fetch routers:", legacy.error);
+            setError("Failed to load routers");
+            return;
+          }
+          setRouters(legacy.data || []);
+          return;
+        }
+        console.error("Failed to fetch routers:", withModelIds.error);
         setError("Failed to load routers");
         return;
       }
-      setRouters(data || []);
+
+      setRouters(withModelIds.data || []);
     } catch (err) {
       console.error("Failed to fetch routers:", err);
       setError("Failed to load routers");
@@ -92,8 +107,7 @@ export default function RoutersPage() {
     setFormName("");
     setFormSlug("");
     setFormInstructions("");
-    setFormModelId("gemini-3-flash");
-    setFormFallbackModelId("");
+    setFormModelIds(["gemini-3-flash"]);
     setEditingId(null);
     setError(null);
   };
@@ -107,8 +121,10 @@ export default function RoutersPage() {
     setFormName(r.name);
     setFormSlug(r.slug);
     setFormInstructions(r.instructions);
-    setFormModelId(r.model_id);
-    setFormFallbackModelId(r.fallback_model_id || "");
+    const ids = Array.isArray(r.model_ids) && r.model_ids.length > 0
+      ? r.model_ids
+      : normalizeModelIds([r.model_id, r.fallback_model_id ?? null]);
+    setFormModelIds(ids.length > 0 ? ids : ["gemini-3-flash"]);
     setEditingId(r.id);
     setShowModal(true);
   };
@@ -125,46 +141,84 @@ export default function RoutersPage() {
       setError("Slug is required (e.g. house-analysis)");
       return;
     }
+    const cleanedModelIds = normalizeModelIds(formModelIds);
+    if (cleanedModelIds.length === 0) {
+      setError("Select at least one model.");
+      return;
+    }
     setSaving(true);
     setError(null);
     try {
-      const payload = {
+      const payloadBase = {
         user_id: user.id,
         slug,
         name: formName.trim() || slug,
         instructions: formInstructions.trim(),
-        model_id: formModelId,
-        fallback_model_id: formFallbackModelId.trim() || null,
+        // Keep legacy columns populated for backward compatibility.
+        model_id: cleanedModelIds[0],
+        fallback_model_id: cleanedModelIds[1] ?? null,
         updated_at: new Date().toISOString(),
       };
 
       if (editingId) {
-        const { error: updateError } = await supabase
+        const updateWithModelIds = await supabase
           .from("user_routers")
           .update({
-            name: payload.name,
-            instructions: payload.instructions,
-            model_id: payload.model_id,
-            fallback_model_id: payload.fallback_model_id,
-            updated_at: payload.updated_at,
+            name: payloadBase.name,
+            instructions: payloadBase.instructions,
+            model_id: payloadBase.model_id,
+            fallback_model_id: payloadBase.fallback_model_id,
+            model_ids: cleanedModelIds,
+            updated_at: payloadBase.updated_at,
           })
           .eq("id", editingId)
           .eq("user_id", user.id);
 
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from("user_routers")
-          .insert(payload);
-
-        if (insertError) {
-          if (insertError.code === "23505") {
-            setError("A router with this slug already exists");
-          } else {
-            throw insertError;
+        if (updateWithModelIds.error) {
+          if (!isMissingColumnError(updateWithModelIds.error, "model_ids")) {
+            throw updateWithModelIds.error;
           }
-          setSaving(false);
-          return;
+          const legacyUpdate = await supabase
+            .from("user_routers")
+            .update({
+              name: payloadBase.name,
+              instructions: payloadBase.instructions,
+              model_id: payloadBase.model_id,
+              fallback_model_id: payloadBase.fallback_model_id,
+              updated_at: payloadBase.updated_at,
+            })
+            .eq("id", editingId)
+            .eq("user_id", user.id);
+          if (legacyUpdate.error) throw legacyUpdate.error;
+        }
+      } else {
+        const insertWithModelIds = await supabase
+          .from("user_routers")
+          .insert({ ...payloadBase, model_ids: cleanedModelIds });
+
+        if (insertWithModelIds.error) {
+          if (isMissingColumnError(insertWithModelIds.error, "model_ids")) {
+            const legacyInsert = await supabase
+              .from("user_routers")
+              .insert(payloadBase);
+            if (legacyInsert.error) {
+              if (legacyInsert.error.code === "23505") {
+                setError("A router with this slug already exists");
+              } else {
+                throw legacyInsert.error;
+              }
+              setSaving(false);
+              return;
+            }
+          } else {
+            if (insertWithModelIds.error.code === "23505") {
+              setError("A router with this slug already exists");
+            } else {
+              throw insertWithModelIds.error;
+            }
+            setSaving(false);
+            return;
+          }
         }
       }
       setShowModal(false);
@@ -209,8 +263,7 @@ export default function RoutersPage() {
       year: "numeric",
     });
 
-  const getModelLabel = (id: string) =>
-    AVAILABLE_MODELS.find((m) => m.id === id)?.label ?? id;
+  const getModelLabel = (id: string) => getModelLabelFromList(id);
 
   if (loading) {
     return (
@@ -282,9 +335,20 @@ export default function RoutersPage() {
                       <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded font-mono">
                         router:{r.slug}
                       </code>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">
-                        → {getModelLabel(r.model_id)}
-                      </span>
+                      {(() => {
+                        const ids =
+                          Array.isArray(r.model_ids) && r.model_ids.length > 0
+                            ? r.model_ids
+                            : normalizeModelIds([r.model_id, r.fallback_model_id ?? null]);
+                        const first = ids[0] ?? r.model_id;
+                        const more = Math.max(ids.length - 1, 0);
+                        return (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            → {getModelLabel(first)}
+                            {more > 0 ? ` +${more}` : ""}
+                          </span>
+                        );
+                      })()}
                     </div>
                     {r.instructions && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-2">
@@ -383,38 +447,14 @@ export default function RoutersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                  Model
-                </label>
-                <select
-                  value={formModelId}
-                  onChange={(e) => setFormModelId(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {AVAILABLE_MODELS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                  Fallback Model <span className="text-gray-400">(optional)</span>
-                </label>
-                <select
-                  value={formFallbackModelId}
-                  onChange={(e) => setFormFallbackModelId(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">None</option>
-                  {AVAILABLE_MODELS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
+                <ModelsOrderEditor
+                  label="Models"
+                  hint="try in order"
+                  modelIds={formModelIds}
+                  options={AVAILABLE_MODELS}
+                  maxModels={5}
+                  onChange={setFormModelIds}
+                />
               </div>
 
               {error && (

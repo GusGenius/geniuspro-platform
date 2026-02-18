@@ -44,7 +44,7 @@ export default function BillingPage() {
       const monthStart = getMonthStart();
       const { data: usageRows, error: usageError } = await supabase
         .from("usage_logs")
-        .select("model, prompt_tokens, completion_tokens")
+        .select("model, prompt_tokens, completion_tokens, billed_cost_usd")
         .eq("user_id", user.id)
         .gte("created_at", monthStart);
 
@@ -53,11 +53,15 @@ export default function BillingPage() {
       } else if (usageRows) {
         let cost = 0;
         for (const row of usageRows) {
-          cost += calculateCost(
-            row.model || "",
-            row.prompt_tokens || 0,
-            row.completion_tokens || 0
-          );
+          const billed = Number((row as { billed_cost_usd?: unknown }).billed_cost_usd);
+          // Prefer server-billed totals when available; fallback to local estimate.
+          cost += Number.isFinite(billed) && billed > 0
+            ? billed
+            : calculateCost(
+                row.model || "",
+                row.prompt_tokens || 0,
+                row.completion_tokens || 0
+              );
         }
         setMonthlyCost(cost);
       }

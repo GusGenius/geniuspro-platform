@@ -90,7 +90,7 @@ export default function UsagePage() {
       const since = getPeriodStart(period);
       const { data: rows, error } = await supabase
         .from("usage_logs")
-        .select("model, prompt_tokens, completion_tokens, total_tokens, response_time_ms, created_at, api_key_id")
+        .select("model, prompt_tokens, completion_tokens, total_tokens, billed_cost_usd, response_time_ms, created_at, api_key_id")
         .eq("user_id", user.id)
         .neq("endpoint", CHAT_USAGE_ENDPOINT)
         .gte("created_at", since)
@@ -131,7 +131,10 @@ export default function UsagePage() {
         const tt = row.total_tokens ?? 0;
         const lat = row.response_time_ms ?? 0;
         const model = row.model ?? "unknown";
-        const cost = calculateCost(model, pt, ct);
+        const billed = Number((row as { billed_cost_usd?: unknown }).billed_cost_usd);
+        // Prefer server-billed totals when available; fallback to local estimate.
+        const cost =
+          Number.isFinite(billed) && billed > 0 ? billed : calculateCost(model, pt, ct);
 
         totalTokens += tt;
         promptTokens += pt;
