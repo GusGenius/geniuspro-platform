@@ -17,6 +17,7 @@ interface RouterRow {
   fallback_model_id: string | null;
   model_ids?: string[] | null;
   routing_mode?: string | null;
+  router_steps?: unknown | null;
   created_at: string;
 }
 
@@ -46,19 +47,34 @@ export default function RoutersPage() {
     return out;
   }
 
+  function hasSam3Step(routerSteps: unknown): boolean {
+    if (!routerSteps || typeof routerSteps !== "object") return false;
+    const steps = (routerSteps as { steps?: unknown }).steps;
+    if (!Array.isArray(steps)) return false;
+    for (const step of steps) {
+      if (!step || typeof step !== "object") continue;
+      const type = (step as { type?: unknown }).type;
+      if (type === "vision_sam3") return true;
+    }
+    return false;
+  }
+
   const fetchRouters = useCallback(async () => {
     if (!user) return;
     try {
       const withModelIds = await supabase
         .from("user_routers")
-        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode, created_at")
+        .select(
+          "id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode, router_steps, created_at"
+        )
         .eq("user_id", user.id)
         .order("name");
 
       if (withModelIds.error) {
         if (
           isMissingColumnError(withModelIds.error, "model_ids") ||
-          isMissingColumnError(withModelIds.error, "routing_mode")
+          isMissingColumnError(withModelIds.error, "routing_mode") ||
+          isMissingColumnError(withModelIds.error, "router_steps")
         ) {
           const legacy = await supabase
             .from("user_routers")
@@ -212,10 +228,15 @@ export default function RoutersPage() {
                         const more = Math.max(ids.length - 1, 0);
                         return (
                           <span className="text-xs text-gray-400 dark:text-gray-500">
-                            → {getModelLabel(first)}
+                            {"->"} {getModelLabel(first)}
                             {more > 0 ? ` +${more}` : ""}
                             {r.routing_mode === "pipeline" ? (
                               <span className="ml-1.5 text-blue-500 dark:text-blue-400">(pipeline)</span>
+                            ) : null}
+                            {hasSam3Step(r.router_steps) ? (
+                              <span className="ml-1.5 text-teal-600 dark:text-teal-300">
+                                (sam3)
+                              </span>
                             ) : null}
                           </span>
                         );

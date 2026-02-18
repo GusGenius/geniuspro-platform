@@ -8,11 +8,21 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { ModelsOrderEditor } from "@/components/routers/models-order-editor";
-import { AVAILABLE_MODELS, getModelLabel } from "@/components/routers/available-models";
+import { AVAILABLE_MODELS } from "@/components/routers/available-models";
 import {
   parseRouterInstructions,
   serializeRouterInstructions,
 } from "@/components/routers/router-instructions";
+import { RouterSam3Config } from "@/components/routers/router-sam3-config";
+import type { Sam3RouterStepsConfig } from "@/components/routers/router-sam3-config";
+import { RouterStepInstructions } from "@/components/routers/router-step-instructions";
+import {
+  normalizeModelIds,
+  normalizeSlug,
+  slugFromName,
+} from "@/components/routers/router-form-utils";
+import { parseSam3ConfigFromRouterSteps, buildRouterStepsFromSam3Config } from "@/components/routers/router-sam3-steps";
+import { saveRouterToSupabase } from "@/components/routers/router-save";
 
 export type RoutingMode = "fallback" | "pipeline";
 
@@ -22,45 +32,8 @@ export type RouterFormData = {
   instructions: string;
   model_ids: string[];
   routing_mode: RoutingMode;
+  router_steps?: unknown | null;
 };
-
-function slugFromName(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function normalizeSlug(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-function normalizeModelIds(input: Array<string | null | undefined>): string[] {
-  const out: string[] = [];
-  for (const v of input) {
-    if (typeof v !== "string") continue;
-    const trimmed = v.trim();
-    if (!trimmed) continue;
-    if (!out.includes(trimmed)) out.push(trimmed);
-  }
-  return out;
-}
-
-function isMissingColumnError(err: unknown, column: string): boolean {
-  const msg =
-    typeof err === "object" && err !== null && "message" in err
-      ? String((err as { message?: unknown }).message ?? "")
-      : "";
-  return (
-    msg.toLowerCase().includes(`column user_routers.${column}`) &&
-    msg.toLowerCase().includes("does not exist")
-  );
-}
 
 type Props = {
   mode: "create" | "edit";
@@ -102,6 +75,9 @@ export function RouterForm({
   const [formModelIds, setFormModelIds] = useState(initialData.model_ids);
   const [formRoutingMode, setFormRoutingMode] = useState<RoutingMode>(
     initialData.routing_mode ?? "fallback"
+  );
+  const [sam3Config, setSam3Config] = useState<Sam3RouterStepsConfig>(() =>
+    parseSam3ConfigFromRouterSteps(initialData.router_steps)
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -168,6 +144,14 @@ export function RouterForm({
       setError("Select at least one model.");
       return;
     }
+
+    const builtSteps = buildRouterStepsFromSam3Config(sam3Config);
+    if (!builtSteps.ok) {
+      setError(builtSteps.error);
+      return;
+    }
+    const routerSteps = builtSteps.value;
+
     setSaving(true);
     setError(null);
     try {
@@ -199,100 +183,25 @@ export function RouterForm({
         updated_at: new Date().toISOString(),
       };
 
-      const routingModePayload =
-        formRoutingMode === "pipeline" ? "pipeline" : "fallback";
-
-      if (editingId) {
-        const updatePayload: Record<string, unknown> = {
-          name: payloadBase.name,
-          instructions: payloadBase.instructions,
-          model_id: payloadBase.model_id,
-          fallback_model_id: payloadBase.fallback_model_id,
-          model_ids: cleanedModelIds,
-          routing_mode: routingModePayload,
-          updated_at: payloadBase.updated_at,
-        };
-        const updateWithModelIds = await supabase
-          .from("user_routers")
-          .update(updatePayload)
-          .eq("id", editingId)
-          .eq("user_id", user.id);
-
-        if (updateWithModelIds.error) {
-          if (isMissingColumnError(updateWithModelIds.error, "routing_mode")) {
-            delete updatePayload.routing_mode;
-            const retry = await supabase
-              .from("user_routers")
-              .update(updatePayload)
-              .eq("id", editingId)
-              .eq("user_id", user.id);
-            if (retry.error) throw retry.error;
-          } else if (isMissingColumnError(updateWithModelIds.error, "model_ids")) {
-            const legacyUpdate = await supabase
-              .from("user_routers")
-              .update({
-                name: payloadBase.name,
-                instructions: payloadBase.instructions,
-                model_id: payloadBase.model_id,
-                fallback_model_id: payloadBase.fallback_model_id,
-                updated_at: payloadBase.updated_at,
-              })
-              .eq("id", editingId)
-              .eq("user_id", user.id);
-            if (legacyUpdate.error) throw legacyUpdate.error;
-          } else {
-            throw updateWithModelIds.error;
-          }
+      const saved = await saveRouterToSupabase({
+        supabase,
+        user,
+        editingId,
+        payloadBase,
+        modelIds: cleanedModelIds,
+        routingMode: formRoutingMode,
+        routerSteps,
+      });
+      if (!saved.ok) {
+        const msg = saved.error instanceof Error ? saved.error.message : String(saved.error ?? "Failed to save");
+        // Preserve the duplicate-slug UX.
+        if (msg.includes("23505") || msg.toLowerCase().includes("duplicate")) {
+          setError("A router with this slug already exists");
+          return;
         }
-      } else {
-        const insertPayload = {
-          ...payloadBase,
-          model_ids: cleanedModelIds,
-          routing_mode: routingModePayload,
-        };
-        const insertWithModelIds = await supabase
-          .from("user_routers")
-          .insert(insertPayload);
-
-        if (insertWithModelIds.error) {
-          if (isMissingColumnError(insertWithModelIds.error, "routing_mode")) {
-            const { routing_mode: _rm, ...insertWithoutRouting } = insertPayload;
-            const retryInsert = await supabase
-              .from("user_routers")
-              .insert(insertWithoutRouting);
-            if (retryInsert.error) {
-              if (retryInsert.error.code === "23505") {
-                setError("A router with this slug already exists");
-              } else {
-                throw retryInsert.error;
-              }
-              setSaving(false);
-              return;
-            }
-          } else if (isMissingColumnError(insertWithModelIds.error, "model_ids")) {
-            const legacyInsert = await supabase
-              .from("user_routers")
-              .insert(payloadBase);
-            if (legacyInsert.error) {
-              if (legacyInsert.error.code === "23505") {
-                setError("A router with this slug already exists");
-              } else {
-                throw legacyInsert.error;
-              }
-              setSaving(false);
-              return;
-            }
-          } else {
-            if (insertWithModelIds.error.code === "23505") {
-              setError("A router with this slug already exists");
-            } else {
-              throw insertWithModelIds.error;
-            }
-            setSaving(false);
-            return;
-          }
-        }
+        throw saved.error;
       }
+
       router.push("/routers");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -439,57 +348,15 @@ export function RouterForm({
             />
           </div>
 
-          <div className="bg-gray-200/60 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mt-4">
-            <p className="text-xs text-gray-600 dark:text-gray-400">
-              Want SAM 3 segmentation? That&apos;s the Vision API (different base URL and endpoints), not chat routers. See{" "}
-              <Link href="/docs#vision" className="text-blue-500 dark:text-blue-400 hover:underline">
-                Docs → Vision (SAM 3)
-              </Link>
-              .
-            </p>
-          </div>
+          <RouterSam3Config value={sam3Config} onChange={setSam3Config} />
 
-          {formRoutingMode === "pipeline" && (
-            <div className="mt-4 bg-gray-200/60 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Step instructions (optional)
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    Each step runs as a separate model call. Use this to give different directions per model (analysis → rewrite → final answer).
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={fillPipelineTemplate}
-                  className="text-xs font-medium px-3 py-2 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300"
-                >
-                  Use template
-                </button>
-              </div>
-
-              <div className="space-y-3 mt-4">
-                {normalizeModelIds(formModelIds).map((modelId, idx) => {
-                  const key = modelId.trim().toLowerCase();
-                  return (
-                    <div key={key}>
-                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                        Step {idx + 1} — {getModelLabel(modelId)}
-                      </label>
-                      <textarea
-                        value={formStepInstructionsByModelId[key] ?? ""}
-                        onChange={(e) => setStepInstruction(modelId, e.target.value)}
-                        placeholder="What should this model do in the pipeline?"
-                        rows={3}
-                        className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <RouterStepInstructions
+            visible={formRoutingMode === "pipeline"}
+            modelIds={formModelIds}
+            instructionsByModelId={formStepInstructionsByModelId}
+            onChangeInstruction={setStepInstruction}
+            onUseTemplate={fillPipelineTemplate}
+          />
 
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mt-4">

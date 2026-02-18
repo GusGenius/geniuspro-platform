@@ -44,13 +44,14 @@ export default function EditRouterPage() {
         fallback_model_id?: string | null;
         model_ids?: string[] | null;
         routing_mode?: string;
+        router_steps?: unknown | null;
       };
       let data: RouterData | null = null;
       let err: { message?: string } | null = null;
 
       const withRouting = await supabase
         .from("user_routers")
-        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode")
+        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode, router_steps")
         .eq("id", id)
         .eq("user_id", userId)
         .single();
@@ -58,11 +59,18 @@ export default function EditRouterPage() {
       const msg = withRouting.error?.message?.toLowerCase() ?? "";
       const isRoutingColumnMissing =
         msg.includes("routing_mode") && msg.includes("does not exist");
+      const isRouterStepsMissing =
+        msg.includes("router_steps") && msg.includes("does not exist");
 
-      if (withRouting.error && isRoutingColumnMissing) {
+      if (withRouting.error && (isRoutingColumnMissing || isRouterStepsMissing)) {
+        const select = isRoutingColumnMissing
+          ? "id, slug, name, instructions, model_id, fallback_model_id, model_ids, router_steps"
+          : isRouterStepsMissing
+            ? "id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode"
+            : "id, slug, name, instructions, model_id, fallback_model_id, model_ids";
         const withoutRouting = await supabase
           .from("user_routers")
-          .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids")
+          .select(select)
           .eq("id", id)
           .eq("user_id", userId)
           .single();
@@ -95,6 +103,7 @@ export default function EditRouterPage() {
         instructions: data.instructions ?? "",
         model_ids: ids.length > 0 ? ids : ["gemini-3-flash"],
         routing_mode: mode,
+        router_steps: data.router_steps ?? null,
       });
       setLoading(false);
     }
