@@ -12,7 +12,7 @@ interface LayoutProps {
 }
 
 // Routes that require login
-const protectedRoutes = ["/api-keys", "/usage", "/billing"];
+const protectedRoutes = ["/api-keys", "/routers", "/usage", "/billing"];
 // Routes that render without the app shell
 const bareRoutes = ["/login", "/auth/handoff"];
 

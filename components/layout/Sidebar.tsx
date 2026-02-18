@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Key,
+  GitBranch,
   BarChart3,
   BookOpen,
   CreditCard,
@@ -114,6 +115,7 @@ export default function Sidebar() {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Chat", href: "https://chat.geniuspro.io", icon: MessageSquare, external: true, handoff: true },
     { name: "API Keys", href: "/api-keys", icon: Key },
+    { name: "Routers", href: "/routers", icon: GitBranch },
     { name: "Docs", href: "/docs", icon: BookOpen },
     { name: "Usage", href: "/usage", icon: BarChart3 },
     { name: "Pricing", href: "/pricing", icon: DollarSign },
