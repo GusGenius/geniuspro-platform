@@ -310,7 +310,7 @@ export function Orb({ size = "large", className }: OrbProps) {
             {/* Cat icon - GeniusPro branding */}
             <foreignObject x="50" y="50" width="200" height="200">
               <div
-                xmlns="http://www.w3.org/1999/xhtml"
+                {...({ xmlns: "http://www.w3.org/1999/xhtml" } as React.HTMLAttributes<HTMLDivElement>)}
                 style={{
                   width: "100%",
                   height: "100%",
