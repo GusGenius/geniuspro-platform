@@ -23,6 +23,8 @@ const AVAILABLE_MODELS = [
   { id: "gemini-3-flash", label: "Gemini 3 Flash" },
   { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
   { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+  { id: "gemini-nano-banana", label: "Gemini Nano Banana (Image)" },
+  { id: "gemini-nano-banana-pro", label: "Gemini Nano Banana Pro (Image)" },
   { id: "claude-opus-4.6", label: "Claude Opus 4.6" },
   { id: "claude-sonnet-4.5", label: "Claude Sonnet 4.5" },
   { id: "claude-haiku-4.5", label: "Claude Haiku 4.5" },
