@@ -16,6 +16,7 @@ interface RouterRow {
   model_id: string;
   fallback_model_id: string | null;
   model_ids?: string[] | null;
+  routing_mode?: string | null;
   created_at: string;
 }
 
@@ -50,12 +51,15 @@ export default function RoutersPage() {
     try {
       const withModelIds = await supabase
         .from("user_routers")
-        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, created_at")
+        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode, created_at")
         .eq("user_id", user.id)
         .order("name");
 
       if (withModelIds.error) {
-        if (isMissingColumnError(withModelIds.error, "model_ids")) {
+        if (
+          isMissingColumnError(withModelIds.error, "model_ids") ||
+          isMissingColumnError(withModelIds.error, "routing_mode")
+        ) {
           const legacy = await supabase
             .from("user_routers")
             .select("id, slug, name, instructions, model_id, fallback_model_id, created_at")
@@ -210,6 +214,9 @@ export default function RoutersPage() {
                           <span className="text-xs text-gray-400 dark:text-gray-500">
                             → {getModelLabel(first)}
                             {more > 0 ? ` +${more}` : ""}
+                            {r.routing_mode === "pipeline" ? (
+                              <span className="ml-1.5 text-blue-500 dark:text-blue-400">(pipeline)</span>
+                            ) : null}
                           </span>
                         );
                       })()}

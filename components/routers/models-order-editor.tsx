@@ -7,6 +7,8 @@ type ModelOption = { id: string; label: string };
 type Props = {
   label: string;
   hint?: string;
+  /** Overrides the default "Fallback/Pipeline" description below the model list. */
+  descriptionHint?: string;
   modelIds: string[];
   options: ModelOption[];
   maxModels?: number;
@@ -33,6 +35,7 @@ function getDefaultNewModel(options: ModelOption[], exclude: string[]): string {
 export function ModelsOrderEditor({
   label,
   hint,
+  descriptionHint,
   modelIds,
   options,
   maxModels = 5,
@@ -129,7 +132,7 @@ export function ModelsOrderEditor({
 
         <div className="flex items-center justify-between pt-1">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            The API tries model 1 first, then falls back if it errors.
+            {descriptionHint ?? "Fallback: try in order on error. Pipeline: chain models (e.g. Gemini + Claude)."}
           </p>
           <button
             type="button"

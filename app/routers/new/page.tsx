@@ -11,6 +11,7 @@ export default function NewRouterPage() {
         slug: "",
         instructions: "",
         model_ids: ["gemini-3-flash"],
+        routing_mode: "fallback",
       }}
       backHref="/routers"
       backLabel="Back to Routers"

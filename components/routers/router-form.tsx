@@ -10,11 +10,14 @@ import { supabase } from "@/lib/supabase/client";
 import { ModelsOrderEditor } from "@/components/routers/models-order-editor";
 import { AVAILABLE_MODELS } from "@/components/routers/available-models";
 
+export type RoutingMode = "fallback" | "pipeline";
+
 export type RouterFormData = {
   name: string;
   slug: string;
   instructions: string;
   model_ids: string[];
+  routing_mode: RoutingMode;
 };
 
 function slugFromName(name: string): string {
@@ -67,6 +70,9 @@ export function RouterForm({
   const [formSlug, setFormSlug] = useState(initialData.slug);
   const [formInstructions, setFormInstructions] = useState(initialData.instructions);
   const [formModelIds, setFormModelIds] = useState(initialData.model_ids);
+  const [formRoutingMode, setFormRoutingMode] = useState<RoutingMode>(
+    initialData.routing_mode ?? "fallback"
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,44 +111,77 @@ export function RouterForm({
         updated_at: new Date().toISOString(),
       };
 
+      const routingModePayload =
+        formRoutingMode === "pipeline" ? "pipeline" : "fallback";
+
       if (editingId) {
+        const updatePayload: Record<string, unknown> = {
+          name: payloadBase.name,
+          instructions: payloadBase.instructions,
+          model_id: payloadBase.model_id,
+          fallback_model_id: payloadBase.fallback_model_id,
+          model_ids: cleanedModelIds,
+          routing_mode: routingModePayload,
+          updated_at: payloadBase.updated_at,
+        };
         const updateWithModelIds = await supabase
           .from("user_routers")
-          .update({
-            name: payloadBase.name,
-            instructions: payloadBase.instructions,
-            model_id: payloadBase.model_id,
-            fallback_model_id: payloadBase.fallback_model_id,
-            model_ids: cleanedModelIds,
-            updated_at: payloadBase.updated_at,
-          })
+          .update(updatePayload)
           .eq("id", editingId)
           .eq("user_id", user.id);
 
         if (updateWithModelIds.error) {
-          if (!isMissingColumnError(updateWithModelIds.error, "model_ids")) {
+          if (isMissingColumnError(updateWithModelIds.error, "routing_mode")) {
+            delete updatePayload.routing_mode;
+            const retry = await supabase
+              .from("user_routers")
+              .update(updatePayload)
+              .eq("id", editingId)
+              .eq("user_id", user.id);
+            if (retry.error) throw retry.error;
+          } else if (isMissingColumnError(updateWithModelIds.error, "model_ids")) {
+            const legacyUpdate = await supabase
+              .from("user_routers")
+              .update({
+                name: payloadBase.name,
+                instructions: payloadBase.instructions,
+                model_id: payloadBase.model_id,
+                fallback_model_id: payloadBase.fallback_model_id,
+                updated_at: payloadBase.updated_at,
+              })
+              .eq("id", editingId)
+              .eq("user_id", user.id);
+            if (legacyUpdate.error) throw legacyUpdate.error;
+          } else {
             throw updateWithModelIds.error;
           }
-          const legacyUpdate = await supabase
-            .from("user_routers")
-            .update({
-              name: payloadBase.name,
-              instructions: payloadBase.instructions,
-              model_id: payloadBase.model_id,
-              fallback_model_id: payloadBase.fallback_model_id,
-              updated_at: payloadBase.updated_at,
-            })
-            .eq("id", editingId)
-            .eq("user_id", user.id);
-          if (legacyUpdate.error) throw legacyUpdate.error;
         }
       } else {
+        const insertPayload = {
+          ...payloadBase,
+          model_ids: cleanedModelIds,
+          routing_mode: routingModePayload,
+        };
         const insertWithModelIds = await supabase
           .from("user_routers")
-          .insert({ ...payloadBase, model_ids: cleanedModelIds });
+          .insert(insertPayload);
 
         if (insertWithModelIds.error) {
-          if (isMissingColumnError(insertWithModelIds.error, "model_ids")) {
+          if (isMissingColumnError(insertWithModelIds.error, "routing_mode")) {
+            const { routing_mode: _rm, ...insertWithoutRouting } = insertPayload;
+            const retryInsert = await supabase
+              .from("user_routers")
+              .insert(insertWithoutRouting);
+            if (retryInsert.error) {
+              if (retryInsert.error.code === "23505") {
+                setError("A router with this slug already exists");
+              } else {
+                throw retryInsert.error;
+              }
+              setSaving(false);
+              return;
+            }
+          } else if (isMissingColumnError(insertWithModelIds.error, "model_ids")) {
             const legacyInsert = await supabase
               .from("user_routers")
               .insert(payloadBase);
@@ -235,9 +274,48 @@ export function RouterForm({
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+              Routing strategy
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="routing_mode"
+                  value="fallback"
+                  checked={formRoutingMode === "fallback"}
+                  onChange={() => setFormRoutingMode("fallback")}
+                  className="rounded-full border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Fallback — try in order on error
+                </span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="routing_mode"
+                  value="pipeline"
+                  checked={formRoutingMode === "pipeline"}
+                  onChange={() => setFormRoutingMode("pipeline")}
+                  className="rounded-full border-gray-300 dark:border-gray-600 text-blue-500 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Pipeline — chain models (e.g. Gemini + Claude)
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div>
             <ModelsOrderEditor
               label="Models"
               hint="try in order"
+              descriptionHint={
+                formRoutingMode === "pipeline"
+                  ? "Pipeline: each model's output feeds into the next (e.g. Gemini for analysis → Claude for refinement)."
+                  : "Fallback: try model 1 first, then others only if it errors."
+              }
               modelIds={formModelIds}
               options={AVAILABLE_MODELS}
               maxModels={5}

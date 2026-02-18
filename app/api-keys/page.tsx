@@ -19,35 +19,33 @@ interface ApiKeyRow {
 }
 
 type ApiKeyProfile = "openai_compat" | "coding_superintelligence" | "vision" | "gutter" | "universal";
-const OPENAI_COMPAT_BASE_URL = "https://api.geniuspro.io/v1";
-const CHAT_MODEL_ID = "geniuspro-agi-1.2";
-const CODING_MODEL_ID = "geniuspro-code-agi-1.2";
+const API_BASE_URL = "https://api.geniuspro.io/v1";
 
-const PROFILE_DISPLAY: Record<ApiKeyProfile, { label: string; color: string; hint: string }> = {
+const PROFILE_DISPLAY: Record<string, { label: string; color: string; hint: string }> = {
   openai_compat: {
-    label: "GeniusPro API (Chat)",
+    label: "GeniusPro API",
     color: "bg-blue-500/20 text-blue-400",
-    hint: "Use with https://api.geniuspro.io/v1 for chat (OpenAI-compatible, Cursor).",
+    hint: `Use with ${API_BASE_URL}. Create routers for custom models and instructions.`,
   },
   coding_superintelligence: {
-    label: "GeniusPro Coding Superintelligence",
+    label: "Coding (legacy)",
     color: "bg-purple-500/20 text-purple-400",
-    hint: "Use with https://api.geniuspro.io/coding-superintelligence/v1 (Cursor).",
+    hint: "Use routers instead. Create a router with geniuspro-code-agi-1.2.",
   },
   vision: {
-    label: "GeniusPro Vision (SAM 3)",
+    label: "Vision (legacy)",
     color: "bg-cyan-500/20 text-cyan-400",
-    hint: "Use with https://api.geniuspro.io/vision/v1 for image and video segmentation.",
+    hint: "Use routers instead for vision workflows.",
   },
   gutter: {
-    label: "Gutter Empire (Unity)",
+    label: "Gutter (legacy)",
     color: "bg-fuchsia-500/20 text-fuchsia-400",
-    hint: "Use with https://api.geniuspro.io/gutter for Gutter Empire Unity app.",
+    hint: "Legacy profile.",
   },
   universal: {
-    label: "Legacy Universal",
+    label: "Legacy",
     color: "bg-gray-500/20 text-gray-400",
-    hint: "Deprecated. Rotate this key to one of the two profiles.",
+    hint: "Deprecated. Create a new key and use routers.",
   },
 };
 
@@ -356,9 +354,7 @@ export default function ApiKeysPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-600 dark:text-yellow-300">
                       <strong>Save this key!</strong> You won&apos;t be able to see it again. Use it with{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{OPENAI_COMPAT_BASE_URL}</code> — use{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CHAT_MODEL_ID}</code> for chat or{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CODING_MODEL_ID}</code> for coding, or pick a specific model.
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{API_BASE_URL}</code>. Create routers in the Routers section for custom models and instructions.
                     </p>
                   </div>
 
@@ -389,10 +385,10 @@ export default function ApiKeysPage() {
                     </label>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
-                        {OPENAI_COMPAT_BASE_URL}
+                        {API_BASE_URL}
                       </code>
                       <button
-                        onClick={() => handleCopy(OPENAI_COMPAT_BASE_URL, "new-url")}
+                        onClick={() => handleCopy(API_BASE_URL, "new-url")}
                         className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
                         title="Copy API URL"
                       >
@@ -405,45 +401,9 @@ export default function ApiKeysPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      Models
-                    </label>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
-                          {CHAT_MODEL_ID}
-                        </code>
-                        <button
-                          onClick={() => handleCopy(CHAT_MODEL_ID, "new-chat-model")}
-                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
-                          title="Copy chat model"
-                        >
-                          {copiedId === "new-chat-model" ? (
-                            <Check className="w-5 h-5 text-green-400" />
-                          ) : (
-                            <Copy className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <code className="flex-1 text-sm text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-900 px-3 py-2 rounded-lg break-all select-all cursor-text font-mono">
-                          {CODING_MODEL_ID}
-                        </code>
-                        <button
-                          onClick={() => handleCopy(CODING_MODEL_ID, "new-coding-model")}
-                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-900 rounded-lg transition-colors"
-                          title="Copy coding model"
-                        >
-                          {copiedId === "new-coding-model" ? (
-                            <Check className="w-5 h-5 text-green-400" />
-                          ) : (
-                            <Copy className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">model=router:your-slug</code> to call your custom routers. Create them in the Routers section.
+                  </p>
                 </div>
               ) : (
                 <div>
@@ -460,9 +420,7 @@ export default function ApiKeysPage() {
                     autoFocus
                   />
                   <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{OPENAI_COMPAT_BASE_URL}</code>. Use{" "}
-                    <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CHAT_MODEL_ID}</code> (chat) or{" "}
-                    <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{CODING_MODEL_ID}</code> (coding), or pick a specific model per request.
+                    Works with <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{API_BASE_URL}</code>. Create routers for custom models and instructions.
                   </p>
 
                   {error && <p className="mt-3 text-sm text-red-400">{error}</p>}

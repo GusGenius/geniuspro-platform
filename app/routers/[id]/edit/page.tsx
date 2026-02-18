@@ -36,14 +36,44 @@ export default function EditRouterPage() {
     }
     const userId = user.id;
     async function fetchRouter() {
-      const { data, error } = await supabase
+      type RouterData = {
+        name?: string;
+        slug?: string;
+        instructions?: string;
+        model_id?: string;
+        fallback_model_id?: string | null;
+        model_ids?: string[] | null;
+        routing_mode?: string;
+      };
+      let data: RouterData | null = null;
+      let err: { message?: string } | null = null;
+
+      const withRouting = await supabase
         .from("user_routers")
-        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids")
+        .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids, routing_mode")
         .eq("id", id)
         .eq("user_id", userId)
         .single();
 
-      if (error || !data) {
+      const msg = withRouting.error?.message?.toLowerCase() ?? "";
+      const isRoutingColumnMissing =
+        msg.includes("routing_mode") && msg.includes("does not exist");
+
+      if (withRouting.error && isRoutingColumnMissing) {
+        const withoutRouting = await supabase
+          .from("user_routers")
+          .select("id, slug, name, instructions, model_id, fallback_model_id, model_ids")
+          .eq("id", id)
+          .eq("user_id", userId)
+          .single();
+        data = withoutRouting.data as RouterData | null;
+        err = withoutRouting.error;
+      } else {
+        data = withRouting.data as RouterData | null;
+        err = withRouting.error;
+      }
+
+      if (err || !data) {
         setNotFound(true);
         setLoading(false);
         return;
@@ -54,11 +84,17 @@ export default function EditRouterPage() {
           ? data.model_ids
           : normalizeModelIds([data.model_id, data.fallback_model_id ?? null]);
 
+      const mode =
+        data.routing_mode?.trim().toLowerCase() === "pipeline"
+          ? ("pipeline" as const)
+          : ("fallback" as const);
+
       setInitialData({
         name: data.name ?? "",
         slug: data.slug ?? "",
         instructions: data.instructions ?? "",
         model_ids: ids.length > 0 ? ids : ["gemini-3-flash"],
+        routing_mode: mode,
       });
       setLoading(false);
     }
