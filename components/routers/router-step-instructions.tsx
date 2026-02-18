@@ -29,7 +29,7 @@ export function RouterStepInstructions({
           </h3>
           <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
             Each step runs as a separate model call. Use this to give different
-            directions per model (analysis -> rewrite -> final answer).
+            directions per model (analysis → rewrite → final answer).
           </p>
         </div>
         <button
