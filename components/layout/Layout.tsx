@@ -11,10 +11,15 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-// Routes that require login
-const protectedRoutes = ["/api-keys", "/routers", "/cats", "/swarms", "/usage", "/billing"];
+// Routes that require login (prefix match: protects nested routes too)
+const protectedRoutePrefixes = ["/api-keys", "/cats", "/swarms", "/usage", "/billing"];
 // Routes that render without the app shell
 const bareRoutes = ["/login", "/auth/handoff"];
+
+function isProtectedRoute(pathname: string | null): boolean {
+  const p = pathname ?? "";
+  return protectedRoutePrefixes.some((prefix) => p === prefix || p.startsWith(prefix + "/"));
+}
 
 export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
@@ -22,7 +27,7 @@ export default function Layout({ children }: LayoutProps) {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user && protectedRoutes.includes(pathname || "")) {
+    if (!loading && !user && isProtectedRoute(pathname)) {
       router.push("/login");
     }
   }, [loading, user, pathname, router]);
@@ -33,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   // Protected pages — show loading while checking auth
-  if (protectedRoutes.includes(pathname || "") && (loading || !user)) {
+  if (isProtectedRoute(pathname) && (loading || !user)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-gray-600 dark:text-gray-400">Loading...</div>

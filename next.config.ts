@@ -8,6 +8,16 @@ const nextConfig: NextConfig = {
         destination: "/cats",
         permanent: true,
       },
+      {
+        source: "/routers",
+        destination: "/cats",
+        permanent: true,
+      },
+      {
+        source: "/routers/:path*",
+        destination: "/cats",
+        permanent: true,
+      },
     ];
   },
 };

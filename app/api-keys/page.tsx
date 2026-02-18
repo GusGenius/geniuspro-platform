@@ -354,7 +354,7 @@ export default function ApiKeysPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-yellow-600 dark:text-yellow-300">
                       <strong>Save this key!</strong> You won&apos;t be able to see it again. Use it with{" "}
-                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{API_BASE_URL}</code>. Create routers in the Routers section for custom models and instructions.
+                      <code className="text-xs bg-gray-200 dark:bg-gray-800 px-1 rounded select-all cursor-text">{API_BASE_URL}</code>. Create cats in the Cats section for reusable workflows you can call from the API.
                     </p>
                   </div>
 
@@ -402,7 +402,7 @@ export default function ApiKeysPage() {
                   </div>
 
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">model=router:your-slug</code> to call your custom routers. Create them in the Routers section.
+                    Use <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">model=cat:your-slug</code> to call your cats. Create them in the Cats section.
                   </p>
                 </div>
               ) : (
