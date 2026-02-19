@@ -300,7 +300,7 @@ export function KittensEditor({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
                         Image source
@@ -339,10 +339,30 @@ export function KittensEditor({
                         <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
                       </select>
                     </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Fallback model
+                      </label>
+                      <select
+                        value={String((k as { fallback_model_id?: unknown }).fallback_model_id ?? "")}
+                        onChange={(e) =>
+                          updateKitten(k.id, {
+                            fallback_model_id: e.target.value || undefined,
+                          } as CatKitten)
+                        }
+                        className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="">None</option>
+                        <option value="gemini-nano-banana">Nano Banana</option>
+                        <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                      </select>
+                    </div>
                   </div>
 
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
                     Calls Gemini directly. Requires GEMINI_API_KEY or GOOGLE_API_KEY.
+                    Fallback model is used when primary fails (e.g. 429, 503).
                   </p>
                 </div>
               )}

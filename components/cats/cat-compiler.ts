@@ -64,6 +64,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
               ? ("previous_overlay" as const)
               : ("original" as const),
           model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || "gemini-nano-banana-pro",
+          fallback_model_id: String((k as { fallback_model_id?: unknown }).fallback_model_id ?? "").trim() || undefined,
           system_instructions: String((k as { system_instructions?: unknown }).system_instructions ?? "").trim() || undefined,
           instructions: String((k as { instructions?: unknown }).instructions ?? "").trim(),
           test_image_storage_path: testImagePath,
