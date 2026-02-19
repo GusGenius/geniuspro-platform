@@ -9,6 +9,12 @@ const API_BASE =
   "https://api.geniuspro.io";
 const CHAT_URL = `${API_BASE}/chat/completions`;
 
+function isStreamingRequestBody(body: unknown): boolean {
+  if (!body || typeof body !== "object") return false;
+  const v = (body as Record<string, unknown>).stream;
+  return v === true;
+}
+
 export async function POST(request: NextRequest) {
   const auth = request.headers.get("authorization");
   if (!auth?.startsWith("Bearer ")) {
@@ -28,17 +34,52 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const res = await fetch(CHAT_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: auth,
-    },
-    body: JSON.stringify(body),
-  });
+  const streamRequested = isStreamingRequestBody(body);
+
+  let res: Response;
+  try {
+    res = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/event-stream",
+        Authorization: auth,
+      },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Upstream request failed";
+    return NextResponse.json(
+      {
+        error: {
+          message: "Failed to reach upstream API",
+          upstream: CHAT_URL,
+          detail: message,
+        },
+      },
+      { status: 502 }
+    );
+  }
+
+  const contentType = res.headers.get("content-type") ?? "";
+
+  // If upstream is streaming, don't buffer the whole body (avoids timeouts).
+  if (
+    res.ok &&
+    (contentType.includes("text/event-stream") || (streamRequested && res.body))
+  ) {
+    return new NextResponse(res.body, {
+      status: res.status,
+      headers: {
+        "Content-Type": contentType || "text/event-stream",
+        // Avoid proxy buffering; keep SSE snappy.
+        "Cache-Control": "no-cache, no-transform",
+      },
+    });
+  }
 
   const text = await res.text();
-  const contentType = res.headers.get("content-type") ?? "";
 
   if (!res.ok) {
     let parsed: unknown;
