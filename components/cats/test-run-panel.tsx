@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronUp, Loader2, Save } from "lucide-react";
+import { Check, Loader2, Save } from "lucide-react";
 
 import { supabase } from "@/lib/supabase/client";
 import { runCatOnce, type CatRunDebugStep } from "@/components/cats/cat-runner";
 import type { CatKitten } from "@/components/cats/types";
+import { StepOutputs } from "@/components/cats/step-outputs";
 
 type Props = {
   id?: string;
@@ -79,9 +80,6 @@ export function TestRunPanel({
   >({ state: "idle" });
 
   const [debugSteps, setDebugSteps] = useState<CatRunDebugStep[] | null>(null);
-  const [openStepIndices, setOpenStepIndices] = useState<Set<number>>(
-    () => new Set()
-  );
 
   const effectiveImageUrl = useMemo(() => {
     const trimmed = imageUrl.trim();
@@ -243,8 +241,6 @@ export function TestRunPanel({
       });
       setTestOutput(res.text);
       setDebugSteps(res.debugSteps ?? null);
-      // Open all steps by default when step viewer is enabled.
-      setOpenStepIndices(new Set((res.debugSteps ?? []).map((s) => s.index)));
 
       // Only notify for a full run; step runs are for debugging.
       if (stepIndex === null) {
@@ -282,15 +278,6 @@ export function TestRunPanel({
       onStepRun?.();
     }
   }, [runStep, canRun]);
-
-  const toggleStepOpen = (index: number) => {
-    setOpenStepIndices((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
-  };
 
   return (
     <div
@@ -528,56 +515,7 @@ export function TestRunPanel({
         </div>
       ) : null}
 
-      {showSteps && debugSteps && debugSteps.length > 0 ? (
-        <div className="mt-4">
-          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-            Step outputs
-          </label>
-          <div className="space-y-2">
-            {debugSteps.map((s) => {
-              const kitten = kittenLabels[s.index - 1];
-              const isOpen = openStepIndices.has(s.index);
-              const title = kitten
-                ? `${s.index}. ${kitten.name}`
-                : `${s.index}. Step`;
-              return (
-                <div
-                  key={s.index}
-                  className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden"
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleStepOpen(s.index)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-gray-200/60 dark:bg-gray-900/60 hover:bg-gray-200 dark:hover:bg-gray-900 transition-colors"
-                  >
-                    <div className="min-w-0 text-left">
-                      <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
-                        {title}
-                      </p>
-                      <p className="text-[11px] text-gray-600 dark:text-gray-400 mt-0.5 truncate">
-                        {s.client_model}
-                        {s.duration_ms ? ` · ${s.duration_ms}ms` : ""}
-                      </p>
-                    </div>
-                    {isOpen ? (
-                      <ChevronUp className="w-4 h-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-500" />
-                    )}
-                  </button>
-                  {isOpen ? (
-                    <div className="px-4 py-3 bg-white/60 dark:bg-gray-950/40">
-                      <pre className="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200">
-                        {s.output_text}
-                      </pre>
-                    </div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
+      <StepOutputs show={showSteps} debugSteps={debugSteps} stepLabels={kittenLabels} />
 
       {testOutput ? (
         <div className="mt-4">
