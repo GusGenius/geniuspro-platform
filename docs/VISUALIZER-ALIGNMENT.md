@@ -103,3 +103,33 @@ data: {"type":"error","message":"..."}
 | Request body | `stream: false` (not true) |
 | API URL (API key) | `https://api.geniuspro.io/v1` as base, or full path `/v1/chat/completions` |
 | Client | Use `geniuspro-cat-progress-client.ts` (or equivalent) that sends stream: false |
+
+---
+
+## Debug logs: verify Gemini instructions
+
+When `debug_pipeline: true` is sent, the Image Gen step returns `_debug_logs` in its output. Use this to confirm Gemini is receiving your gutter prompts.
+
+**Add this after receiving the response** (e.g. in your `onComplete` or `parseCompletionResponse` handler):
+
+```javascript
+// After you have the full response (data or result)
+const debugSteps = result?.debugSteps ?? data?.debug?.pipeline_steps ?? [];
+const imageGenStep = debugSteps.find(s => 
+  String(s?.client_model ?? "").startsWith("image_gen")
+);
+const debugLogs = imageGenStep?.parsed_json?._debug_logs;
+if (debugLogs) {
+  console.log("[Gutter] Instructions sent to Gemini:", debugLogs);
+  console.log("[Gutter] System prompt snippet:", debugLogs.systemInstructionsSnippet);
+  console.log("[Gutter] User prompt snippet:", debugLogs.instructionsSnippet);
+}
+```
+
+**What to check:**
+- `systemInstructionsLength` > 0 — system prompt is set
+- `instructionsLength` > 0 — user prompt is set
+- `systemInstructionsSnippet` starts with "Role: Senior Hydrology" — correct gutter logic
+- `instructionsSnippet` mentions "hybrid rainwater harvesting" — correct design specs
+
+**Request:** Include `debug_pipeline: true` in the request body.
