@@ -251,6 +251,42 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
 
               {(k as { type?: unknown }).type === "image_gen" && (
                 <div className="mt-3 space-y-3">
+                  <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-3">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-3">
+                      Prompts for Gemini image generation
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                          1. System prompt (optional)
+                        </label>
+                        <textarea
+                          value={String((k as { system_instructions?: unknown }).system_instructions ?? "")}
+                          onChange={(e) =>
+                            updateKitten(k.id, { system_instructions: e.target.value } as CatKitten)
+                          }
+                          placeholder="Role, constraints, engineering logic (e.g. Senior Hydrology Engineer, color rules...)"
+                          rows={5}
+                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                          2. User prompt (instructions)
+                        </label>
+                        <textarea
+                          value={String((k as { instructions?: unknown }).instructions ?? "")}
+                          onChange={(e) =>
+                            updateKitten(k.id, { instructions: e.target.value } as CatKitten)
+                          }
+                          placeholder="Describe the image to generate (e.g. [ACTION]: Analyze the photo and design a hybrid rainwater system...)"
+                          rows={4}
+                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
@@ -292,38 +328,9 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      System instructions (optional)
-                    </label>
-                    <textarea
-                      value={String((k as { system_instructions?: unknown }).system_instructions ?? "")}
-                      onChange={(e) =>
-                        updateKitten(k.id, { system_instructions: e.target.value } as CatKitten)
-                      }
-                      placeholder="Role, constraints, engineering logic (e.g. Senior Hydrology Engineer...)"
-                      rows={5}
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-xs"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      Instructions (user prompt)
-                    </label>
-                    <textarea
-                      value={String((k as { instructions?: unknown }).instructions ?? "")}
-                      onChange={(e) =>
-                        updateKitten(k.id, { instructions: e.target.value } as CatKitten)
-                      }
-                      placeholder="Describe the image to generate (e.g. overlay a gutter system)"
-                      rows={4}
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    />
-                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
-                      Calls Gemini directly. Requires GEMINI_API_KEY or GOOGLE_API_KEY.
-                    </p>
-                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Calls Gemini directly. Requires GEMINI_API_KEY or GOOGLE_API_KEY.
+                  </p>
                 </div>
               )}
 
