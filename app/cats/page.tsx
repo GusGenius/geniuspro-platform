@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useProfile } from "@/lib/profile/use-profile";
 import { supabase } from "@/lib/supabase/client";
-import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check, Search } from "lucide-react";
+import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check, Search, Zap } from "lucide-react";
 import { CatsSkeleton } from "@/components/pages/cats-skeleton";
 
 interface UserCatRow {
@@ -17,6 +17,11 @@ interface UserCatRow {
   updated_at: string;
   user_id?: string;
 }
+
+const SYSTEM_AGI_MODELS = [
+  { id: "geniuspro-agi-1.2", label: "Superintelligence", description: "GeniusPro chat model" },
+  { id: "geniuspro-code-agi-1.2", label: "Coding Superintelligence", description: "GeniusPro coding model" },
+] as const;
 
 export default function CatsPage() {
   const { user } = useAuth();
@@ -106,6 +111,10 @@ export default function CatsPage() {
     }
   };
 
+  const handleCopySystemModel = (modelId: string) => {
+    handleCopy(modelId, `system:${modelId}`).catch(() => {});
+  };
+
   if (loading) {
     return <CatsSkeleton />;
   }
@@ -139,6 +148,66 @@ export default function CatsPage() {
             </div>
           </div>
         )}
+
+        {/* System AGI models - always visible */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              System models
+            </h2>
+            {isAdmin && (
+              <Link
+                href="/cats/system"
+                className="text-xs text-blue-500 hover:text-blue-400 font-medium"
+              >
+                Edit as admin
+              </Link>
+            )}
+          </div>
+          <div className="space-y-3">
+            {SYSTEM_AGI_MODELS.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between gap-3 bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-4 sm:p-5"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <Zap className="w-5 h-5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                      {m.label}
+                    </h3>
+                    <div className="mt-1">
+                      <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded font-mono">
+                        {m.id}
+                      </code>
+                    </div>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      {m.description}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleCopySystemModel(m.id)}
+                  className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors flex-shrink-0"
+                  title="Copy API model ID"
+                >
+                  {copiedId === `system:${m.id}` ? (
+                    <Check className="w-4 h-4 text-green-400" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* User cats */}
+        <div className="mb-4">
+          <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
+            Your cats
+          </h2>
+        </div>
 
         {cats.length > 0 && (
           <div className="relative mb-6">
