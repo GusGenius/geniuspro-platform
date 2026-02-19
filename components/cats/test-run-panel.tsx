@@ -73,6 +73,8 @@ export function TestRunPanel({
 
   const [debugSteps, setDebugSteps] = useState<CatRunDebugStep[] | null>(null);
   const [progressMessage, setProgressMessage] = useState<string | null>(null);
+  const [progressStep, setProgressStep] = useState<number>(0);
+  const [progressTotal, setProgressTotal] = useState<number>(0);
   const { savingByStepIndex, savedByStepIndex, errorsByStepIndex } =
     useAutoSaveGeneratedImages({
       userId,
@@ -245,8 +247,15 @@ export function TestRunPanel({
         debugPipeline: true,
         debugRunStep: typeof stepIndex === "number" ? stepIndex : undefined,
         progressUpdates: true,
-        onProgress: (u) =>
-          setProgressMessage(`Step ${u.step}: ${u.stepName} — ${u.message}`),
+        onProgress: (u) => {
+          setProgressStep(u.step);
+          setProgressTotal(u.totalSteps);
+          const progress =
+            u.step > 0 && u.totalSteps > 0
+              ? `Step ${u.step} of ${u.totalSteps}${u.stepName ? `: ${u.stepName}` : ""} — ${u.message}`
+              : u.message;
+          setProgressMessage(progress);
+        },
       });
       setTestOutput(res.text);
       setDebugSteps(res.debugSteps ?? null);
@@ -271,6 +280,8 @@ export function TestRunPanel({
     } finally {
       setTestRunning(false);
       setProgressMessage(null);
+      setProgressStep(0);
+      setProgressTotal(0);
     }
   };
 
@@ -520,9 +531,21 @@ export function TestRunPanel({
       </div>
 
       {progressMessage && testRunning ? (
-        <div className="mt-4 flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/5 p-4">
-          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
-          <p className="text-sm text-blue-700 dark:text-blue-300">{progressMessage}</p>
+        <div className="mt-4 rounded-xl border border-blue-500/30 bg-blue-500/5 p-4">
+          <div className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+            <p className="text-sm text-blue-700 dark:text-blue-300">{progressMessage}</p>
+          </div>
+          {progressTotal > 0 ? (
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-blue-500/20">
+              <div
+                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                style={{
+                  width: `${Math.min(100, (progressStep / progressTotal) * 100)}%`,
+                }}
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
 

@@ -11,6 +11,7 @@ export type CatRunDebugStep = {
 
 export type ProgressUpdate = {
   step: number;
+  totalSteps: number;
   stepName: string;
   message: string;
 };
@@ -108,6 +109,7 @@ async function consumeProgressStream(
         if (type === "progress") {
           onProgress?.({
             step: Number(parsed.step) ?? 0,
+            totalSteps: Number(parsed.totalSteps) ?? 0,
             stepName: String(parsed.stepName ?? ""),
             message: String(parsed.message ?? ""),
           });

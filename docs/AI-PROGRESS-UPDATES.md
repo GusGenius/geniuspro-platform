@@ -38,7 +38,7 @@ When `progress_updates: true` is sent:
 
 | Event type | Payload | When |
 |------------|---------|------|
-| `progress` | `{ type: "progress", step, stepName, message }` | During each pipeline step |
+| `progress` | `{ type: "progress", step, totalSteps, stepName, message }` | During each pipeline step (step 0 = "Your cat is running N kittens...") |
 | `complete` | `{ type: "complete", data: responseData }` | Final response (same shape as non-streaming) |
 | `error` | `{ type: "error", message }` | On failure |
 
