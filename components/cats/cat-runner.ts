@@ -67,8 +67,16 @@ export async function runCatOnce(args: {
   }
 
   const contentType = res.headers.get("content-type") ?? "";
-  if (contentType.includes("text/event-stream") && args.progressUpdates && res.body) {
+  const isSSE = contentType.includes("text/event-stream");
+  if (isSSE && args.progressUpdates && res.body) {
     return consumeProgressStream(res, args.onProgress);
+  }
+  if (args.progressUpdates && !isSSE) {
+    console.warn(
+      "[runCatOnce] progress_updates requested but API returned",
+      contentType || "(no content-type)",
+      "- progress stream not available. Ensure geniuspro-api is deployed with progress support."
+    );
   }
 
   const data = (await res.json()) as {
