@@ -527,11 +527,11 @@ export function TestRunPanel({
       />
 
       {testOutput ? (
-        <div className="mt-4">
+        <div className="mt-4 min-w-0 overflow-hidden">
           <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
             Final output
           </label>
-          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 bg-gray-200/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 bg-gray-200/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl p-4 overflow-x-auto max-w-full">
             {testOutput}
           </pre>
         </div>

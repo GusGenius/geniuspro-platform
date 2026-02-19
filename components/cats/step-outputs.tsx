@@ -55,7 +55,7 @@ export function StepOutputs(props: {
   if (!canRender) return null;
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 min-w-0 overflow-hidden">
       <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
         Step outputs
       </label>
@@ -162,7 +162,7 @@ export function StepOutputs(props: {
                     </div>
                   ) : null}
 
-                  <pre className="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200">
+                  <pre className="whitespace-pre-wrap text-xs text-gray-800 dark:text-gray-200 overflow-x-auto max-w-full">
                     {s.output_text}
                   </pre>
                 </div>
