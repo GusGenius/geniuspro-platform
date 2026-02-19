@@ -141,6 +141,8 @@ export function TestRunPanel({
             ? String((k as { path?: unknown }).path ?? "").trim()
             : (k as { type?: unknown }).type === "sam3"
               ? "Replicate SAM 3"
+              : (k as { type?: unknown }).type === "gutter_custom_solution"
+                ? "Gutter Custom Solution"
               : String((k as { type?: unknown }).type ?? "")).trim(),
     }));
   }, [kittens]);

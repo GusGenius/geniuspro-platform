@@ -3,6 +3,7 @@ export type CatKittenType =
   | "vision_http"
   | "image_gen"
   | "sam3"
+  | "gutter_custom_solution"
   | "transform_js"
   | "transform_py";
 
@@ -19,6 +20,16 @@ export type CatSam3Kitten = {
   targets: CatSam3Target[];
   run_all_targets?: boolean;
   mask_only?: boolean;
+  test_image_storage_path?: string;
+};
+
+export type CatGutterCustomSolutionKitten = {
+  id: string;
+  name: string;
+  type: "gutter_custom_solution";
+  image_source: "original" | "previous_overlay";
+  include_masks_base64?: boolean;
+  include_overlay_image?: boolean;
   test_image_storage_path?: string;
 };
 
@@ -89,6 +100,7 @@ export type CatKitten =
   | CatVisionHttpKitten
   | CatImageGenKitten
   | CatSam3Kitten
+  | CatGutterCustomSolutionKitten
   | CatTransformJsKitten
   | CatTransformPyKitten;
 

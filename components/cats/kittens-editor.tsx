@@ -100,6 +100,15 @@ export function KittensEditor({
             mask_only: true,
           } satisfies CatKitten;
         }
+        if (nextType === "gutter_custom_solution") {
+          return {
+            ...base,
+            type: "gutter_custom_solution",
+            image_source: "previous_overlay",
+            include_masks_base64: true,
+            include_overlay_image: true,
+          } satisfies CatKitten;
+        }
         if (nextType === "transform_js") {
           return {
             ...base,
@@ -250,6 +259,7 @@ export function KittensEditor({
                   <option value="vision_http">Vision HTTP</option>
                   <option value="image_gen">Image Gen (Gemini)</option>
                   <option value="sam3">SAM 3 (Replicate)</option>
+                  <option value="gutter_custom_solution">Gutter Custom Solution</option>
                   <option value="transform_js">Transform (JS)</option>
                   <option value="transform_py">Transform (Python)</option>
                 </select>
@@ -520,6 +530,74 @@ export function KittensEditor({
 
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
                     Calls Replicate SAM 3 directly. Requires REPLICATE_API_TOKEN.
+                  </p>
+                </div>
+              )}
+
+              {(k as { type?: unknown }).type === "gutter_custom_solution" && (
+                <div className="mt-3 space-y-3">
+                  <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-3">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                      End-to-end gutter placement JSON (SAM 3 + heuristics). Designed to match the old
+                      `/gutter/segment-overlay` output schema.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Image source
+                      </label>
+                      <select
+                        value={
+                          String((k as { image_source?: unknown }).image_source ?? "") === "original"
+                            ? "original"
+                            : "previous_overlay"
+                        }
+                        onChange={(e) =>
+                          updateKitten(k.id, {
+                            image_source: e.target.value as "original" | "previous_overlay",
+                          } as CatKitten)
+                        }
+                        className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="previous_overlay">Previous step overlay_base64</option>
+                        <option value="original">Original image</option>
+                      </select>
+                    </div>
+
+                    <label className="flex items-center gap-2 mt-6">
+                      <input
+                        type="checkbox"
+                        checked={(k as { include_masks_base64?: unknown }).include_masks_base64 !== false}
+                        onChange={(e) =>
+                          updateKitten(k.id, { include_masks_base64: e.target.checked } as CatKitten)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Include masks base64
+                      </span>
+                    </label>
+
+                    <label className="flex items-center gap-2 mt-6">
+                      <input
+                        type="checkbox"
+                        checked={(k as { include_overlay_image?: unknown }).include_overlay_image !== false}
+                        onChange={(e) =>
+                          updateKitten(k.id, { include_overlay_image: e.target.checked } as CatKitten)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Include overlay image base64
+                      </span>
+                    </label>
+                  </div>
+
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Calls Replicate SAM 3 + backend placement logic. Requires REPLICATE_API_TOKEN.
+                    Recommended image source: previous overlay (PNG) from the Image Gen step.
                   </p>
                 </div>
               )}

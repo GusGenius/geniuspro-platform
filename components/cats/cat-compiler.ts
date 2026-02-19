@@ -114,6 +114,22 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
         };
       }
 
+      if (type === "gutter_custom_solution") {
+        return {
+          id,
+          name,
+          type: "gutter_custom_solution" as const,
+          image_source:
+            String((k as { image_source?: unknown }).image_source ?? "").trim() ===
+            "original"
+              ? ("original" as const)
+              : ("previous_overlay" as const),
+          include_masks_base64: (k as { include_masks_base64?: unknown }).include_masks_base64 !== false,
+          include_overlay_image: (k as { include_overlay_image?: unknown }).include_overlay_image !== false,
+          test_image_storage_path: testImagePath,
+        };
+      }
+
       if (type === "transform_js") {
         return {
           id,
