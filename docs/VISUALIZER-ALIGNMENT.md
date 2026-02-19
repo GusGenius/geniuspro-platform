@@ -106,6 +106,85 @@ data: {"type":"error","message":"..."}
 
 ---
 
+## GeniusPro response shape (gutter placement)
+
+What the gutter system needs from GeniusPro to position gutters correctly.
+
+### 1. `gutter_masks_base64` (required for drawing gutters)
+
+| Property | Value |
+|----------|-------|
+| Type | Array of base64 PNG strings |
+| Format | Each mask must be the same size as the source image (`image_width` × `image_height`) |
+| Content | One mask per gutter run. White/alpha pixels along the gutter centerline; black/transparent elsewhere |
+| Coordinate system | The app vectorizes each mask and treats the resulting points as normalized 0–1 image coordinates (origin top-left) |
+
+### 2. `gutter_offsets` (paired with masks)
+
+| Property | Value |
+|----------|-------|
+| Type | Array of `[x, y]`, normalized 0–1, one per mask |
+| Pairing | `gutter_offsets[i]` must correspond to `gutter_masks_base64[i]` |
+| For full-image masks | Use `[0, 0]` for each gutter. The mask already encodes position |
+| Length | Must match `gutter_masks_base64.length` |
+
+### 3. `rooflines` (used when masks are missing)
+
+- If GeniusPro does not return masks, the app derives `gutter_offsets` from roofline centers
+- **Issue:** Roofline centers are not gutter centerlines, so placement can be wrong
+- **Improvement:** If GeniusPro returns `suggested_gutters` with `position: [x, y]` per gutter, the app should use those instead of roofline centers
+
+### Recommended response shape (masks)
+
+```json
+{
+  "image_width": 1264,
+  "image_height": 848,
+  "rooflines": [
+    { "id": "roof_0", "points": [[x, y], ...] }
+  ],
+  "gutter_masks_base64": [
+    "<base64 PNG, same size as image, white line on gutter run 1>",
+    "<base64 PNG, same size as image, white line on gutter run 2>"
+  ],
+  "gutter_offsets": [
+    [0, 0],
+    [0, 0]
+  ]
+}
+```
+
+### Alternative: `suggested_gutters` (positions instead of masks)
+
+```json
+{
+  "suggested_gutters": [
+    {
+      "roof_id": "roof_0",
+      "position": [0.5, 0.32],
+      "points": [[0.2, 0.35], [0.8, 0.30]]
+    }
+  ]
+}
+```
+
+- `position` — center of the gutter run (normalized 0–1)
+- `points` — polyline along the gutter centerline, normalized 0–1. If present, the app could draw gutters without masks
+
+### Summary
+
+| Need | Purpose |
+|------|---------|
+| `gutter_masks_base64` | PNG masks, image-sized, one per gutter run. White/alpha on the gutter line |
+| `gutter_offsets` | `[0, 0]` per mask when masks are full-image; otherwise one `[x, y]` per mask |
+| `image_width` / `image_height` | So masks and coordinates can be scaled correctly |
+| `suggested_gutters[].position` (optional) | Better fallback than roofline centers when masks are missing |
+| `suggested_gutters[].points` (optional) | Direct polyline for each gutter; would allow drawing without masks |
+
+**Main requirement:** Full-image masks (same size as the source image) so the vectorized centerlines map directly to image coordinates.
+
+---
+
 ## Debug logs: verify Gemini instructions
 
 When `debug_pipeline: true` is sent, the Image Gen step returns `_debug_logs` in its output. Use this to confirm Gemini is receiving your gutter prompts.
