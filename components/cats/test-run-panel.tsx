@@ -149,11 +149,15 @@ export function TestRunPanel({
 
   const firstKittenTestImage = (kittens[0] as { test_image_storage_path?: string } | undefined)
     ?.test_image_storage_path?.trim();
+  const hasAnyKittenTestImage = kittens.some(
+    (k) => !!(k as { test_image_storage_path?: string }).test_image_storage_path?.trim()
+  );
   const hasImage =
     !!imageUrl.trim() ||
     !!imageFile ||
     !!savedImageUrl ||
-    !!firstKittenTestImage;
+    !!firstKittenTestImage ||
+    hasAnyKittenTestImage;
   const hasText = !!testInput.trim();
   const canRun = hasText || hasImage;
 
