@@ -50,6 +50,21 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
         };
       }
 
+      if (type === "image_gen") {
+        return {
+          id,
+          name,
+          type: "image_gen" as const,
+          image_source:
+            String((k as { image_source?: unknown }).image_source ?? "").trim() ===
+            "previous_overlay"
+              ? ("previous_overlay" as const)
+              : ("original" as const),
+          model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || "gemini-nano-banana-pro",
+          instructions: String((k as { instructions?: unknown }).instructions ?? "").trim(),
+        };
+      }
+
       if (type === "transform_js") {
         return {
           id,

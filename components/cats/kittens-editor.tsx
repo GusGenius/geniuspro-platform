@@ -46,6 +46,15 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
             image_source: "original",
           } satisfies CatKitten;
         }
+        if (nextType === "image_gen") {
+          return {
+            ...base,
+            type: "image_gen",
+            image_source: "original",
+            model_id: "gemini-nano-banana-pro",
+            instructions: "",
+          } satisfies CatKitten;
+        }
         if (nextType === "transform_js") {
           return {
             ...base,
@@ -194,6 +203,7 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
                 >
                   <option value="model">Model</option>
                   <option value="vision_http">Vision HTTP</option>
+                  <option value="image_gen">Image Gen (Gemini)</option>
                   <option value="transform_js">Transform (JS)</option>
                   <option value="transform_py">Transform (Python)</option>
                 </select>
@@ -236,6 +246,69 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
                     />
                   </div>
                 </>
+              )}
+
+              {(k as { type?: unknown }).type === "image_gen" && (
+                <div className="mt-3 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Image source
+                      </label>
+                      <select
+                        value={
+                          String((k as { image_source?: unknown }).image_source ?? "") ===
+                          "previous_overlay"
+                            ? "previous_overlay"
+                            : "original"
+                        }
+                        onChange={(e) =>
+                          updateKitten(k.id, {
+                            image_source: e.target.value as "original" | "previous_overlay",
+                          } as CatKitten)
+                        }
+                        className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="original">Original image</option>
+                        <option value="previous_overlay">Previous step overlay_base64</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Model
+                      </label>
+                      <select
+                        value={String((k as { model_id?: unknown }).model_id ?? "gemini-nano-banana-pro")}
+                        onChange={(e) =>
+                          updateKitten(k.id, { model_id: e.target.value } as CatKitten)
+                        }
+                        className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="gemini-nano-banana">Nano Banana</option>
+                        <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Instructions
+                    </label>
+                    <textarea
+                      value={String((k as { instructions?: unknown }).instructions ?? "")}
+                      onChange={(e) =>
+                        updateKitten(k.id, { instructions: e.target.value } as CatKitten)
+                      }
+                      placeholder="Describe the image to generate (e.g. overlay a gutter system)"
+                      rows={4}
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    />
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                      Calls Gemini directly. Requires GEMINI_API_KEY or GOOGLE_API_KEY.
+                    </p>
+                  </div>
+                </div>
               )}
 
               {(k as { type?: unknown }).type === "vision_http" && (

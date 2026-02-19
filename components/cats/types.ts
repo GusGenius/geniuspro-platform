@@ -1,4 +1,9 @@
-export type CatKittenType = "model" | "vision_http" | "transform_js" | "transform_py";
+export type CatKittenType =
+  | "model"
+  | "vision_http"
+  | "image_gen"
+  | "transform_js"
+  | "transform_py";
 
 export type CatModelKitten = {
   id: string;
@@ -29,6 +34,15 @@ export type CatVisionHttpKitten = {
   instructions?: string;
 };
 
+export type CatImageGenKitten = {
+  id: string;
+  name: string;
+  type: "image_gen";
+  image_source: "original" | "previous_overlay";
+  model_id: string;
+  instructions: string;
+};
+
 export type CatTransformJsKitten = {
   id: string;
   name: string;
@@ -46,6 +60,7 @@ export type CatTransformPyKitten = {
 export type CatKitten =
   | CatModelKitten
   | CatVisionHttpKitten
+  | CatImageGenKitten
   | CatTransformJsKitten
   | CatTransformPyKitten;
 
