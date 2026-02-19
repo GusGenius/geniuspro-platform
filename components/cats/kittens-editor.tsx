@@ -593,11 +593,24 @@ export function KittensEditor({
                         Include overlay image base64
                       </span>
                     </label>
+
+                    <label className="flex items-center gap-2 mt-6">
+                      <input
+                        type="checkbox"
+                        checked={(k as { use_gemini_overlay?: unknown }).use_gemini_overlay !== false}
+                        onChange={(e) =>
+                          updateKitten(k.id, { use_gemini_overlay: e.target.checked } as CatKitten)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Gemini designs system first (old server flow)
+                      </span>
+                    </label>
                   </div>
 
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                    Calls Replicate SAM 3 + backend placement logic. Requires REPLICATE_API_TOKEN.
-                    Recommended image source: previous overlay (PNG) from the Image Gen step.
+                    When &quot;Gemini designs system first&quot; is on: Gemini creates the overlay (cyan gutters, yellow rain chains, etc.); SAM 3 segments it. Requires GEMINI_API_KEY and REPLICATE_API_TOKEN.
                   </p>
                 </div>
               )}

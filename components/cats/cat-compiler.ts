@@ -126,6 +126,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
               : ("previous_overlay" as const),
           include_masks_base64: (k as { include_masks_base64?: unknown }).include_masks_base64 !== false,
           include_overlay_image: (k as { include_overlay_image?: unknown }).include_overlay_image !== false,
+          use_gemini_overlay: (k as { use_gemini_overlay?: unknown }).use_gemini_overlay !== false,
           test_image_storage_path: testImagePath,
         };
       }

@@ -19,7 +19,7 @@ The API sends **SSE (Server-Sent Events)** progress messages to the client durin
 | `lib/chat-completions/request-parser.ts` | Parses `progress_updates: true` from request body |
 | `lib/chat-completions/core-executor.ts` | When `progressUpdatesRequested`, returns SSE stream instead of JSON; wires `onProgress` into `executeTypedKittens` |
 | `lib/cat-kittens/execute.ts` | `executeTypedKittens` accepts `onProgress`; calls it at start of each step and passes it to sub-steps |
-| `lib/gutter-custom-solution.ts` | `runGutterCustomSolution` accepts `onProgress`; emits messages at: SAM 3 run, mask fetch, heuristics, overlay render |
+| `lib/gutter-solution/custom-solution.ts` | `runGutterCustomSolution` accepts `onProgress`; emits messages at: SAM 3 run, mask fetch, heuristics, overlay render |
 | `lib/replicate-sam3.ts` | `runReplicateSam3Pipeline` accepts `onProgress`; emits per-target (e.g. "Segmenting gutters...") |
 
 ### Platform (geniuspro-platform)

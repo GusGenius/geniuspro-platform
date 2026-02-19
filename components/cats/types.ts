@@ -30,6 +30,8 @@ export type CatGutterCustomSolutionKitten = {
   image_source: "original" | "previous_overlay";
   include_masks_base64?: boolean;
   include_overlay_image?: boolean;
+  /** When true (default), Gemini designs the system first; SAM 3 segments the overlay. */
+  use_gemini_overlay?: boolean;
   test_image_storage_path?: string;
 };
 

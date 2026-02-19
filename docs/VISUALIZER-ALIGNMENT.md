@@ -108,7 +108,7 @@ data: {"type":"error","message":"..."}
 
 ## What the Visualizer needs from SAM 3 (or the pipeline)
 
-Source image → SAM 3 segmentation → masks + structured data → Visualizer.
+**Gutter pipeline order:** Gemini (Image Gen) → SAM 3 segmentation → masks + structured data → Visualizer.
 
 ### 1. Gutter masks (`gutter_masks_base64`)
 
@@ -191,8 +191,8 @@ The app vectorizes masks into centerlines and draws along those paths. For gutte
 ### Pipeline flow
 
 ```
-Source image → SAM 3 segmentation → masks + structured data
-                    ↓
+Gemini (Image Gen) → source image → SAM 3 segmentation → masks + structured data
+                                              ↓
      gutter_masks_base64 (one per gutter run)
      downspout_masks_base64 (one per downspout)
      suggested_rain_chains (position + end_y)
@@ -230,7 +230,7 @@ Source image → SAM 3 segmentation → masks + structured data
 }
 ```
 
-SAM 3 (or the pipeline) should produce these masks and structured fields so the Visualizer can place and draw gutters, downspouts, rain chains, and tank correctly.
+Gemini produces the source image; SAM 3 (or the pipeline) produces these masks and structured fields so the Visualizer can place and draw gutters, downspouts, rain chains, and tank correctly.
 
 ---
 
