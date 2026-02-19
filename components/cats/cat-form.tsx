@@ -64,6 +64,7 @@ export function CatForm({
   const [copiedModelId, setCopiedModelId] = useState(false);
   const [lastFullRunOk, setLastFullRunOk] = useState(false);
   const [pendingTestStep, setPendingTestStep] = useState<number | null>(null);
+  const [savedTestImagePath, setSavedTestImagePath] = useState<string | null>(null);
 
   const normalizedSlug = useMemo(() => {
     return normalizeCatSlug(slug || slugFromName(name));
@@ -368,7 +369,9 @@ export function CatForm({
               userId={user?.id ?? ""}
               accessToken={session?.access_token ?? null}
               kittens={normalizeKittens(kittens)}
-              savedTestImagePath={initial?.test_image_storage_path ?? null}
+              savedTestImagePath={
+                savedTestImagePath ?? initial?.test_image_storage_path ?? null
+              }
               onSaveTestImage={async (storagePath) => {
                 const { error } = await supabase
                   .from("user_cats")
@@ -378,6 +381,7 @@ export function CatForm({
                   })
                   .eq("id", editingId);
                 if (error) throw error;
+                setSavedTestImagePath(storagePath);
               }}
               runStep={pendingTestStep}
               onStepRun={() => setPendingTestStep(null)}

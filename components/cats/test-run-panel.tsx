@@ -66,6 +66,9 @@ export function TestRunPanel({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
+  const [savedImageLoading, setSavedImageLoading] = useState(false);
+  const [savedImageError, setSavedImageError] = useState<string | null>(null);
+  const [imageLoadError, setImageLoadError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<
     | { state: "idle" }
     | { state: "uploading" }
@@ -88,15 +91,30 @@ export function TestRunPanel({
   }, [imageUrl, imagePreviewUrl, savedImageUrl]);
 
   useEffect(() => {
-    if (!savedTestImagePath?.trim() || !userId) return;
+    if (!savedTestImagePath?.trim() || !userId) {
+      setSavedImageUrl(null);
+      setSavedImageLoading(false);
+      setSavedImageError(null);
+      return;
+    }
+    setSavedImageLoading(true);
+    setSavedImageError(null);
     getSignedUrl(savedTestImagePath)
-      .then(setSavedImageUrl)
-      .catch(() => setSavedImageUrl(null));
+      .then((url) => {
+        setSavedImageUrl(url);
+        setSavedImageError(null);
+      })
+      .catch((err) => {
+        setSavedImageUrl(null);
+        setSavedImageError(err instanceof Error ? err.message : "Failed to load");
+      })
+      .finally(() => setSavedImageLoading(false));
   }, [savedTestImagePath, userId]);
 
   const onPickFile = async (file: File | null) => {
     setImageFile(file);
     setTestError(null);
+    setImageLoadError(null);
     setUploadStatus({ state: "idle" });
     if (!file) {
       setImagePreviewUrl(null);
@@ -364,11 +382,28 @@ export function TestRunPanel({
           </div>
         </div>
 
+        {(savedTestImagePath || savedImageLoading) && !effectiveImageUrl ? (
+          <div className="mt-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-100/50 dark:bg-gray-900/50">
+            {savedImageLoading ? (
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading saved image...
+              </div>
+            ) : savedImageError ? (
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                Saved image could not be loaded: {savedImageError}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
         {effectiveImageUrl ? (
           <div className="mt-3">
             <div className="flex items-center justify-between gap-2 mb-2">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Preview
+                {savedImageUrl && effectiveImageUrl === savedImageUrl
+                  ? "Saved default image"
+                  : "Preview"}
               </p>
               {onSaveTestImage && (imageFile || (imageUrl.trim().startsWith("data:") && imageUrl.trim().length > 100)) ? (
                 <button
@@ -414,10 +449,17 @@ export function TestRunPanel({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={effectiveImageUrl}
-                alt=""
+                alt="Test image"
                 className="w-full max-h-64 object-contain"
+                onError={() => setImageLoadError("Image failed to load")}
+                onLoad={() => setImageLoadError(null)}
               />
             </div>
+            {imageLoadError ? (
+              <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                {imageLoadError}
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>
