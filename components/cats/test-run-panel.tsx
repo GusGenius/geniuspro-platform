@@ -170,15 +170,6 @@ export function TestRunPanel({
     }
 
     const message = testInput.trim();
-    if (!canRun) {
-      setTestError(
-        hasImage
-          ? "Enter a prompt (or leave a short note) to run."
-          : "Enter a prompt or add an image to test."
-      );
-      return;
-    }
-
     const hasUrl = !!imageUrl.trim();
     const hasFile = !!imageFile;
     const hasSaved = !!savedImageUrl;
@@ -190,6 +181,12 @@ export function TestRunPanel({
     const kittenTestPath = kittenForStep
       ? (kittenForStep as { test_image_storage_path?: string }).test_image_storage_path
       : undefined;
+
+    const canRunNow = !!message || hasUrl || hasFile || hasSaved || !!kittenTestPath?.trim();
+    if (!canRunNow) {
+      setTestError("Enter a prompt or add an image to test.");
+      return;
+    }
 
     let finalImageUrl: string | undefined = undefined;
     const shouldSendImage = hasUrl || hasFile || hasSaved || !!kittenTestPath?.trim();
@@ -276,13 +273,13 @@ export function TestRunPanel({
     containerRef.current?.scrollIntoView({ behavior: "smooth" });
     setShowSteps(true);
     const fn = runStepRef.current;
-    if (fn && accessToken && canRun) {
+    if (fn && accessToken) {
       void fn(runStep).finally(() => onStepRun?.());
     } else {
-      if (!canRun) setTestError("Add an image or enter a prompt to test.");
+      if (!accessToken) setTestError("You must be logged in to run a test.");
       onStepRun?.();
     }
-  }, [runStep, canRun]);
+  }, [runStep, accessToken]);
 
   return (
     <div
