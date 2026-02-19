@@ -15,7 +15,7 @@ export default function SystemCatEditPage() {
   const params = useParams();
   const slug = typeof params.slug === "string" ? params.slug : null;
   const { user } = useAuth();
-  const { isAdmin } = useProfile(user?.id);
+  const { isAdmin, loading: profileLoading } = useProfile(user?.id);
   const [loading, setLoading] = useState(true);
   const [initial, setInitial] = useState<{
     name: string;
@@ -31,6 +31,7 @@ export default function SystemCatEditPage() {
       return;
     }
 
+    if (profileLoading) return;
     if (!isAdmin) {
       setLoading(false);
       setNotFound(true);
@@ -60,7 +61,7 @@ export default function SystemCatEditPage() {
     }
 
     load();
-  }, [user, slug, isAdmin]);
+  }, [user, slug, isAdmin, profileLoading]);
 
   if (loading) {
     return <CatDetailSkeleton />;
