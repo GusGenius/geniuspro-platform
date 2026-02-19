@@ -11,6 +11,7 @@ export function useAutoSaveGeneratedImages(args: {
   userId: string;
   catSlug: string;
   debugSteps: Array<{ index: number; parsed_json: unknown | null }> | null;
+  onSaveGeneratedImage?: (stepIndex: number, saved: SavedGeneratedImage) => void;
 }): {
   runId: string | null;
   savingByStepIndex: Record<number, boolean>;
@@ -70,6 +71,10 @@ export function useAutoSaveGeneratedImages(args: {
             ...prev,
             [s.index]: { signedUrl: saved.signedUrl, storagePath: saved.storagePath },
           }));
+          args.onSaveGeneratedImage?.(s.index, {
+            signedUrl: saved.signedUrl,
+            storagePath: saved.storagePath,
+          });
         } catch (err) {
           if (cancelled) return;
           const msg = err instanceof Error ? err.message : "Failed to save generated image";

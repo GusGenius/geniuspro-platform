@@ -23,6 +23,7 @@ type Props = {
   kittens: CatKitten[];
   savedTestImagePath?: string | null;
   onSaveTestImage?: (storagePath: string) => Promise<void>;
+  onSaveGeneratedImage?: (stepIndex: number, saved: { signedUrl: string; storagePath: string }) => void;
   runStep?: number | null;
   onStepRun?: () => void;
   onFullRunResult?: (args: {
@@ -41,6 +42,7 @@ export function TestRunPanel({
   kittens,
   savedTestImagePath,
   onSaveTestImage,
+  onSaveGeneratedImage,
   runStep,
   onStepRun,
   onFullRunResult,
@@ -75,6 +77,7 @@ export function TestRunPanel({
       userId,
       catSlug,
       debugSteps,
+      onSaveGeneratedImage,
     });
 
   const effectiveImageUrl = useMemo(() => {

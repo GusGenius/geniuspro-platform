@@ -65,6 +65,9 @@ export function CatForm({
   const [lastFullRunOk, setLastFullRunOk] = useState(false);
   const [pendingTestStep, setPendingTestStep] = useState<number | null>(null);
   const [savedTestImagePath, setSavedTestImagePath] = useState<string | null>(null);
+  const [latestGeneratedByStep, setLatestGeneratedByStep] = useState<
+    Record<number, string>
+  >({});
 
   const normalizedSlug = useMemo(() => {
     return normalizeCatSlug(slug || slugFromName(name));
@@ -327,6 +330,7 @@ export function CatForm({
                 }
                 userId={mode === "edit" ? user?.id : undefined}
                 catSlug={mode === "edit" ? normalizedSlug : undefined}
+                latestGeneratedImageByStep={latestGeneratedByStep}
               />
             ) : null}
 
@@ -382,6 +386,12 @@ export function CatForm({
                   .eq("id", editingId);
                 if (error) throw error;
                 setSavedTestImagePath(storagePath);
+              }}
+              onSaveGeneratedImage={(stepIndex, saved) => {
+                setLatestGeneratedByStep((prev) => ({
+                  ...prev,
+                  [stepIndex]: saved.signedUrl,
+                }));
               }}
               runStep={pendingTestStep}
               onStepRun={() => setPendingTestStep(null)}

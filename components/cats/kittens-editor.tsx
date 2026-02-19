@@ -18,6 +18,8 @@ type Props = {
   /** When set, show per-kitten test image override. */
   userId?: string;
   catSlug?: string;
+  /** Latest generated overlay URL by step index (1-based). Shown next to test image. */
+  latestGeneratedImageByStep?: Record<number, string>;
 };
 
 function createKitten(): CatKitten {
@@ -37,6 +39,7 @@ export function KittensEditor({
   onTestKitten,
   userId,
   catSlug,
+  latestGeneratedImageByStep,
 }: Props) {
   const list = kittens.length > 0 ? kittens : [createKitten()];
   const [uploadingKittenId, setUploadingKittenId] = useState<string | null>(null);
@@ -477,57 +480,81 @@ export function KittensEditor({
                   <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
                     Test image (override)
                   </label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="block w-full max-w-[200px] text-xs text-gray-600 dark:text-gray-300 file:mr-2 file:px-3 file:py-2 file:rounded-lg file:border file:border-gray-200 dark:file:border-gray-700 file:bg-gray-100 dark:file:bg-gray-900 file:text-gray-700 dark:file:text-gray-200"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file || !userId || !catSlug) return;
-                        setUploadingKittenId(k.id);
-                        try {
-                          const { storagePath, signedUrl } = await uploadCatTestImage({
-                            userId,
-                            catSlug,
-                            file,
-                            kittenId: k.id,
-                          });
-                          updateKitten(k.id, { test_image_storage_path: storagePath } as CatKitten);
-                          setKittenImageUrls((prev) => ({ ...prev, [k.id]: signedUrl }));
-                        } finally {
-                          setUploadingKittenId(null);
-                        }
-                      }}
-                    />
-                    {(k as { test_image_storage_path?: string }).test_image_storage_path ? (
-                      <span className="text-xs text-green-600 dark:text-green-400 flex-shrink-0">
-                        {uploadingKittenId === k.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin inline" />
-                        ) : (
-                          "Saved"
-                        )}
-                      </span>
-                    ) : uploadingKittenId === k.id ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+                  <div className="flex flex-wrap items-start gap-4">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="block w-full max-w-[200px] text-xs text-gray-600 dark:text-gray-300 file:mr-2 file:px-3 file:py-2 file:rounded-lg file:border file:border-gray-200 dark:file:border-gray-700 file:bg-gray-100 dark:file:bg-gray-900 file:text-gray-700 dark:file:text-gray-200"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file || !userId || !catSlug) return;
+                            setUploadingKittenId(k.id);
+                            try {
+                              const { storagePath, signedUrl } = await uploadCatTestImage({
+                                userId,
+                                catSlug,
+                                file,
+                                kittenId: k.id,
+                              });
+                              updateKitten(k.id, { test_image_storage_path: storagePath } as CatKitten);
+                              setKittenImageUrls((prev) => ({ ...prev, [k.id]: signedUrl }));
+                            } finally {
+                              setUploadingKittenId(null);
+                            }
+                          }}
+                        />
+                        {(k as { test_image_storage_path?: string }).test_image_storage_path ? (
+                          <span className="text-xs text-green-600 dark:text-green-400 flex-shrink-0">
+                            {uploadingKittenId === k.id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin inline" />
+                            ) : (
+                              "Saved"
+                            )}
+                          </span>
+                        ) : uploadingKittenId === k.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+                        ) : null}
+                      </div>
+                      {kittenImageUrls[k.id] ? (
+                        <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-900/60 max-w-[240px]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={kittenImageUrls[k.id]}
+                            alt="Kitten test image"
+                            className="w-full max-h-32 object-contain"
+                          />
+                        </div>
+                      ) : (k as { test_image_storage_path?: string }).test_image_storage_path &&
+                        uploadingKittenId !== k.id ? (
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 max-w-[240px]">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Loading image...
+                        </div>
+                      ) : null}
+                    </div>
+                    {latestGeneratedImageByStep?.[idx + 1] ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">
+                          Latest generated (Step {idx + 1})
+                        </span>
+                        <a
+                          href={latestGeneratedImageByStep[idx + 1]}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-900/60 max-w-[240px] hover:opacity-90 transition-opacity"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={latestGeneratedImageByStep[idx + 1]}
+                            alt={`Latest generated overlay Step ${idx + 1}`}
+                            className="w-full max-h-32 object-contain"
+                          />
+                        </a>
+                      </div>
                     ) : null}
                   </div>
-                  {kittenImageUrls[k.id] ? (
-                    <div className="mt-2 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100/60 dark:bg-gray-900/60 max-w-[240px]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={kittenImageUrls[k.id]}
-                        alt="Kitten test image"
-                        className="w-full max-h-32 object-contain"
-                      />
-                    </div>
-                  ) : (k as { test_image_storage_path?: string }).test_image_storage_path &&
-                    uploadingKittenId !== k.id ? (
-                    <div className="mt-2 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Loading image...
-                    </div>
-                  ) : null}
                   <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                     Replace this kitten&apos;s test image. Used when running Step {idx + 1}
                   </p>
