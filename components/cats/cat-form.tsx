@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "@/lib/auth/auth-context";
+import { useProfile } from "@/lib/profile/use-profile";
 import { supabase } from "@/lib/supabase/client";
 import { slugFromName } from "@/components/cats/cat-slug";
 
@@ -46,6 +47,7 @@ export function CatForm({
   backLabel,
 }: Props) {
   const { user, session } = useAuth();
+  const { isAdmin } = useProfile(user?.id);
   const router = useRouter();
 
   const [name, setName] = useState(initial?.name ?? "");
@@ -109,8 +111,9 @@ export function CatForm({
     try {
       // Upsert cat record (source of truth + runtime).
       const now = new Date().toISOString();
+      const ownerId = (mode === "edit" && initial?.user_id) ? initial.user_id : user.id;
       const catPayload = {
-        user_id: user.id,
+        user_id: ownerId,
         name: trimmedName,
         description: description.trim(),
         slug: slugFinal,
@@ -120,13 +123,14 @@ export function CatForm({
 
       let savedCat: { id: string } | null = null;
       if (mode === "edit" && editingId) {
-        const res = await supabase
+        let updateQuery = supabase
           .from("user_cats")
           .update(catPayload)
-          .eq("id", editingId)
-          .eq("user_id", user.id)
-          .select("id")
-          .single();
+          .eq("id", editingId);
+        if (!isAdmin) {
+          updateQuery = updateQuery.eq("user_id", user.id);
+        }
+        const res = await updateQuery.select("id").single();
         if (res.error || !res.data) throw res.error ?? new Error("Save failed");
         savedCat = res.data as { id: string };
       } else {
@@ -158,11 +162,11 @@ export function CatForm({
     setSaving(true);
     setError(null);
     try {
-      const res = await supabase
-        .from("user_cats")
-        .delete()
-        .eq("id", editingId)
-        .eq("user_id", user.id);
+      let deleteQuery = supabase.from("user_cats").delete().eq("id", editingId);
+      if (!isAdmin) {
+        deleteQuery = deleteQuery.eq("user_id", user.id);
+      }
+      const res = await deleteQuery;
       if (res.error) throw res.error;
 
       router.push("/cats");
@@ -356,6 +360,7 @@ export function CatForm({
               <CatPublishPanel
                 catId={editingId}
                 catSlug={normalizedSlug}
+                ownerId={initial?.user_id ?? user?.id ?? ""}
                 canPublish={lastFullRunOk}
               />
             ) : null}

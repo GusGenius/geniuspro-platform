@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useProfile } from "@/lib/profile/use-profile";
 import { supabase } from "@/lib/supabase/client";
-import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check } from "lucide-react";
+import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check, Search } from "lucide-react";
 import { CatsSkeleton } from "@/components/pages/cats-skeleton";
 
 interface UserCatRow {
@@ -14,25 +15,42 @@ interface UserCatRow {
   slug: string;
   created_at: string;
   updated_at: string;
+  user_id?: string;
 }
 
 export default function CatsPage() {
   const { user } = useAuth();
+  const { isAdmin } = useProfile(user?.id);
   const [cats, setCats] = useState<UserCatRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const filteredCats = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return cats;
+    return cats.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.slug.toLowerCase().includes(q) ||
+        (c.description && c.description.toLowerCase().includes(q))
+    );
+  }, [cats, searchQuery]);
 
   const fetchCats = useCallback(async () => {
     if (!user) return;
     setError(null);
     try {
-      const { data, error: fetchError } = await supabase
+      let query = supabase
         .from("user_cats")
-        .select("id, name, description, slug, created_at, updated_at")
-        .eq("user_id", user.id)
+        .select("id, name, description, slug, created_at, updated_at, user_id")
         .order("created_at", { ascending: false });
+      if (!isAdmin) {
+        query = query.eq("user_id", user.id);
+      }
+      const { data, error: fetchError } = await query;
 
       if (fetchError) {
         setError(fetchError.message);
@@ -47,7 +65,7 @@ export default function CatsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   useEffect(() => {
     fetchCats();
@@ -58,11 +76,11 @@ export default function CatsPage() {
     setDeletingId(id);
     setError(null);
     try {
-      const { error: deleteError } = await supabase
-        .from("user_cats")
-        .delete()
-        .eq("id", id)
-        .eq("user_id", user.id);
+      let deleteQuery = supabase.from("user_cats").delete().eq("id", id);
+      if (!isAdmin) {
+        deleteQuery = deleteQuery.eq("user_id", user.id);
+      }
+      const { error: deleteError } = await deleteQuery;
 
       if (deleteError) {
         setError(deleteError.message);
@@ -122,26 +140,44 @@ export default function CatsPage() {
           </div>
         )}
 
+        {cats.length > 0 && (
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <input
+              type="search"
+              placeholder="Search by name, slug, or description"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00b8a9] focus:border-transparent text-sm"
+              aria-label="Search cats"
+            />
+          </div>
+        )}
+
         <div className="space-y-4">
-          {cats.length === 0 ? (
+          {filteredCats.length === 0 ? (
             <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-12 text-center">
               <Cat className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300 mb-2">
-                No Cats Yet
+                {searchQuery.trim() ? "No matching cats" : "No Cats Yet"}
               </h3>
               <p className="text-gray-400 dark:text-gray-500 mb-6">
-                Create your first cat to start saving multi-agent setups.
+                {searchQuery.trim()
+                  ? "Try a different search term."
+                  : "Create your first cat to start saving multi-agent setups."}
               </p>
-              <Link
-                href="/cats/new"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
-              >
-                <Plus className="w-4 h-4" />
-                Create Cat
-              </Link>
+              {!searchQuery.trim() && (
+                <Link
+                  href="/cats/new"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Cat
+                </Link>
+              )}
             </div>
           ) : (
-            cats.map((catRow) => (
+            filteredCats.map((catRow) => (
               <Link
                 key={catRow.id}
                 href={`/cats/${catRow.id}`}

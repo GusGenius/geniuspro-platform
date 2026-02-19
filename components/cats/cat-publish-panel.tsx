@@ -36,6 +36,7 @@ function parseLatestVersionRow(v: unknown): LatestVersionRow | null {
 export function CatPublishPanel(props: {
   catId: string;
   catSlug: string;
+  ownerId: string;
   canPublish: boolean;
 }) {
   const { user } = useAuth();
@@ -59,7 +60,6 @@ export function CatPublishPanel(props: {
       const res = await supabase
         .from("user_cat_versions")
         .select("id, version, created_at")
-        .eq("user_id", user.id)
         .eq("cat_id", props.catId)
         .order("version", { ascending: false })
         .limit(1)
@@ -84,12 +84,14 @@ export function CatPublishPanel(props: {
     setPublishing(true);
     setError(null);
     try {
-      const catRes = await supabase
+      let catQuery = supabase
         .from("user_cats")
         .select("name, description, slug, kittens")
-        .eq("user_id", user.id)
-        .eq("id", props.catId)
-        .single();
+        .eq("id", props.catId);
+      if (!props.ownerId || props.ownerId === user.id) {
+        catQuery = catQuery.eq("user_id", user.id);
+      }
+      const catRes = await catQuery.single();
       if (catRes.error || !catRes.data) {
         throw catRes.error ?? new Error("Cat not found");
       }
@@ -102,8 +104,9 @@ export function CatPublishPanel(props: {
 
       // Compute next version.
       const nextVersion = (latest?.version ?? 0) + 1;
+      const versionOwnerId = props.ownerId || user.id;
       const insertRes = await supabase.from("user_cat_versions").insert({
-        user_id: user.id,
+        user_id: versionOwnerId,
         cat_id: props.catId,
         version: nextVersion,
         name: typeof catRow.name === "string" ? catRow.name : "",

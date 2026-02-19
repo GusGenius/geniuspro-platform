@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
+import { useProfile } from "@/lib/profile/use-profile";
 import { CatDetailSkeleton } from "@/components/pages/cat-detail-skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { CatForm } from "@/components/cats/cat-form";
@@ -12,6 +13,7 @@ export default function CatDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
   const { user } = useAuth();
+  const { isAdmin } = useProfile(user?.id);
   const [loading, setLoading] = useState(true);
   const [initial, setInitial] = useState<Partial<CatRow> | null>(null);
   const [notFound, setNotFound] = useState(false);
@@ -22,15 +24,16 @@ export default function CatDetailPage() {
       setNotFound(!id);
       return;
     }
-    const userId = user.id;
 
     async function load() {
-      const res = await supabase
+      let query = supabase
         .from("user_cats")
         .select("id, user_id, name, description, slug, kittens, created_at, updated_at")
-        .eq("id", id)
-        .eq("user_id", userId)
-        .single();
+        .eq("id", id);
+      if (!isAdmin) {
+        query = query.eq("user_id", user.id);
+      }
+      const res = await query.single();
 
       if (res.error || !res.data) {
         setNotFound(true);
@@ -43,7 +46,7 @@ export default function CatDetailPage() {
     }
 
     load();
-  }, [user?.id, id]);
+  }, [user?.id, id, isAdmin]);
 
   if (loading) {
     return <CatDetailSkeleton />;
