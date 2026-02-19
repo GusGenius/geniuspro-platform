@@ -193,7 +193,7 @@ export function CatForm({
           {backLabel}
         </Link>
 
-        <div className="mb-8">
+        <div className="mb-8 min-w-0">
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
             {mode === "create" ? "Create Cat" : "Edit Cat"}
           </h1>
@@ -225,7 +225,7 @@ export function CatForm({
           </div>
         )}
 
-        <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6">
+        <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6 min-w-0 overflow-hidden">
           <div className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">

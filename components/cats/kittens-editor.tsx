@@ -312,7 +312,7 @@ export function KittensEditor({
                           }
                           placeholder="Role, constraints, engineering logic (e.g. Senior Hydrology Engineer, color rules...)"
                           rows={8}
-                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize min-h-[180px] font-mono text-xs"
+                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[180px] font-mono text-xs"
                         />
                       </div>
                       <div>
@@ -326,7 +326,7 @@ export function KittensEditor({
                           }
                           placeholder="Describe the image to generate (e.g. [ACTION]: Analyze the photo and design a hybrid rainwater system...)"
                           rows={6}
-                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize min-h-[150px]"
+                          className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y min-h-[150px]"
                         />
                       </div>
                     </div>

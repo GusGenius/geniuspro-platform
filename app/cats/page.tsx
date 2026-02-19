@@ -125,8 +125,8 @@ export default function CatsPage() {
   return (
     <div className="min-h-full p-6 md:p-10">
       <div className="max-w-4xl mx-auto">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8 min-w-0">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
               Cats
             </h1>
@@ -136,7 +136,7 @@ export default function CatsPage() {
           </div>
           <Link
             href="/cats/new"
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm w-full sm:w-auto flex-shrink-0"
           >
             <Plus className="w-4 h-4" />
             Create Cat
