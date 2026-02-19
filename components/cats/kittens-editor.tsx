@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 
-import { AVAILABLE_MODELS } from "@/components/routers/available-models";
+import { AVAILABLE_MODELS } from "@/components/models/available-models";
 import type { CatKitten } from "@/components/cats/types";
 
 type Props = {

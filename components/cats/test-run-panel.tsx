@@ -11,6 +11,11 @@ type Props = {
   catSlug: string;
   accessToken: string | null;
   kittens: CatKitten[];
+  onFullRunResult?: (args: {
+    ok: boolean;
+    outputText: string;
+    debugSteps: CatRunDebugStep[] | null;
+  }) => void;
 };
 
 function isProbablyUrl(value: string): boolean {
@@ -60,7 +65,7 @@ async function uploadToStorage(args: {
   return { signedUrl: signed.data.signedUrl, storagePath };
 }
 
-export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
+export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }: Props) {
   const [testInput, setTestInput] = useState("");
   const [testRunning, setTestRunning] = useState(false);
   const [testOutput, setTestOutput] = useState<string | null>(null);
@@ -181,8 +186,24 @@ export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
       setDebugSteps(res.debugSteps ?? null);
       // Open all steps by default when step viewer is enabled.
       setOpenStepIndices(new Set((res.debugSteps ?? []).map((s) => s.index)));
+
+      // Only notify for a full run; step runs are for debugging.
+      if (stepIndex === null) {
+        onFullRunResult?.({
+          ok: true,
+          outputText: res.text,
+          debugSteps: res.debugSteps ?? null,
+        });
+      }
     } catch (err) {
       setTestError(err instanceof Error ? err.message : "Test run failed");
+      if (stepIndex === null) {
+        onFullRunResult?.({
+          ok: false,
+          outputText: "",
+          debugSteps: null,
+        });
+      }
     } finally {
       setTestRunning(false);
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import type { CatKitten } from "@/components/cats/types";
-import { AVAILABLE_MODELS } from "@/components/routers/available-models";
+import { AVAILABLE_MODELS } from "@/components/models/available-models";
 
 type AiGeneratedCat = {
   name: string;
@@ -66,7 +66,7 @@ export async function generateCatFromDescription(args: {
 
   const modelList = AVAILABLE_MODELS.map((m) => `${m.id} (${m.label})`).join(", ");
 
-  const res = await fetch("https://api.geniuspro.io/chat/completions", {
+  const res = await fetch("/api/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

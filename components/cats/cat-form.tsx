@@ -16,19 +16,18 @@ import {
 
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
-import { slugFromName } from "@/components/routers/router-form-utils";
-import { saveRouterToSupabase } from "@/components/routers/router-save";
+import { slugFromName } from "@/components/cats/cat-slug";
 
 import { CAT_TEMPLATES, getCatTemplate } from "@/components/cats/cat-templates";
 import type { CatKitten, CatRow } from "@/components/cats/types";
 import {
-  compileCatToRouterInstructions,
   normalizeCatSlug,
   normalizeKittens,
 } from "@/components/cats/cat-compiler";
 import { KittensEditor } from "@/components/cats/kittens-editor";
 import { AiWizardModal } from "@/components/cats/ai-wizard-modal";
 import { TestRunPanel } from "@/components/cats/test-run-panel";
+import { CatPublishPanel } from "@/components/cats/cat-publish-panel";
 
 type Mode = "create" | "edit";
 
@@ -74,6 +73,7 @@ export function CatForm({
   const [error, setError] = useState<string | null>(null);
   const [aiWizardOpen, setAiWizardOpen] = useState(false);
   const [copiedModelId, setCopiedModelId] = useState(false);
+  const [lastFullRunOk, setLastFullRunOk] = useState(false);
 
   const normalizedSlug = useMemo(() => {
     return normalizeCatSlug(slug || slugFromName(name));
@@ -134,13 +134,7 @@ export function CatForm({
     setSaving(true);
     setError(null);
     try {
-      const { modelIds, instructions } = compileCatToRouterInstructions({
-        catName: trimmedName,
-        catDescription: description.trim(),
-        kittens: kittensFinal,
-      });
-
-      // 1) Upsert cat record (source of truth for UX).
+      // Upsert cat record (source of truth + runtime).
       const now = new Date().toISOString();
       const catPayload = {
         user_id: user.id,
@@ -172,47 +166,6 @@ export function CatForm({
         savedCat = res.data as { id: string };
       }
 
-      // 2) Compile to router engine (runtime). We key it by slug for API calls.
-      const { data: existingRouter } = await supabase
-        .from("user_routers")
-        .select("id, router_steps")
-        .eq("user_id", user.id)
-        .eq("slug", slugFinal)
-        .limit(1)
-        .maybeSingle();
-
-      const routerSaved = await saveRouterToSupabase({
-        supabase,
-        user,
-        editingId:
-          existingRouter && typeof existingRouter.id === "string"
-            ? existingRouter.id
-            : undefined,
-        payloadBase: {
-          user_id: user.id,
-          slug: slugFinal,
-          name: trimmedName,
-          instructions,
-          model_id: modelIds[0] ?? "gemini-3-flash",
-          fallback_model_id: modelIds[1] ?? null,
-          updated_at: now,
-        },
-        modelIds,
-        routingMode: "pipeline",
-        // Preserve any existing router_steps (e.g. special vision pipelines like Home Visualizer).
-        routerSteps:
-          existingRouter && "router_steps" in existingRouter
-            ? (existingRouter as { router_steps?: unknown }).router_steps ?? null
-            : null,
-      });
-      if (!routerSaved.ok) {
-        const msg =
-          routerSaved.error instanceof Error
-            ? routerSaved.error.message
-            : String(routerSaved.error ?? "Failed to compile runtime");
-        throw new Error(msg);
-      }
-
       if (mode === "create") {
         router.push(`/cats/${savedCat.id}`);
       }
@@ -232,15 +185,6 @@ export function CatForm({
     setSaving(true);
     setError(null);
     try {
-      // Best-effort: remove compiled runtime.
-      if (normalizedSlug) {
-        await supabase
-          .from("user_routers")
-          .delete()
-          .eq("user_id", user.id)
-          .eq("slug", normalizedSlug);
-      }
-
       const res = await supabase
         .from("user_cats")
         .delete()
@@ -452,11 +396,21 @@ export function CatForm({
         </div>
 
         {mode === "edit" && normalizedSlug ? (
-          <TestRunPanel
-            catSlug={normalizedSlug}
-            accessToken={session?.access_token ?? null}
-            kittens={normalizeKittens(kittens)}
-          />
+          <>
+            <TestRunPanel
+              catSlug={normalizedSlug}
+              accessToken={session?.access_token ?? null}
+              kittens={normalizeKittens(kittens)}
+              onFullRunResult={({ ok }) => setLastFullRunOk(ok)}
+            />
+            {editingId ? (
+              <CatPublishPanel
+                catId={editingId}
+                catSlug={normalizedSlug}
+                canPublish={lastFullRunOk}
+              />
+            ) : null}
+          </>
         ) : null}
       </div>
 

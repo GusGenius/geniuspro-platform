@@ -26,7 +26,7 @@ export async function runCatOnce(args: {
     contentParts.push({ type: "image_url", image_url: { url: args.imageUrl.trim() } });
   }
 
-  const res = await fetch("https://api.geniuspro.io/chat/completions", {
+  const res = await fetch("/api/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
