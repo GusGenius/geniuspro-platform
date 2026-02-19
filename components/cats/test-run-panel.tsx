@@ -92,6 +92,10 @@ export function TestRunPanel({
 
   useEffect(() => {
     if (!savedTestImagePath?.trim() || !userId) {
+      console.log("[TestRunPanel] No saved image path or userId, skipping load", {
+        savedTestImagePath: savedTestImagePath ?? null,
+        hasUserId: !!userId,
+      });
       setSavedImageUrl(null);
       setSavedImageLoading(false);
       setSavedImageError(null);
@@ -99,12 +103,15 @@ export function TestRunPanel({
     }
     setSavedImageLoading(true);
     setSavedImageError(null);
+    console.log("[TestRunPanel] Loading saved image", { path: savedTestImagePath });
     getSignedUrl(savedTestImagePath)
       .then((url) => {
+        console.log("[TestRunPanel] Saved image loaded", { path: savedTestImagePath, urlLength: url?.length ?? 0 });
         setSavedImageUrl(url);
         setSavedImageError(null);
       })
       .catch((err) => {
+        console.warn("[TestRunPanel] Failed to load saved image", { path: savedTestImagePath, err });
         setSavedImageUrl(null);
         setSavedImageError(err instanceof Error ? err.message : "Failed to load");
       })
@@ -411,6 +418,7 @@ export function TestRunPanel({
                   onClick={async () => {
                     if (!imageFile && !imageUrl.trim().startsWith("data:")) return;
                     setUploadStatus({ state: "saving" });
+                    console.log("[TestRunPanel] Saving test image as default...");
                     try {
                       let file: File;
                       if (imageFile) {
@@ -425,10 +433,13 @@ export function TestRunPanel({
                         catSlug,
                         file,
                       });
+                      console.log("[TestRunPanel] Uploaded, storagePath:", storagePath);
                       await onSaveTestImage(storagePath);
                       setSavedImageUrl(await getSignedUrl(storagePath));
                       setUploadStatus({ state: "saved" });
+                      console.log("[TestRunPanel] Saved as default successfully");
                     } catch (err) {
+                      console.warn("[TestRunPanel] Save failed", err);
                       setTestError(err instanceof Error ? err.message : "Failed to save");
                       setUploadStatus({ state: "idle" });
                     }
