@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { HandoffSkeleton } from "@/components/auth/HandoffSkeleton";
+import { HandoffSkeleton } from "@/components/auth/handoff-skeleton";
 
 export default function HandoffPage() {
   const router = useRouter();
@@ -38,9 +38,18 @@ export default function HandoffPage() {
         });
 
         if (!res.ok) {
-          const json = (await res.json().catch(() => ({}))) as any;
+          let json: unknown = {};
+          try {
+            json = await res.json();
+          } catch {
+            json = {};
+          }
           setStatus("error");
-          setErrorMessage(typeof json?.error === "string" ? json.error : "Handoff failed");
+          setErrorMessage(
+            typeof (json as { error?: unknown })?.error === "string"
+              ? String((json as { error: string }).error)
+              : "Handoff failed"
+          );
           setTimeout(() => {
             router.push("/login?error=handoff_failed");
           }, 2000);

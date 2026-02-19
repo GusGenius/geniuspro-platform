@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { CreditCard, Loader2, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
-import { BillingSkeleton } from "@/components/pages/BillingSkeleton";
+import { BillingSkeleton } from "@/components/pages/billing-skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { calculateCost, formatCost } from "@/lib/pricing";
 // Stripe checkout is handled via server-side session URL redirect

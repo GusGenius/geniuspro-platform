@@ -1,12 +1,12 @@
 "use client";
 
-import type { CatKitten } from "@/components/cats/types";
+import type { CatModelKitten } from "@/components/cats/types";
 import { AVAILABLE_MODELS } from "@/components/models/available-models";
 
 type AiGeneratedCat = {
   name: string;
   description: string;
-  kittens: Array<Pick<CatKitten, "name" | "model_id" | "instructions">>;
+  kittens: Array<Pick<CatModelKitten, "name" | "model_id" | "instructions">>;
 };
 
 function isNonEmptyString(v: unknown): v is string {

@@ -9,7 +9,7 @@ import {
   Check,
   Copy,
   Loader2,
-  Sparkles,
+  Plus,
   Save,
   Trash2,
 } from "lucide-react";
@@ -18,14 +18,12 @@ import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { slugFromName } from "@/components/cats/cat-slug";
 
-import { CAT_TEMPLATES, getCatTemplate } from "@/components/cats/cat-templates";
 import type { CatKitten, CatRow } from "@/components/cats/types";
 import {
   normalizeCatSlug,
   normalizeKittens,
 } from "@/components/cats/cat-compiler";
 import { KittensEditor } from "@/components/cats/kittens-editor";
-import { AiWizardModal } from "@/components/cats/ai-wizard-modal";
 import { TestRunPanel } from "@/components/cats/test-run-panel";
 import { CatPublishPanel } from "@/components/cats/cat-publish-panel";
 
@@ -39,15 +37,6 @@ type Props = {
   backLabel: string;
   showTestRun?: boolean;
 };
-
-function createDefaultKitten(): CatKitten {
-  return {
-    id: crypto.randomUUID(),
-    name: "Helper",
-    model_id: "gemini-3-flash",
-    instructions: "Be helpful, correct, and concise.",
-  };
-}
 
 export function CatForm({
   mode,
@@ -65,13 +54,11 @@ export function CatForm({
   const [kittens, setKittens] = useState<CatKitten[]>(
     Array.isArray(initial?.kittens) && initial!.kittens!.length > 0
       ? normalizeKittens(initial!.kittens as CatKitten[])
-      : [createDefaultKitten()]
+      : []
   );
 
-  const [templateId, setTemplateId] = useState<string>("research-write");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [aiWizardOpen, setAiWizardOpen] = useState(false);
   const [copiedModelId, setCopiedModelId] = useState(false);
   const [lastFullRunOk, setLastFullRunOk] = useState(false);
 
@@ -100,20 +87,6 @@ export function CatForm({
     } catch {
       // Best-effort; ignore clipboard failures (some environments block it).
     }
-  };
-
-  const applyTemplate = () => {
-    const tpl = getCatTemplate(templateId);
-    if (!tpl) return;
-    setName((prev) => (prev.trim() ? prev : tpl.defaultName));
-    setDescription((prev) => (prev.trim() ? prev : tpl.defaultDescription));
-    setKittens(
-      tpl.kittens.map((k) => ({
-        id: crypto.randomUUID(),
-        ...k,
-      }))
-    );
-    if (!slug.trim()) setSlug(slugFromName(tpl.defaultName));
   };
 
   const handleSave = async () => {
@@ -245,63 +218,9 @@ export function CatForm({
 
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6">
           <div className="space-y-5">
-            {mode === "create" ? (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                    Start from a template
-                  </label>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <select
-                      value={templateId}
-                      onChange={(e) => setTemplateId(e.target.value)}
-                      className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {CAT_TEMPLATES.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.label}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="button"
-                      onClick={applyTemplate}
-                      className="px-4 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                    {getCatTemplate(templateId)?.description ??
-                      "Pick a template to get started fast."}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                    AI (optional)
-                  </label>
-                  <div className="flex items-center justify-between gap-3 bg-white/60 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                    <p className="text-xs text-gray-600 dark:text-gray-300">
-                      Use the AI Wizard to generate kittens, then edit them.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setAiWizardOpen(true)}
-                      disabled={saving}
-                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      AI Wizard
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : null}
-
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                Name
+                Name your cat
               </label>
               <input
                 value={name}
@@ -363,7 +282,37 @@ export function CatForm({
               />
             </div>
 
-            <KittensEditor kittens={kittens} onChange={setKittens} />
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                Kittens ({normalizeKittens(kittens).length})
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const list = normalizeKittens(kittens);
+                  if (list.length >= 8) return;
+                  setKittens([
+                    ...list,
+                    {
+                      id: crypto.randomUUID(),
+                      name: "Kitten",
+                      type: "model",
+                      model_id: "gemini-3-flash",
+                      instructions: "",
+                    },
+                  ]);
+                }}
+                disabled={normalizeKittens(kittens).length >= 8}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="w-4 h-4" />
+                Add kitten
+              </button>
+            </div>
+
+            {normalizeKittens(kittens).length > 0 ? (
+              <KittensEditor kittens={kittens} onChange={setKittens} />
+            ) : null}
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
@@ -413,25 +362,6 @@ export function CatForm({
           </>
         ) : null}
       </div>
-
-      <AiWizardModal
-        open={aiWizardOpen}
-        onClose={() => setAiWizardOpen(false)}
-        accessToken={session?.access_token ?? null}
-        onApply={(gen) => {
-          setName(gen.name);
-          setDescription(gen.description);
-          setSlug(slugFromName(gen.name));
-          setKittens(
-            gen.kittens.map((k) => ({
-              id: crypto.randomUUID(),
-              name: k.name,
-              model_id: k.model_id,
-              instructions: k.instructions,
-            }))
-          );
-        }}
-      />
     </div>
   );
 }

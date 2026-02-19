@@ -2,11 +2,11 @@
 
 import { ReactNode, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Sidebar from "./Sidebar";
-import SidebarProvider from "./SidebarContext";
-import Header from "./Header";
+import Sidebar from "./sidebar";
+import SidebarProvider from "./sidebar-context";
+import Header from "./header";
 import { useAuth } from "@/lib/auth/auth-context";
-import { LayoutSkeleton } from "./LayoutSkeleton";
+import { LayoutSkeleton } from "./layout-skeleton";
 
 interface LayoutProps {
   children: ReactNode;

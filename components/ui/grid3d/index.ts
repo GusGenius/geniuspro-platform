@@ -1,1 +1,1 @@
-export { Grid3D, default } from "./Grid3D";
+export { Grid3D, default } from "./grid-3d";

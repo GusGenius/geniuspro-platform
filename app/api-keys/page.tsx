@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Key, Plus, Copy, Trash2, Check, Loader2, AlertTriangle } from "lucide-react";
 
 import { useAuth } from "@/lib/auth/auth-context";
-import { ApiKeysSkeleton } from "@/components/pages/ApiKeysSkeleton";
+import { ApiKeysSkeleton } from "@/components/pages/api-keys-skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { generateApiKey, hashApiKey, getKeyPrefix } from "@/lib/api-keys/generate";
 

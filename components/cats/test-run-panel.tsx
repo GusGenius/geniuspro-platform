@@ -110,7 +110,13 @@ export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }:
     return kittens.map((k, idx) => ({
       index: idx + 1,
       name: k.name?.trim() || `Step ${idx + 1}`,
-      model: k.model_id?.trim() || "",
+      detail:
+        (typeof (k as { type?: unknown }).type !== "string" ||
+        (k as { type?: unknown }).type === "model"
+          ? String((k as { model_id?: unknown }).model_id ?? "").trim()
+          : (k as { type?: unknown }).type === "vision_http"
+            ? String((k as { path?: unknown }).path ?? "").trim()
+            : String((k as { type?: unknown }).type ?? "")).trim(),
     }));
   }, [kittens]);
 

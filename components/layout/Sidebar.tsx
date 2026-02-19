@@ -19,7 +19,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useSidebar } from "./SidebarContext";
+import { useSidebar } from "./sidebar-context";
 import { useAuth } from "@/lib/auth/auth-context";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";

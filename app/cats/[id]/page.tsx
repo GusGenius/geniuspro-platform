@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
-import { CatDetailSkeleton } from "@/components/pages/CatDetailSkeleton";
+import { CatDetailSkeleton } from "@/components/pages/cat-detail-skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { CatForm } from "@/components/cats/cat-form";
 import type { CatRow } from "@/components/cats/types";

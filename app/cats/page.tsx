@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check } from "lucide-react";
-import { CatsSkeleton } from "@/components/pages/CatsSkeleton";
+import { CatsSkeleton } from "@/components/pages/cats-skeleton";
 
 interface UserCatRow {
   id: string;

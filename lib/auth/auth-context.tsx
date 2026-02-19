@@ -4,11 +4,33 @@ import { createContext, useContext, useEffect, useState, useMemo, useCallback } 
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 
+type AuthError = { message: string };
+type AuthResult = { error: AuthError | null };
+
+function isRecord(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null;
+}
+
+function getString(obj: Record<string, unknown>, key: string): string | null {
+  const value = obj[key];
+  return typeof value === "string" ? value : null;
+}
+
+function getSessionTokens(json: unknown): { accessToken: string; refreshToken: string } | null {
+  if (!isRecord(json)) return null;
+  const session = json["session"];
+  if (!isRecord(session)) return null;
+  const accessToken = getString(session, "access_token");
+  const refreshToken = getString(session, "refresh_token");
+  if (!accessToken || !refreshToken) return null;
+  return { accessToken, refreshToken };
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -74,20 +96,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const json = (await res.json().catch(() => ({}))) as any;
+      let json: unknown = {};
+      try {
+        json = await res.json();
+      } catch {
+        json = {};
+      }
       if (!res.ok) {
-        const rawMessage = typeof json?.error === "string" ? json.error : "Login failed";
+        const rawMessage =
+          isRecord(json) && typeof json["error"] === "string"
+            ? String(json["error"])
+            : "Login failed";
         const errorMessage = rawMessage.includes("Invalid login credentials")
           ? "Invalid email or password."
           : rawMessage;
         return { error: { message: errorMessage } };
       }
 
-      const accessToken = json?.session?.access_token;
-      const refreshToken = json?.session?.refresh_token;
-      if (typeof accessToken === "string" && typeof refreshToken === "string") {
+      const tokens = getSessionTokens(json);
+      if (tokens) {
         // Keep the browser Supabase client in sync (localStorage, onAuthStateChange, etc.).
-        await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        await supabase.auth.setSession({
+          access_token: tokens.accessToken,
+          refresh_token: tokens.refreshToken,
+        });
       }
 
       return { error: null };

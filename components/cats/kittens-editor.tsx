@@ -1,14 +1,17 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 import { AVAILABLE_MODELS } from "@/components/models/available-models";
-import type { CatKitten } from "@/components/cats/types";
+import {
+  ensureKittenSuffix,
+  stripKittenSuffix,
+} from "@/components/cats/cat-compiler";
+import type { CatKitten, CatKittenType } from "@/components/cats/types";
 
 type Props = {
   kittens: CatKitten[];
   onChange: (next: CatKitten[]) => void;
-  maxKittens?: number;
 };
 
 function createKitten(): CatKitten {
@@ -16,21 +19,68 @@ function createKitten(): CatKitten {
   return {
     id,
     name: "Kitten",
+    type: "model",
     model_id: AVAILABLE_MODELS[0]?.id ?? "gemini-3-flash",
     instructions: "",
   };
 }
 
-export function KittensEditor({ kittens, onChange, maxKittens = 8 }: Props) {
+export function KittensEditor({ kittens, onChange }: Props) {
   const list = kittens.length > 0 ? kittens : [createKitten()];
 
   function updateKitten(id: string, patch: Partial<CatKitten>) {
-    onChange(list.map((k) => (k.id === id ? { ...k, ...patch } : k)));
+    onChange(list.map((k) => (k.id === id ? ({ ...k, ...patch } as CatKitten) : k)));
   }
 
-  function addKitten() {
-    if (list.length >= maxKittens) return;
-    onChange([...list, createKitten()]);
+  function setKittenType(id: string, nextType: CatKittenType) {
+    onChange(
+      list.map((k) => {
+        if (k.id !== id) return k;
+        const base = { id: k.id, name: k.name };
+        if (nextType === "vision_http") {
+          return {
+            ...base,
+            type: "vision_http",
+            path: "/gutter/overlay",
+            image_source: "original",
+          } satisfies CatKitten;
+        }
+        if (nextType === "transform_js") {
+          return {
+            ...base,
+            type: "transform_js",
+            code: [
+              "export default async function transform(input, ctx) {",
+              "  // input is JSON from the previous step",
+              "  // return JSON (object/array) or a string",
+              "  return input;",
+              "}",
+              "",
+            ].join("\n"),
+          } satisfies CatKitten;
+        }
+        if (nextType === "transform_py") {
+          return {
+            ...base,
+            type: "transform_py",
+            code: [
+              "def transform(input, ctx):",
+              "    # input is JSON from the previous step",
+              "    # return dict/list for JSON, or a string",
+              "    return input",
+              "",
+            ].join("\n"),
+          } satisfies CatKitten;
+        }
+        // Default: model
+        return {
+          ...base,
+          type: "model",
+          model_id: AVAILABLE_MODELS[0]?.id ?? "gemini-3-flash",
+          instructions: "",
+        } satisfies CatKitten;
+      })
+    );
   }
 
   function removeKitten(id: string) {
@@ -48,25 +98,14 @@ export function KittensEditor({ kittens, onChange, maxKittens = 8 }: Props) {
 
   return (
     <div className="mt-4 bg-gray-200/60 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-            Kittens (steps)
-          </h3>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-            Each kitten runs as one model call in order. The last kitten should
-            produce the final user-facing output.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={addKitten}
-          disabled={list.length >= maxKittens}
-          className="text-xs font-medium px-3 py-2 rounded-lg bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed inline-flex items-center gap-2"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Add kitten
-        </button>
+      <div>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          Kittens (steps)
+        </h3>
+        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          Each kitten is one pipeline step (model call, vision HTTP, or transform).
+          The last kitten should produce the final user-facing output.
+        </p>
       </div>
 
       <div className="space-y-4 mt-4">
@@ -77,16 +116,25 @@ export function KittensEditor({ kittens, onChange, maxKittens = 8 }: Props) {
               className="bg-gray-100/70 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 rounded-xl p-4"
             >
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                   <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-900 text-gray-600 dark:text-gray-300 text-xs font-semibold flex items-center justify-center flex-shrink-0">
                     {idx + 1}
                   </div>
-                  <input
-                    value={k.name}
-                    onChange={(e) => updateKitten(k.id, { name: e.target.value })}
-                    placeholder="Kitten name (e.g. Researcher)"
-                    className="flex-1 min-w-0 px-3 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
+                  <div className="flex items-center gap-1 flex-1 min-w-0 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 overflow-hidden">
+                    <input
+                      value={stripKittenSuffix(k.name)}
+                      onChange={(e) =>
+                        updateKitten(k.id, {
+                          name: ensureKittenSuffix(e.target.value),
+                        })
+                      }
+                      placeholder="e.g. Generate Gutter System"
+                      className="flex-1 min-w-0 px-3 py-2 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-0 border-0"
+                    />
+                    <span className="flex-shrink-0 px-2 py-2 text-gray-500 dark:text-gray-400 font-medium">
+                      {stripKittenSuffix(k.name) ? " Kitten" : "Kitten"}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <button
@@ -121,35 +169,124 @@ export function KittensEditor({ kittens, onChange, maxKittens = 8 }: Props) {
 
               <div className="mt-3">
                 <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                  Model
+                  Type
                 </label>
                 <select
-                  value={k.model_id}
-                  onChange={(e) => updateKitten(k.id, { model_id: e.target.value })}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={
+                    typeof (k as { type?: unknown }).type === "string"
+                      ? String((k as { type?: unknown }).type)
+                      : "model"
+                  }
+                  onChange={(e) => setKittenType(k.id, e.target.value as CatKittenType)}
+                  className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                 >
-                  {AVAILABLE_MODELS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.label}
-                    </option>
-                  ))}
+                  <option value="model">Model</option>
+                  <option value="vision_http">Vision HTTP</option>
+                  <option value="transform_js">Transform (JS)</option>
+                  <option value="transform_py">Transform (Python)</option>
                 </select>
               </div>
 
-              <div className="mt-3">
-                <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                  Instructions
-                </label>
-                <textarea
-                  value={k.instructions}
-                  onChange={(e) =>
-                    updateKitten(k.id, { instructions: e.target.value })
-                  }
-                  placeholder="What should this kitten do?"
-                  rows={4}
-                  className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                />
-              </div>
+              {(typeof (k as { type?: unknown }).type !== "string" ||
+                (k as { type?: unknown }).type === "model") && (
+                <>
+                  <div className="mt-3">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Model
+                    </label>
+                    <select
+                      value={String((k as { model_id?: unknown }).model_id ?? "")}
+                      onChange={(e) =>
+                        updateKitten(k.id, { model_id: e.target.value } as CatKitten)
+                      }
+                      className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                    >
+                      {AVAILABLE_MODELS.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Instructions
+                    </label>
+                    <textarea
+                      value={String((k as { instructions?: unknown }).instructions ?? "")}
+                      onChange={(e) =>
+                        updateKitten(k.id, { instructions: e.target.value } as CatKitten)
+                      }
+                      placeholder="What should this kitten do?"
+                      rows={4}
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    />
+                  </div>
+                </>
+              )}
+
+              {(k as { type?: unknown }).type === "vision_http" && (
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Vision path
+                    </label>
+                    <input
+                      value={String((k as { path?: unknown }).path ?? "")}
+                      onChange={(e) => updateKitten(k.id, { path: e.target.value } as CatKitten)}
+                      placeholder="/gutter/overlay"
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                      list="vision-paths"
+                    />
+                    <datalist id="vision-paths">
+                      <option value="/gutter/overlay" />
+                      <option value="/gutter/segment-overlay" />
+                      <option value="/analyze-home-photo" />
+                    </datalist>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Image source
+                    </label>
+                    <select
+                      value={
+                        String((k as { image_source?: unknown }).image_source ?? "original") ===
+                        "previous_overlay"
+                          ? "previous_overlay"
+                          : "original"
+                      }
+                      onChange={(e) =>
+                        updateKitten(k.id, { image_source: e.target.value } as CatKitten)
+                      }
+                      className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                    >
+                      <option value="original">Original image</option>
+                      <option value="previous_overlay">Previous step overlay_base64</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {((k as { type?: unknown }).type === "transform_js" ||
+                (k as { type?: unknown }).type === "transform_py") && (
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                    Code
+                  </label>
+                  <textarea
+                    value={String((k as { code?: unknown }).code ?? "")}
+                    onChange={(e) => updateKitten(k.id, { code: e.target.value } as CatKitten)}
+                    rows={10}
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-xs"
+                  />
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                    JS: export default function or export const transform. Python: define
+                    transform(input, ctx).
+                  </p>
+                </div>
+              )}
             </div>
           );
         })}

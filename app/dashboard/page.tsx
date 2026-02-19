@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/auth-context";
 import { getGreeting } from "@/lib/utils";
-import { Cat } from "@/components/cat/Cat";
+import { Cat } from "@/components/cat/cat";
 import { ArrowRight, Loader2 } from "lucide-react";
 
 export default function DashboardPage() {

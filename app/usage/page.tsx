@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { BarChart3, Calendar, ChevronDown } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
-import { UsageSkeleton } from "@/components/pages/UsageSkeleton";
+import { UsageSkeleton } from "@/components/pages/usage-skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { calculateCost, formatCost, getModelPricing } from "@/lib/pricing";
 

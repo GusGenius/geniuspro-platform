@@ -7,7 +7,7 @@ import { Loader2, Mail, Lock } from "lucide-react";
 
 import { useAuth } from "@/lib/auth/auth-context";
 import { Grid3D } from "@/components/ui/grid3d";
-import { LoginSkeleton } from "@/components/auth/LoginSkeleton";
+import { LoginSkeleton } from "@/components/auth/login-skeleton";
 
 function sanitizeRedirect(raw: string | null): string | null {
   if (!raw) return null;

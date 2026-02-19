@@ -16,6 +16,7 @@ export async function runCatOnce(args: {
   imageUrl?: string;
   debugPipeline?: boolean;
   debugRunStep?: number;
+  draftRun?: boolean;
 }): Promise<{ text: string; debugSteps?: CatRunDebugStep[] }> {
   const message = args.userMessage.trim();
   if (!message) throw new Error("Enter something to test.");
@@ -35,6 +36,7 @@ export async function runCatOnce(args: {
     body: JSON.stringify({
       model,
       stream: false,
+      cat_draft: args.draftRun !== false,
       debug_pipeline: args.debugPipeline === true,
       ...(typeof args.debugRunStep === "number" && args.debugRunStep > 0
         ? { debug_run_step: Math.floor(args.debugRunStep) }
