@@ -365,7 +365,7 @@ export function CatForm({
               id="test-run-panel"
               catId={editingId!}
               catSlug={normalizedSlug}
-              userId={user.id}
+              userId={user?.id ?? ""}
               accessToken={session?.access_token ?? null}
               kittens={normalizeKittens(kittens)}
               savedTestImagePath={initial?.test_image_storage_path ?? null}
