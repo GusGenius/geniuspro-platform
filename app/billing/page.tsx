@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { CreditCard, Loader2, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
+import { BillingSkeleton } from "@/components/pages/BillingSkeleton";
 import { supabase } from "@/lib/supabase/client";
 import { calculateCost, formatCost } from "@/lib/pricing";
 // Stripe checkout is handled via server-side session URL redirect
@@ -109,11 +110,7 @@ export default function BillingPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return <BillingSkeleton />;
   }
 
   return (

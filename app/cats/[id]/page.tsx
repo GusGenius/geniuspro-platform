@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Loader2 } from "lucide-react";
-
 import { useAuth } from "@/lib/auth/auth-context";
+import { CatDetailSkeleton } from "@/components/pages/CatDetailSkeleton";
 import { supabase } from "@/lib/supabase/client";
 import { CatForm } from "@/components/cats/cat-form";
 import type { CatRow } from "@/components/cats/types";
@@ -47,11 +46,7 @@ export default function CatDetailPage() {
   }, [user?.id, id]);
 
   if (loading) {
-    return (
-      <div className="min-h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return <CatDetailSkeleton />;
   }
 
   if (notFound || !initial || !id) {

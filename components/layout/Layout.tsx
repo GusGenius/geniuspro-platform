@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import SidebarProvider from "./SidebarContext";
 import Header from "./Header";
 import { useAuth } from "@/lib/auth/auth-context";
+import { LayoutSkeleton } from "./LayoutSkeleton";
 
 interface LayoutProps {
   children: ReactNode;
@@ -39,11 +40,7 @@ export default function Layout({ children }: LayoutProps) {
 
   // Protected pages — show loading while checking auth
   if (isProtectedRoute(pathname) && (loading || !user)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
-      </div>
-    );
+    return <LayoutSkeleton />;
   }
 
   return (

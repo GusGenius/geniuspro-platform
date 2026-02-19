@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Key, Plus, Copy, Trash2, Check, Loader2, AlertTriangle } from "lucide-react";
 
 import { useAuth } from "@/lib/auth/auth-context";
+import { ApiKeysSkeleton } from "@/components/pages/ApiKeysSkeleton";
 import { supabase } from "@/lib/supabase/client";
 import { generateApiKey, hashApiKey, getKeyPrefix } from "@/lib/api-keys/generate";
 
@@ -211,11 +212,7 @@ export default function ApiKeysPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return <ApiKeysSkeleton />;
   }
 
   return (

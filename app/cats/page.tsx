@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth/auth-context";
 import { supabase } from "@/lib/supabase/client";
 import { Cat, Plus, Trash2, Loader2, AlertTriangle, Copy, Check } from "lucide-react";
+import { CatsSkeleton } from "@/components/pages/CatsSkeleton";
 
 interface UserCatRow {
   id: string;
@@ -88,11 +89,7 @@ export default function CatsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return <CatsSkeleton />;
   }
 
   return (

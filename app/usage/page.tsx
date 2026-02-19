@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { BarChart3, Calendar, ChevronDown, Loader2 } from "lucide-react";
+import { BarChart3, Calendar, ChevronDown } from "lucide-react";
 import { useAuth } from "@/lib/auth/auth-context";
+import { UsageSkeleton } from "@/components/pages/UsageSkeleton";
 import { supabase } from "@/lib/supabase/client";
 import { calculateCost, formatCost, getModelPricing } from "@/lib/pricing";
 
@@ -205,11 +206,7 @@ export default function UsagePage() {
   const maxDaily = Math.max(...daily.map((d) => d.prompt + d.completion), 1);
 
   if (loading) {
-    return (
-      <div className="min-h-full flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
+    return <UsageSkeleton />;
   }
 
   return (

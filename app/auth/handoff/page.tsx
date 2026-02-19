@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
-import { Loader2 } from "lucide-react";
+import { HandoffSkeleton } from "@/components/auth/HandoffSkeleton";
 
 export default function HandoffPage() {
   const router = useRouter();
@@ -63,12 +63,7 @@ export default function HandoffPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
       <div className="text-center">
-        {status === "loading" && (
-          <>
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400">Signing you in...</p>
-          </>
-        )}
+        {status === "loading" && <HandoffSkeleton />}
         {status === "error" && (
           <>
             <div className="text-red-500 mb-4">

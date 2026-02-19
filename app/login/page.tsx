@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/lib/auth/auth-context";
 import { Loader2, Mail, Lock } from "lucide-react";
 import { Grid3D } from "@/components/ui/grid3d";
+import { LoginSkeleton } from "@/components/auth/LoginSkeleton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,11 +42,7 @@ export default function LoginPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-      </div>
-    );
+    return <LoginSkeleton />;
   }
 
   return (
