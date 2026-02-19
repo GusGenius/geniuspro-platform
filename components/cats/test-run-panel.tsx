@@ -72,6 +72,7 @@ export function TestRunPanel({
   >({ state: "idle" });
 
   const [debugSteps, setDebugSteps] = useState<CatRunDebugStep[] | null>(null);
+  const [progressMessage, setProgressMessage] = useState<string | null>(null);
   const { savingByStepIndex, savedByStepIndex, errorsByStepIndex } =
     useAutoSaveGeneratedImages({
       userId,
@@ -234,6 +235,7 @@ export function TestRunPanel({
     setTestError(null);
     setTestOutput(null);
     setDebugSteps(null);
+    setProgressMessage(null);
     try {
       const res = await runCatOnce({
         accessToken,
@@ -242,6 +244,9 @@ export function TestRunPanel({
         imageUrl: finalImageUrl,
         debugPipeline: true,
         debugRunStep: typeof stepIndex === "number" ? stepIndex : undefined,
+        progressUpdates: true,
+        onProgress: (u) =>
+          setProgressMessage(`Step ${u.step}: ${u.stepName} — ${u.message}`),
       });
       setTestOutput(res.text);
       setDebugSteps(res.debugSteps ?? null);
@@ -265,6 +270,7 @@ export function TestRunPanel({
       }
     } finally {
       setTestRunning(false);
+      setProgressMessage(null);
     }
   };
 
@@ -512,6 +518,13 @@ export function TestRunPanel({
           </div>
         </div>
       </div>
+
+      {progressMessage && testRunning ? (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/5 p-4">
+          <Loader2 className="w-4 h-4 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-400" />
+          <p className="text-sm text-blue-700 dark:text-blue-300">{progressMessage}</p>
+        </div>
+      ) : null}
 
       {testError ? (
         <div className="mt-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
