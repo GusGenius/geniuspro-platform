@@ -79,8 +79,8 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           .map((t) => {
             if (typeof t !== "object" || t === null) return null;
             const name = String((t as { name?: unknown }).name ?? "").trim();
-            const promptsRaw = Array.isArray((t as { prompts?: unknown }).prompts)
-              ? (t as { prompts?: unknown[] }).prompts
+            const promptsRaw: unknown[] = Array.isArray((t as { prompts?: unknown }).prompts)
+              ? ((t as { prompts?: unknown[] }).prompts ?? [])
               : [];
             const prompts = promptsRaw
               .map((p) => String(p ?? "").trim())
