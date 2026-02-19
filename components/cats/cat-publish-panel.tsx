@@ -47,10 +47,9 @@ export function CatPublishPanel(props: {
 
   const disabledReason = useMemo(() => {
     if (!user) return "You must be logged in.";
-    if (!props.canPublish) return "Run a successful full test run before publishing.";
     if (publishing) return "Publishing...";
     return null;
-  }, [user, props.canPublish, publishing]);
+  }, [user, publishing]);
 
   const loadLatest = async () => {
     if (!user) return;
@@ -80,7 +79,12 @@ export function CatPublishPanel(props: {
 
   const handlePublish = async () => {
     if (!user) return;
-    if (!props.canPublish) return;
+    if (!props.canPublish) {
+      const ok = confirm(
+        "This cat has not had a successful full test run in the UI yet. Publish anyway?"
+      );
+      if (!ok) return;
+    }
     setPublishing(true);
     setError(null);
     try {
@@ -171,6 +175,12 @@ export function CatPublishPanel(props: {
           Not published yet.
         </div>
       )}
+
+      {!props.canPublish ? (
+        <div className="mt-3 text-xs text-amber-700 dark:text-amber-300">
+          Tip: run a successful full test run before publishing (recommended), but publishing is allowed.
+        </div>
+      ) : null}
 
       {error ? (
         <div className="mt-3 bg-red-500/10 border border-red-500/30 rounded-xl p-3">
