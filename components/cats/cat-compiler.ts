@@ -72,8 +72,8 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
       }
 
       if (type === "sam3") {
-        const targetsRaw = Array.isArray((k as { targets?: unknown }).targets)
-          ? (k as { targets?: unknown[] }).targets
+        const targetsRaw: unknown[] = Array.isArray((k as { targets?: unknown }).targets)
+          ? ((k as { targets?: unknown[] }).targets ?? [])
           : [];
         const targets = targetsRaw
           .map((t) => {
