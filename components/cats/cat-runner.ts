@@ -15,6 +15,7 @@ export async function runCatOnce(args: {
   userMessage: string;
   imageUrl?: string;
   debugPipeline?: boolean;
+  debugRunStep?: number;
 }): Promise<{ text: string; debugSteps?: CatRunDebugStep[] }> {
   const message = args.userMessage.trim();
   if (!message) throw new Error("Enter something to test.");
@@ -35,6 +36,9 @@ export async function runCatOnce(args: {
       model,
       stream: false,
       debug_pipeline: args.debugPipeline === true,
+      ...(typeof args.debugRunStep === "number" && args.debugRunStep > 0
+        ? { debug_run_step: Math.floor(args.debugRunStep) }
+        : {}),
       messages: [{ role: "user", content: contentParts }],
     }),
   });

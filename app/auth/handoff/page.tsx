@@ -30,7 +30,24 @@ export default function HandoffPage() {
           return;
         }
 
-        // Set the session using Supabase
+        // Set cookie-based session for server/middleware protection.
+        const res = await fetch("/api/auth/handoff", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: accessToken, refresh_token: refreshToken }),
+        });
+
+        if (!res.ok) {
+          const json = (await res.json().catch(() => ({}))) as any;
+          setStatus("error");
+          setErrorMessage(typeof json?.error === "string" ? json.error : "Handoff failed");
+          setTimeout(() => {
+            router.push("/login?error=handoff_failed");
+          }, 2000);
+          return;
+        }
+
+        // Also initialize the browser client so UI/state stays in sync.
         const { error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,

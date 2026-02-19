@@ -68,20 +68,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-      
-      if (error) {
-        let errorMessage = error.message;
-        if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Invalid email or password.";
-        }
-        return { error: { ...error, message: errorMessage } };
+
+      const json = (await res.json().catch(() => ({}))) as any;
+      if (!res.ok) {
+        const rawMessage = typeof json?.error === "string" ? json.error : "Login failed";
+        const errorMessage = rawMessage.includes("Invalid login credentials")
+          ? "Invalid email or password."
+          : rawMessage;
+        return { error: { message: errorMessage } };
       }
-      
-      return { error: null, data };
+
+      const accessToken = json?.session?.access_token;
+      const refreshToken = json?.session?.refresh_token;
+      if (typeof accessToken === "string" && typeof refreshToken === "string") {
+        // Keep the browser Supabase client in sync (localStorage, onAuthStateChange, etc.).
+        await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+      }
+
+      return { error: null };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
       return { error: { message: errorMessage } };
@@ -89,6 +98,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Best-effort; still clear local session below.
+    }
     await supabase.auth.signOut();
   }, []);
 

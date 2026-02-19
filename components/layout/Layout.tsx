@@ -12,14 +12,18 @@ interface LayoutProps {
   children: ReactNode;
 }
 
-// Routes that require login (prefix match: protects nested routes too)
-const protectedRoutePrefixes = ["/api-keys", "/cats", "/swarms", "/usage", "/billing"];
-// Routes that render without the app shell
-const bareRoutes = ["/login", "/auth/handoff"];
+// Public pages that must render without an existing session.
+// IMPORTANT: `/auth/handoff` needs to run unauthenticated so it can accept
+// tokens from the other app and call `supabase.auth.setSession(...)`.
+const publicRoutePrefixes = ["/login", "/auth/handoff"];
 
-function isProtectedRoute(pathname: string | null): boolean {
+function isPublicRoute(pathname: string | null): boolean {
   const p = pathname ?? "";
-  return protectedRoutePrefixes.some((prefix) => p === prefix || p.startsWith(prefix + "/"));
+  return publicRoutePrefixes.some((prefix) => p === prefix || p.startsWith(prefix + "/"));
+}
+
+function buildLoginUrl(currentPath: string): string {
+  return `/login?redirect=${encodeURIComponent(currentPath)}`;
 }
 
 export default function Layout({ children }: LayoutProps) {
@@ -28,18 +32,18 @@ export default function Layout({ children }: LayoutProps) {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading && !user && isProtectedRoute(pathname)) {
-      router.push("/login");
+    if (!loading && !user && !isPublicRoute(pathname)) {
+      router.push(buildLoginUrl(pathname ?? "/"));
     }
   }, [loading, user, pathname, router]);
 
   // Bare pages (no sidebar/header)
-  if (bareRoutes.includes(pathname || "")) {
+  if (isPublicRoute(pathname)) {
     return <>{children}</>;
   }
 
   // Protected pages — show loading while checking auth
-  if (isProtectedRoute(pathname) && (loading || !user)) {
+  if (loading || !user) {
     return <LayoutSkeleton />;
   }
 

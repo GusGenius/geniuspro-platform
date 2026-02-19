@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
+  Check,
+  Copy,
   Loader2,
   Sparkles,
   Save,
@@ -71,6 +73,7 @@ export function CatForm({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiWizardOpen, setAiWizardOpen] = useState(false);
+  const [copiedModelId, setCopiedModelId] = useState(false);
 
   const normalizedSlug = useMemo(() => {
     return normalizeCatSlug(slug || slugFromName(name));
@@ -83,6 +86,21 @@ export function CatForm({
     if (!normalizedSlug) return false;
     return normalizeKittens(kittens).length > 0;
   }, [user, saving, name, normalizedSlug, kittens]);
+
+  const apiModelId = useMemo(() => {
+    return normalizedSlug ? `cat:${normalizedSlug}` : "";
+  }, [normalizedSlug]);
+
+  const handleCopyModelId = async () => {
+    if (!apiModelId) return;
+    try {
+      await navigator.clipboard.writeText(apiModelId);
+      setCopiedModelId(true);
+      window.setTimeout(() => setCopiedModelId(false), 1200);
+    } catch {
+      // Best-effort; ignore clipboard failures (some environments block it).
+    }
+  };
 
   const applyTemplate = () => {
     const tpl = getCatTemplate(templateId);
@@ -283,55 +301,59 @@ export function CatForm({
 
         <div className="bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6">
           <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                Start from a template
-              </label>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <select
-                  value={templateId}
-                  onChange={(e) => setTemplateId(e.target.value)}
-                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {CAT_TEMPLATES.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.label}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={applyTemplate}
-                  className="px-4 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
-                >
-                  Apply
-                </button>
-              </div>
-              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {getCatTemplate(templateId)?.description ??
-                  "Pick a template to get started fast."}
-              </p>
-            </div>
+            {mode === "create" ? (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                    Start from a template
+                  </label>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <select
+                      value={templateId}
+                      onChange={(e) => setTemplateId(e.target.value)}
+                      className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {CAT_TEMPLATES.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={applyTemplate}
+                      className="px-4 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    {getCatTemplate(templateId)?.description ??
+                      "Pick a template to get started fast."}
+                  </p>
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                AI (optional)
-              </label>
-              <div className="flex items-center justify-between gap-3 bg-white/60 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                <p className="text-xs text-gray-600 dark:text-gray-300">
-                  Use the AI Wizard to generate kittens, then edit them.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setAiWizardOpen(true)}
-                  disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  AI Wizard
-                </button>
-              </div>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+                    AI (optional)
+                  </label>
+                  <div className="flex items-center justify-between gap-3 bg-white/60 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      Use the AI Wizard to generate kittens, then edit them.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAiWizardOpen(true)}
+                      disabled={saving}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      AI Wizard
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : null}
 
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
@@ -351,18 +373,35 @@ export function CatForm({
 
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
-                API Slug
+                Cat ID (slug)
               </label>
-              <input
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="e.g., research-writer"
-                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="e.g., research-writer"
+                  className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleCopyModelId();
+                  }}
+                  disabled={!apiModelId}
+                  className="inline-flex items-center justify-center gap-2 px-3 py-3 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Copy API model ID"
+                >
+                  {copiedModelId ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
               <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                Call via{" "}
+                API model id:{" "}
                 <code className="bg-gray-200 dark:bg-gray-800 px-1 rounded">
-                  model=cat:{normalizedSlug || "your-slug"}
+                  {apiModelId || "cat:your-slug"}
                 </code>
               </p>
             </div>

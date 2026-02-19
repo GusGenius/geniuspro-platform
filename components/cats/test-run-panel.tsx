@@ -110,6 +110,10 @@ export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
   }, [kittens]);
 
   const handleTestRun = async () => {
+    await handleRunToStep(null);
+  };
+
+  const handleRunToStep = async (stepIndex: number | null) => {
     if (!accessToken) {
       setTestError("You must be logged in to run a test.");
       return;
@@ -171,6 +175,7 @@ export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
         userMessage: message,
         imageUrl: finalImageUrl,
         debugPipeline: true,
+        debugRunStep: typeof stepIndex === "number" ? stepIndex : undefined,
       });
       setTestOutput(res.text);
       setDebugSteps(res.debugSteps ?? null);
@@ -218,8 +223,11 @@ export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
 
       <div className="mt-4">
         <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-          Image (optional)
+          Image
         </label>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+          Some cats (vision flows) require an image. Upload one or paste a URL.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="bg-white/60 dark:bg-gray-950/40 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
             <p className="text-xs text-gray-600 dark:text-gray-300 font-medium">
@@ -301,21 +309,35 @@ export function TestRunPanel({ catSlug, accessToken, kittens }: Props) {
           placeholder="Paste a prompt to test this cat..."
         />
         <div className="mt-3 flex items-center justify-end">
-          <button
-            type="button"
-            onClick={() => void handleTestRun()}
-            disabled={testRunning || !testInput.trim()}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {testRunning ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Running...
-              </>
-            ) : (
-              "Run"
-            )}
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {kittenLabels.map((k) => (
+              <button
+                key={k.index}
+                type="button"
+                onClick={() => void handleRunToStep(k.index)}
+                disabled={testRunning || !testInput.trim()}
+                className="px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title={`Run through step ${k.index}: ${k.name}`}
+              >
+                Step {k.index}: {k.name}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => void handleRunToStep(null)}
+              disabled={testRunning || !testInput.trim()}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {testRunning ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Running...
+                </>
+              ) : (
+                "Run full"
+              )}
+            </button>
+          </div>
         </div>
       </div>
 

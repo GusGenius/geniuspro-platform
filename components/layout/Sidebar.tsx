@@ -281,7 +281,8 @@ export default function Sidebar() {
         onMouseLeave={handleMouseLeave}
       >
       {/* Logo */}
-      <div
+      <Link
+        href="/dashboard"
         className={`flex h-16 items-center border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${
           isExpanded ? "justify-start px-4" : "justify-center px-0"
         }`}
@@ -311,7 +312,7 @@ export default function Sidebar() {
             priority
           />
         )}
-      </div>
+      </Link>
 
       {/* Navigation */}
       <nav
