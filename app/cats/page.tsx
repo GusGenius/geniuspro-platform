@@ -44,6 +44,8 @@ export default function CatsPage() {
     );
   }, [cats, searchQuery]);
 
+  const [publishedCatIds, setPublishedCatIds] = useState<Set<string>>(new Set());
+
   const fetchCats = useCallback(async () => {
     if (!user) {
       setLoading(false);
@@ -63,13 +65,31 @@ export default function CatsPage() {
       if (fetchError) {
         setError(fetchError.message);
         setCats([]);
+        setPublishedCatIds(new Set());
         return;
       }
-      setCats((data as UserCatRow[]) ?? []);
+      const catRows = (data as UserCatRow[]) ?? [];
+      setCats(catRows);
+
+      // Fetch published status: cats with at least one version
+      if (catRows.length > 0) {
+        const catIds = catRows.map((c) => c.id);
+        const { data: versions } = await supabase
+          .from("user_cat_versions")
+          .select("cat_id")
+          .in("cat_id", catIds);
+        const published = new Set(
+          (versions ?? []).map((v: { cat_id: string }) => v.cat_id)
+        );
+        setPublishedCatIds(published);
+      } else {
+        setPublishedCatIds(new Set());
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to load cats";
       setError(msg);
       setCats([]);
+      setPublishedCatIds(new Set());
     } finally {
       setLoading(false);
     }
@@ -257,9 +277,20 @@ export default function CatsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
-                      {catRow.name}
-                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                        {catRow.name}
+                      </h3>
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          publishedCatIds.has(catRow.id)
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                        }`}
+                      >
+                        {publishedCatIds.has(catRow.id) ? "Published" : "Draft"}
+                      </span>
+                    </div>
                     <div className="mt-2">
                       <code className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 px-2 py-0.5 rounded font-mono">
                         cat:{catRow.slug}
