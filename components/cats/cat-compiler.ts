@@ -45,6 +45,8 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
             "previous_overlay"
               ? ("previous_overlay" as const)
               : ("original" as const),
+          model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || undefined,
+          instructions: String((k as { instructions?: unknown }).instructions ?? "").trim() || undefined,
         };
       }
 

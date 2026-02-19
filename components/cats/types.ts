@@ -17,6 +17,16 @@ export type CatVisionHttpKitten = {
   type: "vision_http";
   path: string;
   image_source: "original" | "previous_overlay";
+  /**
+   * Optional: request the vision server to use a specific model.
+   * Requires the vision server endpoint to support this field.
+   */
+  model_id?: string;
+  /**
+   * Optional: pass extra instructions to the vision server.
+   * Requires the vision server endpoint to support this field.
+   */
+  instructions?: string;
 };
 
 export type CatTransformJsKitten = {

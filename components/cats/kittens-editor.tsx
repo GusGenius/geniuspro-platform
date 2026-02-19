@@ -227,7 +227,8 @@ export function KittensEditor({ kittens, onChange }: Props) {
               )}
 
               {(k as { type?: unknown }).type === "vision_http" && (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="mt-3 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
                       Vision path
@@ -265,6 +266,41 @@ export function KittensEditor({ kittens, onChange }: Props) {
                       <option value="original">Original image</option>
                       <option value="previous_overlay">Previous step overlay_base64</option>
                     </select>
+                  </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Model override (optional)
+                      </label>
+                      <input
+                        value={String((k as { model_id?: unknown }).model_id ?? "")}
+                        onChange={(e) =>
+                          updateKitten(k.id, { model_id: e.target.value } as CatKitten)
+                        }
+                        placeholder="e.g. gemini-nano-banana-pro"
+                        className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                      />
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                        Only works if the vision endpoint supports model overrides.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Instructions (optional)
+                      </label>
+                      <textarea
+                        value={String((k as { instructions?: unknown }).instructions ?? "")}
+                        onChange={(e) =>
+                          updateKitten(k.id, { instructions: e.target.value } as CatKitten)
+                        }
+                        placeholder="Extra instructions to send to the vision endpoint"
+                        rows={3}
+                        className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
