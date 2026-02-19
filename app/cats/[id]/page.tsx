@@ -25,13 +25,15 @@ export default function CatDetailPage() {
       return;
     }
 
+    const userId = user.id;
+
     async function load() {
       let query = supabase
         .from("user_cats")
         .select("id, user_id, name, description, slug, kittens, created_at, updated_at")
         .eq("id", id);
       if (!isAdmin) {
-        query = query.eq("user_id", user.id);
+        query = query.eq("user_id", userId);
       }
       const res = await query.single();
 
@@ -46,7 +48,7 @@ export default function CatDetailPage() {
     }
 
     load();
-  }, [user?.id, id, isAdmin]);
+  }, [user, id, isAdmin]);
 
   if (loading) {
     return <CatDetailSkeleton />;
