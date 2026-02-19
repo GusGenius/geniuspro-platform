@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 4008",
+    "dev": "next dev -p 4008 --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
+    "scheduler": "^0.27.0",
     "@react-three/fiber": "^9.5.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.39.0",
@@ -24,13 +25,13 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.2.0",
     "typescript": "^5"
   }
 }

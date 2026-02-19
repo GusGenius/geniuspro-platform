@@ -45,7 +45,10 @@ export default function CatsPage() {
   }, [cats, searchQuery]);
 
   const fetchCats = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setError(null);
     try {
       let query = supabase

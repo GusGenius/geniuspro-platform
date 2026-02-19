@@ -302,7 +302,7 @@ export default function Sidebar() {
             alt="GeniusPro"
             width={40}
             height={40}
-            className="object-contain"
+            className="object-contain h-10 w-10"
             style={{
               filter:
                 theme === "dark"
@@ -310,6 +310,7 @@ export default function Sidebar() {
                   : "brightness(0.85) contrast(1.1) saturate(1.1)",
             }}
             priority
+            unoptimized
           />
         )}
       </Link>

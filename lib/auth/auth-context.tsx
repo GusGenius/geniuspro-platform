@@ -45,15 +45,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
     let isInitialized = false;
 
+    const AUTH_INIT_TIMEOUT_MS = 5000;
+
     const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        if (!url || !key || key === "your-publishable-key") {
+          if (!mounted) return;
+          console.warn("Supabase env vars missing or placeholder. Auth disabled.");
+          setSession(null);
+          setUser(null);
+          setLoading(false);
+          isInitialized = true;
+          return;
+        }
+
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("Auth init timeout")), AUTH_INIT_TIMEOUT_MS)
+        );
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise,
+        ]);
         if (!mounted) return;
-        
+
         if (error) {
           console.error("Error getting session:", error);
         }
-        
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -61,6 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         if (!mounted) return;
         console.error("Error initializing auth:", error);
+        setSession(null);
+        setUser(null);
         setLoading(false);
         isInitialized = true;
       }
