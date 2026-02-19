@@ -42,7 +42,7 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
           return {
             ...base,
             type: "vision_http",
-            path: "/gutter/overlay",
+            path: "",
             image_source: "original",
           } satisfies CatKitten;
         }
@@ -248,15 +248,9 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
                     <input
                       value={String((k as { path?: unknown }).path ?? "")}
                       onChange={(e) => updateKitten(k.id, { path: e.target.value } as CatKitten)}
-                      placeholder="/gutter/overlay"
+                      placeholder="/your/vision/path"
                       className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
-                      list="vision-paths"
                     />
-                    <datalist id="vision-paths">
-                      <option value="/gutter/overlay" />
-                      <option value="/gutter/segment-overlay" />
-                      <option value="/analyze-home-photo" />
-                    </datalist>
                   </div>
 
                   <div>

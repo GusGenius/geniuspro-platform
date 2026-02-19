@@ -39,7 +39,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           id,
           name,
           type: "vision_http" as const,
-          path: String((k as { path?: unknown }).path ?? "").trim() || "/gutter/overlay",
+          path: String((k as { path?: unknown }).path ?? "").trim(),
           image_source:
             String((k as { image_source?: unknown }).image_source ?? "").trim() ===
             "previous_overlay"
