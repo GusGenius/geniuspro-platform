@@ -126,6 +126,59 @@ export function CatForm({
         updated_at: now,
       };
 
+      const debugCats = process.env.NEXT_PUBLIC_DEBUG_CATS === "true";
+      if (debugCats) {
+        const summarizeKitten = (k: unknown) => {
+          const type = typeof (k as { type?: unknown })?.type === "string" ? String((k as { type?: unknown }).type) : "(missing)";
+          const name = typeof (k as { name?: unknown })?.name === "string" ? String((k as { name?: unknown }).name) : "";
+          const id = typeof (k as { id?: unknown })?.id === "string" ? String((k as { id?: unknown }).id) : "";
+          const imgSrc = typeof (k as { image_source?: unknown })?.image_source === "string"
+            ? String((k as { image_source?: unknown }).image_source)
+            : undefined;
+          const path = typeof (k as { path?: unknown })?.path === "string" ? String((k as { path?: unknown }).path) : undefined;
+          const modelId = typeof (k as { model_id?: unknown })?.model_id === "string"
+            ? String((k as { model_id?: unknown }).model_id)
+            : undefined;
+          const instrLen = typeof (k as { instructions?: unknown })?.instructions === "string"
+            ? String((k as { instructions?: unknown }).instructions).length
+            : 0;
+          const sysLen = typeof (k as { system_instructions?: unknown })?.system_instructions === "string"
+            ? String((k as { system_instructions?: unknown }).system_instructions).length
+            : 0;
+          const codeLen = typeof (k as { code?: unknown })?.code === "string"
+            ? String((k as { code?: unknown }).code).length
+            : 0;
+          const targetsCount = Array.isArray((k as { targets?: unknown })?.targets)
+            ? ((k as { targets?: unknown[] }).targets ?? []).length
+            : 0;
+          return {
+            id,
+            name,
+            type,
+            image_source: imgSrc,
+            path,
+            model_id: modelId,
+            targetsCount,
+            instructionsLen: instrLen,
+            systemInstructionsLen: sysLen,
+            codeLen,
+          };
+        };
+
+        const before = Array.isArray(kittens) ? kittens.map(summarizeKitten) : [];
+        const after = Array.isArray(kittensFinal) ? kittensFinal.map(summarizeKitten) : [];
+        console.debug("[cats] save", {
+          mode,
+          editingId,
+          userId: user.id,
+          ownerId,
+          slug: slugFinal,
+          name: trimmedName,
+          kittens_before: before,
+          kittens_after: after,
+        });
+      }
+
       let savedCat: { id: string } | null = null;
       if (mode === "edit" && editingId) {
         let updateQuery = supabase
@@ -148,10 +201,20 @@ export function CatForm({
         savedCat = res.data as { id: string };
       }
 
+      if (process.env.NEXT_PUBLIC_DEBUG_CATS === "true") {
+        console.debug("[cats] save_ok", { id: savedCat.id, slug: slugFinal });
+      }
+
       if (mode === "create") {
         router.push(`/cats/${savedCat.id}`);
       }
     } catch (err) {
+      if (process.env.NEXT_PUBLIC_DEBUG_CATS === "true") {
+        console.debug("[cats] save_error", {
+          message: err instanceof Error ? err.message : String(err),
+          slug: slugFinal,
+        });
+      }
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
