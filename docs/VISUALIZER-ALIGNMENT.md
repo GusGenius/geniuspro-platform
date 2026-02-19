@@ -133,3 +133,27 @@ if (debugLogs) {
 - `instructionsSnippet` mentions "hybrid rainwater harvesting" — correct design specs
 
 **Request:** Include `debug_pipeline: true` in the request body.
+
+---
+
+## Implementation checklist (Visualizer)
+
+| Change | Location | Status |
+|--------|----------|--------|
+| `debug_pipeline: true` | gutter-custom-solution route (line 93) | ✓ Set |
+| `debug_pipeline: true` | geniuspro-cat-progress-client.js (line 59) | ✓ Set |
+| Include `debugSteps` in result | app/api/gutter-custom-solution-stream/route.js | ✓ Result event now includes debugSteps from runCatWithProgress |
+| Log gutter instructions | `components/full-ai-flow/screens/AIScreen5Generating.js` | ✓ Logging in streaming and non-streaming paths |
+
+**When pipeline completes, filter console by `[Gutter]`:**
+
+- `[Gutter] Instructions sent to Gemini:` — full _debug_logs object
+- `[Gutter] System prompt snippet:` — systemInstructionsSnippet
+- `[Gutter] User prompt snippet:` — instructionsSnippet
+
+**What to verify:**
+
+- `systemInstructionsLength` > 0
+- `instructionsLength` > 0
+- `systemInstructionsSnippet` starts with "Role: Senior Hydrology"
+- `instructionsSnippet` mentions "hybrid rainwater harvesting"
