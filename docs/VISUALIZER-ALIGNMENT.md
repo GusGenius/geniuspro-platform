@@ -106,6 +106,90 @@ data: {"type":"error","message":"..."}
 
 ---
 
+## Gutter AI (Unity) — GeniusPro response spec
+
+Gutter AI uses `cat:gutter-custom-solution` with `stream: false` and `progress_updates: true`. The response is proxied to a Unity client. GeniusPro must return placement JSON in this structure.
+
+### 1. Response format (normalized 0–1, origin top-left)
+
+**Unity JsonUtility format:** Positions and points use `{ x, y }` objects (not arrays) for direct deserialization into Vector2.
+
+```json
+{
+  "success": true,
+  "image_width": 1264,
+  "image_height": 848,
+  "ground_level": 0.92,
+  "rooflines": [
+    { "id": "roof_0", "points": [{ "x": 0.1, "y": 0.2 }, { "x": 0.5, "y": 0.15 }, { "x": 0.9, "y": 0.2 }] }
+  ],
+  "gutter_masks_base64": ["<base64 PNG per gutter run>"],
+  "gutter_offsets": [{ "x": 0, "y": 0 }],
+  "downspout_masks_base64": ["<base64 PNG per downspout>"],
+  "suggested_rain_chains": [
+    { "position": { "x": 0.5, "y": 0.35 }, "end_y": 0.92 }
+  ],
+  "suggested_downspouts": [
+    { "position": { "x": 0.3, "y": 0.35 }, "end_y": 0.92 }
+  ],
+  "suggested_tank": {
+    "position": { "x": 0.5, "y": 0.9 },
+    "bbox": { "xMin": 0.42, "yMin": 0.78, "xMax": 0.58, "yMax": 0.92 },
+    "size": { "width": 0.16, "height": 0.14 }
+  },
+  "overlay_image_base64": "<optional full visualization PNG>"
+}
+```
+
+### 2. Field requirements
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `image_width`, `image_height` | Yes | For coordinate scaling |
+| `rooflines` | Yes | `{ id, points: [{ x, y }, ...] }` |
+| `suggested_tank` | Yes | `position: { x, y }` (centerX, bottomY); `bbox: { xMin, yMin, xMax, yMax }` preferred for size |
+| `suggested_rain_chains` | Yes | `position: { x, y }`, optional `end_y` |
+| `suggested_downspouts` | Yes | `position: { x, y }`, optional `end_y`, `bbox: { xMin, yMin, xMax, yMax }` |
+| `ground_level` | Yes | Default 0.92 |
+| `gutter_masks_base64` | Preferred | Full-image masks, white on gutter line |
+| `gutter_offsets` | With masks | `{ x: 0, y: 0 }` per mask for full-image masks |
+| `downspout_masks_base64` | Optional | Same format as gutter masks |
+| `overlay_image_base64` | Optional | Full overlay when `include_overlay_image: true` |
+
+### 3. Mask format
+
+- Same size as source image (`image_width` × `image_height`)
+- PNG with alpha
+- White/alpha on detected region, black/transparent elsewhere
+- One mask per gutter run (horizontal/vertical line)
+- One mask per downspout (vertical line)
+
+### 4. Coordinate system
+
+- Normalized 0–1, origin top-left
+- x = 0 left, x = 1 right
+- y = 0 top, y = 1 bottom
+
+**Format:** GeniusPro returns `{ x, y }` object format for Unity JsonUtility compatibility (e.g. `position: { x: 0.5, y: 0.35 }`, `points: [{ x: 0.1, y: 0.2 }, { x: 0.5, y: 0.15 }]`). Bbox: `{ xMin, yMin, xMax, yMax }`. Size: `{ width, height }`.
+
+### 5. Tank placement
+
+- `position`: `{ x, y }` (centerX, bottomY — center of base, bottom Y)
+- `bbox`: `{ xMin, yMin, xMax, yMax }` (preferred for size/position)
+- `size`: `{ width, height }` (optional fallback)
+
+### 6. Integration
+
+- Use `cat:gutter-custom-solution` with `stream: false` and `progress_updates: true`
+- Return `overlay_image_base64` when `include_overlay_image: true` and input is PNG
+- Response is proxied to Unity client expecting the same placement data
+
+### 7. Debug
+
+- Keep `debug_pipeline: true` support for `_debug_logs` and gutter prompt verification
+
+---
+
 ## What the Visualizer needs from SAM 3 (or the pipeline)
 
 **Gutter pipeline order:** Gemini (Image Gen) → SAM 3 segmentation → masks + structured data → Visualizer.
@@ -218,14 +302,14 @@ Gemini (Image Gen) → source image → SAM 3 segmentation → masks + structure
   "image_height": 848,
   "ground_level": 0.92,
   "rooflines": [
-    { "id": "roof_0", "points": [[0.1, 0.2], [0.5, 0.15], [0.9, 0.2]] }
+    { "id": "roof_0", "points": [{ "x": 0.1, "y": 0.2 }, { "x": 0.5, "y": 0.15 }, { "x": 0.9, "y": 0.2 }] }
   ],
   "gutter_masks_base64": ["<base64 PNG per gutter run>"],
-  "gutter_offsets": [[0, 0]],
+  "gutter_offsets": [{ "x": 0, "y": 0 }],
   "downspout_masks_base64": ["<base64 PNG per downspout>"],
-  "suggested_rain_chains": [{ "position": [0.5, 0.35], "end_y": 0.92 }],
-  "suggested_downspouts": [{ "position": [0.5, 0.35], "end_y": 0.92 }],
-  "suggested_tank": { "position": [0.5, 0.95], "bbox": [0.3, 0.85, 0.7, 0.95] },
+  "suggested_rain_chains": [{ "position": { "x": 0.5, "y": 0.35 }, "end_y": 0.92 }],
+  "suggested_downspouts": [{ "position": { "x": 0.5, "y": 0.35 }, "end_y": 0.92 }],
+  "suggested_tank": { "position": { "x": 0.5, "y": 0.95 }, "bbox": { "xMin": 0.3, "yMin": 0.85, "xMax": 0.7, "yMax": 0.95 } },
   "overlay_image_base64": "<optional full visualization PNG>"
 }
 ```
