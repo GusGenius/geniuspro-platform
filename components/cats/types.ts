@@ -40,6 +40,8 @@ export type CatImageGenKitten = {
   type: "image_gen";
   image_source: "original" | "previous_overlay";
   model_id: string;
+  /** Optional system instruction (role, constraints). */
+  system_instructions?: string;
   instructions: string;
 };
 

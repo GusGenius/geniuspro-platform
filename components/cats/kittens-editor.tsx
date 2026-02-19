@@ -52,6 +52,7 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
             type: "image_gen",
             image_source: "original",
             model_id: "gemini-nano-banana-pro",
+            system_instructions: "",
             instructions: "",
           } satisfies CatKitten;
         }
@@ -293,7 +294,22 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
 
                   <div>
                     <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      Instructions
+                      System instructions (optional)
+                    </label>
+                    <textarea
+                      value={String((k as { system_instructions?: unknown }).system_instructions ?? "")}
+                      onChange={(e) =>
+                        updateKitten(k.id, { system_instructions: e.target.value } as CatKitten)
+                      }
+                      placeholder="Role, constraints, engineering logic (e.g. Senior Hydrology Engineer...)"
+                      rows={5}
+                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                      Instructions (user prompt)
                     </label>
                     <textarea
                       value={String((k as { instructions?: unknown }).instructions ?? "")}
