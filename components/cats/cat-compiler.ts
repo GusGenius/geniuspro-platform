@@ -71,6 +71,49 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
         };
       }
 
+      if (type === "sam3") {
+        const targetsRaw = Array.isArray((k as { targets?: unknown }).targets)
+          ? (k as { targets?: unknown[] }).targets
+          : [];
+        const targets = targetsRaw
+          .map((t) => {
+            if (typeof t !== "object" || t === null) return null;
+            const name = String((t as { name?: unknown }).name ?? "").trim();
+            const promptsRaw = Array.isArray((t as { prompts?: unknown }).prompts)
+              ? (t as { prompts?: unknown[] }).prompts
+              : [];
+            const prompts = promptsRaw
+              .map((p) => String(p ?? "").trim())
+              .filter((p) => p.length > 0);
+            if (!name || prompts.length === 0) return null;
+            return { name, prompts };
+          })
+          .filter((t): t is { name: string; prompts: string[] } => t !== null);
+        const defaultTargets =
+          targets.length === 0
+            ? [
+                { name: "gutter", prompts: ["gutter", "roofline"] },
+                { name: "rain_chain", prompts: ["rain chain"] },
+                { name: "downspout", prompts: ["downspout"] },
+                { name: "tank", prompts: ["water tank", "rainwater tank"] },
+              ]
+            : targets;
+        return {
+          id,
+          name,
+          type: "sam3" as const,
+          image_source:
+            String((k as { image_source?: unknown }).image_source ?? "").trim() ===
+            "previous_overlay"
+              ? ("previous_overlay" as const)
+              : ("original" as const),
+          targets: defaultTargets,
+          run_all_targets: (k as { run_all_targets?: unknown }).run_all_targets === true,
+          mask_only: (k as { mask_only?: unknown }).mask_only === true,
+          test_image_storage_path: testImagePath,
+        };
+      }
+
       if (type === "transform_js") {
         return {
           id,

@@ -2,8 +2,25 @@ export type CatKittenType =
   | "model"
   | "vision_http"
   | "image_gen"
+  | "sam3"
   | "transform_js"
   | "transform_py";
+
+export type CatSam3Target = {
+  name: string;
+  prompts: string[];
+};
+
+export type CatSam3Kitten = {
+  id: string;
+  name: string;
+  type: "sam3";
+  image_source: "original" | "previous_overlay";
+  targets: CatSam3Target[];
+  run_all_targets?: boolean;
+  mask_only?: boolean;
+  test_image_storage_path?: string;
+};
 
 export type CatModelKitten = {
   id: string;
@@ -26,13 +43,13 @@ export type CatVisionHttpKitten = {
   image_source: "original" | "previous_overlay";
   test_image_storage_path?: string;
   /**
-   * Optional: request the vision server to use a specific model.
-   * Requires the vision server endpoint to support this field.
+   * Optional: request the vision endpoint to use a specific model.
+   * Requires the endpoint to support this field.
    */
   model_id?: string;
   /**
-   * Optional: pass extra instructions to the vision server.
-   * Requires the vision server endpoint to support this field.
+   * Optional: pass extra instructions to the vision endpoint.
+   * Requires the endpoint to support this field.
    */
   instructions?: string;
 };
@@ -71,6 +88,7 @@ export type CatKitten =
   | CatModelKitten
   | CatVisionHttpKitten
   | CatImageGenKitten
+  | CatSam3Kitten
   | CatTransformJsKitten
   | CatTransformPyKitten;
 

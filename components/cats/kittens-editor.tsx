@@ -85,6 +85,21 @@ export function KittensEditor({
             instructions: "",
           } satisfies CatKitten;
         }
+        if (nextType === "sam3") {
+          return {
+            ...base,
+            type: "sam3",
+            image_source: "original",
+            targets: [
+              { name: "gutter", prompts: ["gutter", "roofline"] },
+              { name: "rain_chain", prompts: ["rain chain"] },
+              { name: "downspout", prompts: ["downspout"] },
+              { name: "tank", prompts: ["water tank", "rainwater tank"] },
+            ],
+            run_all_targets: true,
+            mask_only: true,
+          } satisfies CatKitten;
+        }
         if (nextType === "transform_js") {
           return {
             ...base,
@@ -234,6 +249,7 @@ export function KittensEditor({
                   <option value="model">Model</option>
                   <option value="vision_http">Vision HTTP</option>
                   <option value="image_gen">Image Gen (Gemini)</option>
+                  <option value="sam3">SAM 3 (Replicate)</option>
                   <option value="transform_js">Transform (JS)</option>
                   <option value="transform_py">Transform (Python)</option>
                 </select>
@@ -379,6 +395,131 @@ export function KittensEditor({
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
                     Calls Gemini directly. Requires GEMINI_API_KEY or GOOGLE_API_KEY.
                     Fallback model is used when primary fails (e.g. 429, 503).
+                  </p>
+                </div>
+              )}
+
+              {(k as { type?: unknown }).type === "sam3" && (
+                <div className="mt-3 space-y-3">
+                  <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-3">
+                    <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-3">
+                      Replicate SAM 3 — text-prompt segmentation. Configure targets (name + prompts).
+                    </p>
+                    <div className="space-y-3">
+                      {(Array.isArray((k as { targets?: unknown }).targets)
+                        ? (k as { targets?: { name: string; prompts: string[] }[] }).targets
+                        : []
+                      ).map((t, ti) => (
+                        <div
+                          key={ti}
+                          className="flex flex-wrap gap-2 items-start p-2 rounded-lg bg-gray-100/60 dark:bg-gray-900/60"
+                        >
+                          <input
+                            value={t.name}
+                            onChange={(e) => {
+                              const targets = [...((k as { targets?: { name: string; prompts: string[] }[] }).targets ?? [])];
+                              targets[ti] = { ...targets[ti]!, name: e.target.value };
+                              updateKitten(k.id, { targets } as CatKitten);
+                            }}
+                            placeholder="Target name (e.g. gutter)"
+                            className="flex-1 min-w-[100px] px-3 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm"
+                          />
+                          <input
+                            value={t.prompts.join(", ")}
+                            onChange={(e) => {
+                              const prompts = e.target.value
+                                .split(/[,\n]/)
+                                .map((p) => p.trim())
+                                .filter((p) => p.length > 0);
+                              const targets = [...((k as { targets?: { name: string; prompts: string[] }[] }).targets ?? [])];
+                              targets[ti] = { ...targets[ti]!, prompts: prompts.length > 0 ? prompts : [""] };
+                              updateKitten(k.id, { targets } as CatKitten);
+                            }}
+                            placeholder="Prompts (comma-separated, e.g. gutter, roofline)"
+                            className="flex-[2] min-w-[180px] px-3 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const targets = ((k as { targets?: { name: string; prompts: string[] }[] }).targets ?? []).filter(
+                                (_, i) => i !== ti
+                              );
+                              updateKitten(k.id, { targets: targets.length > 0 ? targets : [{ name: "", prompts: [""] }] } as CatKitten);
+                            }}
+                            className="p-2 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const targets = [...((k as { targets?: { name: string; prompts: string[] }[] }).targets ?? []), { name: "", prompts: [""] }];
+                          updateKitten(k.id, { targets } as CatKitten);
+                        }}
+                        className="text-xs px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800"
+                      >
+                        + Add target
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                        Image source
+                      </label>
+                      <select
+                        value={
+                          String((k as { image_source?: unknown }).image_source ?? "") ===
+                          "previous_overlay"
+                            ? "previous_overlay"
+                            : "original"
+                        }
+                        onChange={(e) =>
+                          updateKitten(k.id, {
+                            image_source: e.target.value as "original" | "previous_overlay",
+                          } as CatKitten)
+                        }
+                        className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
+                      >
+                        <option value="original">Original image</option>
+                        <option value="previous_overlay">Previous step overlay_base64</option>
+                      </select>
+                    </div>
+
+                    <label className="flex items-center gap-2 mt-6">
+                      <input
+                        type="checkbox"
+                        checked={(k as { run_all_targets?: unknown }).run_all_targets === true}
+                        onChange={(e) =>
+                          updateKitten(k.id, { run_all_targets: e.target.checked } as CatKitten)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Run all targets (don&apos;t stop after first success)
+                      </span>
+                    </label>
+
+                    <label className="flex items-center gap-2 mt-6">
+                      <input
+                        type="checkbox"
+                        checked={(k as { mask_only?: unknown }).mask_only === true}
+                        onChange={(e) =>
+                          updateKitten(k.id, { mask_only: e.target.checked } as CatKitten)
+                        }
+                        className="rounded border-gray-300"
+                      />
+                      <span className="text-xs text-gray-600 dark:text-gray-300">
+                        Mask only (single mask per run)
+                      </span>
+                    </label>
+                  </div>
+
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Calls Replicate SAM 3 directly. Requires REPLICATE_API_TOKEN.
                   </p>
                 </div>
               )}

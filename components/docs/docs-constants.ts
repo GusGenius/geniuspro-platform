@@ -17,7 +17,7 @@ export const MODEL_DEVSTRAL = "devstral-2";
 export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/coding-superintelligence/v1";
 
 // Vision Service — SAM 3 segmentation
-export const API_BASE_URL_VISION = "https://api.geniuspro.io/vision/v1";
+export const API_BASE_URL_VISION = "https://your-vision-api.example.com/vision/v1";
 export const MODEL_VISION = "sam3";
 
 export const AUTH_HEADER_EXAMPLE = "Authorization: Bearer YOUR_API_KEY";
@@ -101,25 +101,25 @@ export const CURL_MEMORY_SAVE_SNIPPET_EXAMPLE = `curl https://api.geniuspro.io/c
 export const CURL_MEMORY_LIST_SNIPPETS_EXAMPLE = `curl "https://api.geniuspro.io/coding-superintelligence/v1/memory/snippets?project_slug=my-project&limit=20" \\
   -H "Authorization: Bearer YOUR_API_KEY"`;
 
-export const CURL_VISION_SEGMENT_IMAGE_TEXT = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+export const CURL_VISION_SEGMENT_IMAGE_TEXT = `curl -X POST https://your-vision-api.example.com/vision/v1/segment-image \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -F "image=@image.jpg" \\
   -F "text_prompt=a red car"`;
 
-export const CURL_VISION_SEGMENT_IMAGE_POINTS = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+export const CURL_VISION_SEGMENT_IMAGE_POINTS = `curl -X POST https://your-vision-api.example.com/vision/v1/segment-image \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -F "image=@image.jpg" \\
   -F "input_points=[[320,240]]" \\
   -F "input_labels=[1]"`;
 
-export const CURL_VISION_SEGMENT_IMAGE_BOX = `curl -X POST https://api.geniuspro.io/vision/v1/segment-image \\
+export const CURL_VISION_SEGMENT_IMAGE_BOX = `curl -X POST https://your-vision-api.example.com/vision/v1/segment-image \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -F "image=@image.jpg" \\
   -F "input_box=[100,100,500,400]"`;
 
 export const PYTHON_VISION_EXAMPLE = `import requests
 
-url = "https://api.geniuspro.io/vision/v1/segment-image"
+url = "https://your-vision-api.example.com/vision/v1/segment-image"
 headers = {"Authorization": "Bearer YOUR_API_KEY"}
 
 with open("image.jpg", "rb") as f:
@@ -132,13 +132,13 @@ print(result["masks"])  # Segmentation masks
 print(result["boxes"])  # Bounding boxes
 print(result["scores"])  # Confidence scores`;
 
-export const CURL_VISION_ANALYZE_HOME_PHOTO = `curl -X POST https://api.geniuspro.io/vision/v1/analyze-home-photo \\
+export const CURL_VISION_ANALYZE_HOME_PHOTO = `curl -X POST https://your-vision-api.example.com/vision/v1/analyze-home-photo \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -F "image=@home_photo.jpg"`;
 
 export const PYTHON_VISION_ANALYZE_HOME_PHOTO = `import requests
 
-url = "https://api.geniuspro.io/vision/v1/analyze-home-photo"
+url = "https://your-vision-api.example.com/vision/v1/analyze-home-photo"
 headers = {"Authorization": "Bearer YOUR_API_KEY"}
 
 with open("home_photo.jpg", "rb") as f:

@@ -139,7 +139,9 @@ export function TestRunPanel({
           ? String((k as { model_id?: unknown }).model_id ?? "").trim()
           : (k as { type?: unknown }).type === "vision_http"
             ? String((k as { path?: unknown }).path ?? "").trim()
-            : String((k as { type?: unknown }).type ?? "")).trim(),
+            : (k as { type?: unknown }).type === "sam3"
+              ? "Replicate SAM 3"
+              : String((k as { type?: unknown }).type ?? "")).trim(),
     }));
   }, [kittens]);
 
