@@ -34,6 +34,8 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           ? String((k as { type?: unknown }).type)
           : undefined;
 
+      const testImagePath = String((k as { test_image_storage_path?: unknown }).test_image_storage_path ?? "").trim() || undefined;
+
       if (type === "vision_http") {
         return {
           id,
@@ -47,6 +49,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
               : ("original" as const),
           model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || undefined,
           instructions: String((k as { instructions?: unknown }).instructions ?? "").trim() || undefined,
+          test_image_storage_path: testImagePath,
         };
       }
 
@@ -63,6 +66,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || "gemini-nano-banana-pro",
           system_instructions: String((k as { system_instructions?: unknown }).system_instructions ?? "").trim() || undefined,
           instructions: String((k as { instructions?: unknown }).instructions ?? "").trim(),
+          test_image_storage_path: testImagePath,
         };
       }
 
@@ -72,6 +76,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           name,
           type: "transform_js" as const,
           code: String((k as { code?: unknown }).code ?? ""),
+          test_image_storage_path: testImagePath,
         };
       }
 
@@ -81,6 +86,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
           name,
           type: "transform_py" as const,
           code: String((k as { code?: unknown }).code ?? ""),
+          test_image_storage_path: testImagePath,
         };
       }
 
@@ -91,6 +97,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
         type: "model" as const,
         model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || "gemini-3-flash",
         instructions: String((k as { instructions?: unknown }).instructions ?? "").trim(),
+        test_image_storage_path: testImagePath,
       };
     });
 }

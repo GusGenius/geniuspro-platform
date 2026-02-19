@@ -324,6 +324,8 @@ export function CatForm({
                     ? (step) => setPendingTestStep(step)
                     : undefined
                 }
+                userId={mode === "edit" ? user?.id : undefined}
+                catSlug={mode === "edit" ? normalizedSlug : undefined}
               />
             ) : null}
 
@@ -361,9 +363,22 @@ export function CatForm({
           <>
             <TestRunPanel
               id="test-run-panel"
+              catId={editingId!}
               catSlug={normalizedSlug}
+              userId={user.id}
               accessToken={session?.access_token ?? null}
               kittens={normalizeKittens(kittens)}
+              savedTestImagePath={initial?.test_image_storage_path ?? null}
+              onSaveTestImage={async (storagePath) => {
+                const { error } = await supabase
+                  .from("user_cats")
+                  .update({
+                    test_image_storage_path: storagePath,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq("id", editingId);
+                if (error) throw error;
+              }}
               runStep={pendingTestStep}
               onStepRun={() => setPendingTestStep(null)}
               onFullRunResult={({ ok }) => setLastFullRunOk(ok)}

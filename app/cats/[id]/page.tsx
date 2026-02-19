@@ -30,7 +30,7 @@ export default function CatDetailPage() {
     async function load() {
       let query = supabase
         .from("user_cats")
-        .select("id, user_id, name, description, slug, kittens, created_at, updated_at")
+        .select("id, user_id, name, description, slug, kittens, test_image_storage_path, created_at, updated_at")
         .eq("id", id);
       if (!isAdmin) {
         query = query.eq("user_id", userId);

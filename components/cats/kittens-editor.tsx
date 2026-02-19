@@ -1,7 +1,9 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Play, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Loader2, Play, Trash2 } from "lucide-react";
 
+import { uploadCatTestImage } from "@/lib/cat-test-image";
 import { AVAILABLE_MODELS } from "@/components/models/available-models";
 import {
   ensureKittenSuffix,
@@ -13,6 +15,9 @@ type Props = {
   kittens: CatKitten[];
   onChange: (next: CatKitten[]) => void;
   onTestKitten?: (stepIndex: number) => void;
+  /** When set, show per-kitten test image override. */
+  userId?: string;
+  catSlug?: string;
 };
 
 function createKitten(): CatKitten {
@@ -26,8 +31,16 @@ function createKitten(): CatKitten {
   };
 }
 
-export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
+export function KittensEditor({
+  kittens,
+  onChange,
+  onTestKitten,
+  userId,
+  catSlug,
+}: Props) {
   const list = kittens.length > 0 ? kittens : [createKitten()];
+  const [uploadingKittenId, setUploadingKittenId] = useState<string | null>(null);
+  const canReplacePerKitten = !!userId && !!catSlug;
 
   function updateKitten(id: string, patch: Partial<CatKitten>) {
     onChange(list.map((k) => (k.id === id ? ({ ...k, ...patch } as CatKitten) : k)));
@@ -422,6 +435,51 @@ export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
                   <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                     JS: export default function or export const transform. Python: define
                     transform(input, ctx).
+                  </p>
+                </div>
+              )}
+
+              {canReplacePerKitten && (
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
+                    Test image (override)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="block w-full text-xs text-gray-600 dark:text-gray-300 file:mr-2 file:px-3 file:py-2 file:rounded-lg file:border file:border-gray-200 dark:file:border-gray-700 file:bg-gray-100 dark:file:bg-gray-900 file:text-gray-700 dark:file:text-gray-200"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file || !userId || !catSlug) return;
+                        setUploadingKittenId(k.id);
+                        try {
+                          const { storagePath } = await uploadCatTestImage({
+                            userId,
+                            catSlug,
+                            file,
+                            kittenId: k.id,
+                          });
+                          updateKitten(k.id, { test_image_storage_path: storagePath } as CatKitten);
+                        } finally {
+                          setUploadingKittenId(null);
+                        }
+                      }}
+                    />
+                    {(k as { test_image_storage_path?: string }).test_image_storage_path ? (
+                      <span className="text-xs text-green-600 dark:text-green-400 flex-shrink-0">
+                        {uploadingKittenId === k.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin inline" />
+                        ) : (
+                          "Saved"
+                        )}
+                      </span>
+                    ) : uploadingKittenId === k.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+                    ) : null}
+                  </div>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                    Replace this kitten&apos;s test image. Used when running Step {idx + 1}
                   </p>
                 </div>
               )}

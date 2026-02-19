@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Loader2, Save } from "lucide-react";
 
 import { supabase } from "@/lib/supabase/client";
 import { runCatOnce, type CatRunDebugStep } from "@/components/cats/cat-runner";
@@ -9,9 +9,13 @@ import type { CatKitten } from "@/components/cats/types";
 
 type Props = {
   id?: string;
+  catId: string;
   catSlug: string;
+  userId: string;
   accessToken: string | null;
   kittens: CatKitten[];
+  savedTestImagePath?: string | null;
+  onSaveTestImage?: (storagePath: string) => Promise<void>;
   runStep?: number | null;
   onStepRun?: () => void;
   onFullRunResult?: (args: {
@@ -35,44 +39,17 @@ async function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-async function uploadToStorage(args: {
-  userId: string;
-  catSlug: string;
-  file: File;
-}): Promise<{ signedUrl: string; storagePath: string }> {
-  const ext = (() => {
-    const name = args.file.name || "image";
-    const parts = name.split(".");
-    return parts.length > 1 ? parts[parts.length - 1] : "jpg";
-  })();
-  const objectName = `${crypto.randomUUID()}.${ext}`;
-  const storagePath = `${args.userId}/${args.catSlug}/${objectName}`;
-
-  const up = await supabase.storage
-    .from("cat-test-runs")
-    .upload(storagePath, args.file, {
-      upsert: true,
-      contentType: args.file.type || "image/jpeg",
-    });
-  if (up.error) {
-    throw up.error;
-  }
-
-  const signed = await supabase.storage
-    .from("cat-test-runs")
-    .createSignedUrl(storagePath, 60 * 15);
-  if (signed.error || !signed.data?.signedUrl) {
-    throw signed.error ?? new Error("Failed to create signed URL");
-  }
-
-  return { signedUrl: signed.data.signedUrl, storagePath };
-}
+import { uploadCatTestImage, getSignedUrl } from "@/lib/cat-test-image";
 
 export function TestRunPanel({
   id,
+  catId,
   catSlug,
+  userId,
   accessToken,
   kittens,
+  savedTestImagePath,
+  onSaveTestImage,
   runStep,
   onStepRun,
   onFullRunResult,
@@ -88,10 +65,13 @@ export function TestRunPanel({
   const [imageUrl, setImageUrl] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<
     | { state: "idle" }
     | { state: "uploading" }
     | { state: "uploaded"; storagePath: string }
+    | { state: "saving" }
+    | { state: "saved" }
     | { state: "fallback_data_url" }
   >({ state: "idle" });
 
@@ -103,8 +83,16 @@ export function TestRunPanel({
   const effectiveImageUrl = useMemo(() => {
     const trimmed = imageUrl.trim();
     if (trimmed) return trimmed;
-    return imagePreviewUrl;
-  }, [imageUrl, imagePreviewUrl]);
+    if (imagePreviewUrl) return imagePreviewUrl;
+    return savedImageUrl;
+  }, [imageUrl, imagePreviewUrl, savedImageUrl]);
+
+  useEffect(() => {
+    if (!savedTestImagePath?.trim() || !userId) return;
+    getSignedUrl(savedTestImagePath)
+      .then(setSavedImageUrl)
+      .catch(() => setSavedImageUrl(null));
+  }, [savedTestImagePath, userId]);
 
   const onPickFile = async (file: File | null) => {
     setImageFile(file);
@@ -137,7 +125,13 @@ export function TestRunPanel({
     await handleRunToStep(null);
   };
 
-  const hasImage = !!imageUrl.trim() || !!imageFile;
+  const firstKittenTestImage = (kittens[0] as { test_image_storage_path?: string } | undefined)
+    ?.test_image_storage_path?.trim();
+  const hasImage =
+    !!imageUrl.trim() ||
+    !!imageFile ||
+    !!savedImageUrl ||
+    !!firstKittenTestImage;
   const hasText = !!testInput.trim();
   const canRun = hasText || hasImage;
 
@@ -157,32 +151,42 @@ export function TestRunPanel({
       return;
     }
 
-    // Prefer URL input; else use uploaded file.
     const hasUrl = !!imageUrl.trim();
     const hasFile = !!imageFile;
-    const shouldSendImage = hasUrl || hasFile;
+    const hasSaved = !!savedImageUrl;
+    const stepIndexForImage = typeof stepIndex === "number" ? stepIndex : null;
+    const kittenForStep =
+      stepIndexForImage != null && stepIndexForImage >= 1
+        ? kittens[stepIndexForImage - 1]
+        : null;
+    const kittenTestPath = kittenForStep
+      ? (kittenForStep as { test_image_storage_path?: string }).test_image_storage_path
+      : undefined;
 
     let finalImageUrl: string | undefined = undefined;
+    const shouldSendImage = hasUrl || hasFile || hasSaved || !!kittenTestPath?.trim();
 
     if (shouldSendImage) {
-      if (hasUrl) {
+      if (kittenTestPath?.trim() && stepIndexForImage != null) {
+        try {
+          finalImageUrl = await getSignedUrl(kittenTestPath);
+        } catch {
+          /* fall through */
+        }
+      }
+      if (!finalImageUrl && hasUrl) {
         if (!isProbablyUrl(imageUrl)) {
           setTestError("Image URL must start with https:// or data:image/...");
           return;
         }
         finalImageUrl = imageUrl.trim();
-      } else if (imageFile) {
+      }
+      if (!finalImageUrl && hasFile) {
         // “Do it right”: upload to Storage and send signed URL.
         try {
           setUploadStatus({ state: "uploading" });
-          const {
-            data: { user },
-            error,
-          } = await supabase.auth.getUser();
-          if (error || !user?.id) throw error ?? new Error("Not logged in");
-
-          const uploaded = await uploadToStorage({
-            userId: user.id,
+          const uploaded = await uploadCatTestImage({
+            userId,
             catSlug,
             file: imageFile,
           });
@@ -193,6 +197,9 @@ export function TestRunPanel({
           setUploadStatus({ state: "fallback_data_url" });
           finalImageUrl = await fileToDataUrl(imageFile);
         }
+      }
+      if (!finalImageUrl && hasSaved) {
+        finalImageUrl = savedImageUrl ?? undefined;
       }
     }
 
@@ -319,6 +326,16 @@ export function TestRunPanel({
                     <Loader2 className="w-3 h-3 animate-spin" />
                     Uploading...
                   </span>
+                ) : uploadStatus.state === "saving" ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Saving...
+                  </span>
+                ) : uploadStatus.state === "saved" ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Check className="w-3 h-3 text-green-500" />
+                    Saved as default
+                  </span>
                 ) : uploadStatus.state === "uploaded" ? (
                   <span className="inline-flex items-center gap-2">
                     <Check className="w-3 h-3 text-green-500" />
@@ -349,9 +366,50 @@ export function TestRunPanel({
 
         {effectiveImageUrl ? (
           <div className="mt-3">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-              Preview
-            </p>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Preview
+              </p>
+              {onSaveTestImage && (imageFile || (imageUrl.trim().startsWith("data:") && imageUrl.trim().length > 100)) ? (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!imageFile && !imageUrl.trim().startsWith("data:")) return;
+                    setUploadStatus({ state: "saving" });
+                    try {
+                      let file: File;
+                      if (imageFile) {
+                        file = imageFile;
+                      } else {
+                        const res = await fetch(imageUrl.trim());
+                        const blob = await res.blob();
+                        file = new File([blob], "test-image.jpg", { type: blob.type || "image/jpeg" });
+                      }
+                      const { storagePath } = await uploadCatTestImage({
+                        userId,
+                        catSlug,
+                        file,
+                      });
+                      await onSaveTestImage(storagePath);
+                      setSavedImageUrl(await getSignedUrl(storagePath));
+                      setUploadStatus({ state: "saved" });
+                    } catch (err) {
+                      setTestError(err instanceof Error ? err.message : "Failed to save");
+                      setUploadStatus({ state: "idle" });
+                    }
+                  }}
+                  disabled={uploadStatus.state === "saving"}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs rounded-lg border border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-medium disabled:opacity-50"
+                >
+                  {uploadStatus.state === "saving" ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Save className="w-3 h-3" />
+                  )}
+                  Save as default
+                </button>
+              ) : null}
+            </div>
             <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-200/60 dark:bg-gray-900/60">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

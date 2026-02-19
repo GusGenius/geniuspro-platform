@@ -14,6 +14,8 @@ export type CatModelKitten = {
   type?: "model";
   model_id: string;
   instructions: string;
+  /** Optional: storage path for this kitten's test image override. */
+  test_image_storage_path?: string;
 };
 
 export type CatVisionHttpKitten = {
@@ -22,6 +24,7 @@ export type CatVisionHttpKitten = {
   type: "vision_http";
   path: string;
   image_source: "original" | "previous_overlay";
+  test_image_storage_path?: string;
   /**
    * Optional: request the vision server to use a specific model.
    * Requires the vision server endpoint to support this field.
@@ -43,6 +46,7 @@ export type CatImageGenKitten = {
   /** Optional system instruction (role, constraints). */
   system_instructions?: string;
   instructions: string;
+  test_image_storage_path?: string;
 };
 
 export type CatTransformJsKitten = {
@@ -50,6 +54,7 @@ export type CatTransformJsKitten = {
   name: string;
   type: "transform_js";
   code: string;
+  test_image_storage_path?: string;
 };
 
 export type CatTransformPyKitten = {
@@ -57,6 +62,7 @@ export type CatTransformPyKitten = {
   name: string;
   type: "transform_py";
   code: string;
+  test_image_storage_path?: string;
 };
 
 export type CatKitten =
@@ -73,6 +79,7 @@ export type CatRow = {
   description: string;
   slug: string;
   kittens: CatKitten[];
+  test_image_storage_path?: string;
   created_at: string;
   updated_at: string;
 };
