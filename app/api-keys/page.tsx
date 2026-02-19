@@ -54,7 +54,7 @@ const PROFILE_DISPLAY: Record<string, { label: string; color: string; hint: stri
 const MODEL_DISPLAY: Record<string, { label: string; color: string }> = {
   "GeniusPro-agi-1.2": { label: "Superintelligence", color: "bg-purple-500/20 text-purple-400" },
   "GeniusPro-coding-agi-1.2": { label: "Coding Superintelligence", color: "bg-fuchsia-500/20 text-fuchsia-400" },
-  "GeniusPro-vision-sam3": { label: "Vision SAM 3", color: "bg-cyan-500/20 text-cyan-400" },
+  "sam3": { label: "SAM 3", color: "bg-cyan-500/20 text-cyan-400" },
 };
 
 function getModelBadge(model: string): { label: string; color: string } {

@@ -18,7 +18,7 @@ export const API_BASE_URL_CODING_SUPERINTELLIGENCE = "https://api.geniuspro.io/c
 
 // Vision Service — SAM 3 segmentation
 export const API_BASE_URL_VISION = "https://api.geniuspro.io/vision/v1";
-export const MODEL_VISION = "GeniusPro-vision-sam3";
+export const MODEL_VISION = "sam3";
 
 export const AUTH_HEADER_EXAMPLE = "Authorization: Bearer YOUR_API_KEY";
 

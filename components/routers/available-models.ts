@@ -19,6 +19,7 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   { id: "deepseek-v3", label: "DeepSeek V3" },
   { id: "minimax-m2.5", label: "MiniMax M2.5" },
   { id: "mistral-large-3", label: "Mistral Large 3" },
+  { id: "sam3", label: "SAM 3" },
 ];
 
 export function getModelLabel(id: string): string {
