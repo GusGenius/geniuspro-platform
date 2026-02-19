@@ -406,8 +406,8 @@ export function KittensEditor({
                       Replicate SAM 3 — text-prompt segmentation. Configure targets (name + prompts).
                     </p>
                     <div className="space-y-3">
-                      {(Array.isArray((k as { targets?: unknown }).targets)
-                        ? (k as { targets?: { name: string; prompts: string[] }[] }).targets
+                      {(Array.isArray((k as { targets?: unknown } | undefined)?.targets)
+                        ? ((k as { targets?: { name: string; prompts: string[] }[] } | undefined)?.targets ?? [])
                         : []
                       ).map((t, ti) => (
                         <div
