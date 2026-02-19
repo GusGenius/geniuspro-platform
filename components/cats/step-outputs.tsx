@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Download, ExternalLink } from "lucide-react";
 
+import { getOverlayBase64, guessMimeTypeFromBase64, toDataUrl } from "@/lib/base64-image";
+
 export type StepLabel = { index: number; name: string; detail: string };
 
 export type CatRunDebugStep = {
@@ -14,41 +16,22 @@ export type CatRunDebugStep = {
   parsed_json: unknown | null;
 };
 
-function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null;
-}
-
-function guessMimeTypeFromBase64(b64: string): "image/png" | "image/jpeg" {
-  const t = b64.trim();
-  // PNG base64 signature: iVBORw0K...
-  if (t.startsWith("iVBORw0K")) return "image/png";
-  // JPEG base64 signature: /9j/...
-  if (t.startsWith("/9j/")) return "image/jpeg";
-  // Default to PNG since our overlay flows are typically PNG.
-  return "image/png";
-}
-
-function getOverlayBase64(parsed: unknown): string | null {
-  if (!isRecord(parsed)) return null;
-  const b64 = parsed.overlay_base64;
-  if (typeof b64 === "string" && b64.trim()) return b64.trim();
-
-  // Sometimes we preserve alternates for debugging.
-  const alt = parsed.overlay_image_base64 ?? parsed.gemini_overlay_base64;
-  if (typeof alt === "string" && alt.trim()) return alt.trim();
-  return null;
-}
-
-function toDataUrl(mimeType: string, base64: string): string {
-  return `data:${mimeType};base64,${base64}`;
-}
-
 export function StepOutputs(props: {
   show: boolean;
   debugSteps: CatRunDebugStep[] | null;
   stepLabels: StepLabel[];
+  savedGeneratedByStepIndex?: Record<number, { signedUrl: string; storagePath: string }>;
+  savingGeneratedByStepIndex?: Record<number, boolean>;
+  saveErrorsByStepIndex?: Record<number, string>;
 }) {
-  const { show, debugSteps, stepLabels } = props;
+  const {
+    show,
+    debugSteps,
+    stepLabels,
+    savedGeneratedByStepIndex,
+    savingGeneratedByStepIndex,
+    saveErrorsByStepIndex,
+  } = props;
   const [openStepIndices, setOpenStepIndices] = useState<Set<number>>(() => new Set());
 
   // When the steps change (new run), open them all by default.
@@ -88,6 +71,9 @@ export function StepOutputs(props: {
             overlayBase64 && overlayMimeType ? toDataUrl(overlayMimeType, overlayBase64) : null;
 
           const filenameBase = `step-${s.index}-overlay${overlayMimeType === "image/jpeg" ? ".jpg" : ".png"}`;
+          const saved = savedGeneratedByStepIndex?.[s.index] ?? null;
+          const saving = savingGeneratedByStepIndex?.[s.index] ?? false;
+          const saveError = saveErrorsByStepIndex?.[s.index] ?? null;
 
           return (
             <div
@@ -124,8 +110,27 @@ export function StepOutputs(props: {
                           Generated image preview
                         </p>
                         <div className="flex items-center gap-2">
+                          {saving ? (
+                            <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                              Saving...
+                            </span>
+                          ) : saved ? (
+                            <span
+                              className="text-[11px] text-green-700 dark:text-green-400 truncate max-w-[220px]"
+                              title={saved.storagePath}
+                            >
+                              Saved
+                            </span>
+                          ) : saveError ? (
+                            <span
+                              className="text-[11px] text-amber-700 dark:text-amber-400 truncate max-w-[260px]"
+                              title={saveError}
+                            >
+                              Save failed
+                            </span>
+                          ) : null}
                           <a
-                            href={overlayDataUrl}
+                            href={saved?.signedUrl ?? overlayDataUrl}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-200/60 dark:hover:bg-gray-900/60"
@@ -135,7 +140,7 @@ export function StepOutputs(props: {
                             Open
                           </a>
                           <a
-                            href={overlayDataUrl}
+                            href={saved?.signedUrl ?? overlayDataUrl}
                             download={filenameBase}
                             className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700 text-[11px] text-gray-700 dark:text-gray-200 hover:bg-gray-200/60 dark:hover:bg-gray-900/60"
                             title="Download generated image"

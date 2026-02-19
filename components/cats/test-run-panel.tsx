@@ -7,6 +7,12 @@ import { supabase } from "@/lib/supabase/client";
 import { runCatOnce, type CatRunDebugStep } from "@/components/cats/cat-runner";
 import type { CatKitten } from "@/components/cats/types";
 import { StepOutputs } from "@/components/cats/step-outputs";
+import {
+  getSignedUrl,
+  uploadCatTestImage,
+} from "@/lib/cat-test-image";
+import { useAutoSaveGeneratedImages } from "@/components/cats/use-auto-save-generated-images";
+import { fileToDataUrl, isProbablyUrl } from "@/lib/test-run-utils";
 
 type Props = {
   id?: string;
@@ -25,22 +31,6 @@ type Props = {
     debugSteps: CatRunDebugStep[] | null;
   }) => void;
 };
-
-function isProbablyUrl(value: string): boolean {
-  const v = value.trim();
-  return v.startsWith("http://") || v.startsWith("https://") || v.startsWith("data:");
-}
-
-async function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ""));
-    reader.onerror = () => reject(new Error("Failed to read file"));
-    reader.readAsDataURL(file);
-  });
-}
-
-import { uploadCatTestImage, getSignedUrl } from "@/lib/cat-test-image";
 
 export function TestRunPanel({
   id,
@@ -80,6 +70,12 @@ export function TestRunPanel({
   >({ state: "idle" });
 
   const [debugSteps, setDebugSteps] = useState<CatRunDebugStep[] | null>(null);
+  const { savingByStepIndex, savedByStepIndex, errorsByStepIndex } =
+    useAutoSaveGeneratedImages({
+      userId,
+      catSlug,
+      debugSteps,
+    });
 
   const effectiveImageUrl = useMemo(() => {
     const trimmed = imageUrl.trim();
@@ -515,7 +511,14 @@ export function TestRunPanel({
         </div>
       ) : null}
 
-      <StepOutputs show={showSteps} debugSteps={debugSteps} stepLabels={kittenLabels} />
+      <StepOutputs
+        show={showSteps}
+        debugSteps={debugSteps}
+        stepLabels={kittenLabels}
+        savedGeneratedByStepIndex={savedByStepIndex}
+        savingGeneratedByStepIndex={savingByStepIndex}
+        saveErrorsByStepIndex={errorsByStepIndex}
+      />
 
       {testOutput ? (
         <div className="mt-4">
