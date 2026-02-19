@@ -137,6 +137,10 @@ export function TestRunPanel({
     await handleRunToStep(null);
   };
 
+  const hasImage = !!imageUrl.trim() || !!imageFile;
+  const hasText = !!testInput.trim();
+  const canRun = hasText || hasImage;
+
   const handleRunToStep = async (stepIndex: number | null) => {
     if (!accessToken) {
       setTestError("You must be logged in to run a test.");
@@ -144,8 +148,12 @@ export function TestRunPanel({
     }
 
     const message = testInput.trim();
-    if (!message) {
-      setTestError("Enter something to test.");
+    if (!canRun) {
+      setTestError(
+        hasImage
+          ? "Enter a prompt (or leave a short note) to run."
+          : "Enter a prompt or add an image to test."
+      );
       return;
     }
 
@@ -196,7 +204,7 @@ export function TestRunPanel({
       const res = await runCatOnce({
         accessToken,
         catSlug,
-        userMessage: message,
+        userMessage: message || (shouldSendImage ? "Analyze this image." : ""),
         imageUrl: finalImageUrl,
         debugPipeline: true,
         debugRunStep: typeof stepIndex === "number" ? stepIndex : undefined,
@@ -235,13 +243,13 @@ export function TestRunPanel({
     containerRef.current?.scrollIntoView({ behavior: "smooth" });
     setShowSteps(true);
     const fn = runStepRef.current;
-    if (fn && accessToken && testInput.trim()) {
+    if (fn && accessToken && canRun) {
       void fn(runStep).finally(() => onStepRun?.());
     } else {
-      if (!testInput.trim()) setTestError("Enter something to test.");
+      if (!canRun) setTestError("Add an image or enter a prompt to test.");
       onStepRun?.();
     }
-  }, [runStep]);
+  }, [runStep, canRun]);
 
   const toggleStepOpen = (index: number) => {
     setOpenStepIndices((prev) => {
@@ -365,7 +373,7 @@ export function TestRunPanel({
           onChange={(e) => setTestInput(e.target.value)}
           rows={4}
           className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          placeholder="Paste a prompt to test this cat..."
+          placeholder="Prompt (optional for vision cats—add an image above to run)"
         />
         <div className="mt-3">
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
@@ -377,7 +385,7 @@ export function TestRunPanel({
                 key={k.index}
                 type="button"
                 onClick={() => void handleRunToStep(k.index)}
-                disabled={testRunning || !testInput.trim()}
+                disabled={testRunning || !canRun}
                 className="px-3 py-2 text-xs rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 title={`Run through step ${k.index}: ${k.name}`}
               >
@@ -387,7 +395,7 @@ export function TestRunPanel({
             <button
               type="button"
               onClick={() => void handleRunToStep(null)}
-              disabled={testRunning || !testInput.trim()}
+              disabled={testRunning || !canRun}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {testRunning ? (

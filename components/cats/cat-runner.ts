@@ -19,12 +19,16 @@ export async function runCatOnce(args: {
   draftRun?: boolean;
 }): Promise<{ text: string; debugSteps?: CatRunDebugStep[] }> {
   const message = args.userMessage.trim();
-  if (!message) throw new Error("Enter something to test.");
+  const hasImage = !!(args.imageUrl && args.imageUrl.trim());
+  if (!message && !hasImage) throw new Error("Enter a prompt or add an image to test.");
   const model = `cat:${args.catSlug}`;
 
-  const contentParts: Array<Record<string, unknown>> = [{ type: "text", text: message }];
-  if (args.imageUrl && args.imageUrl.trim()) {
-    contentParts.push({ type: "image_url", image_url: { url: args.imageUrl.trim() } });
+  const contentParts: Array<Record<string, unknown>> = [];
+  if (message) {
+    contentParts.push({ type: "text", text: message });
+  }
+  if (hasImage) {
+    contentParts.push({ type: "image_url", image_url: { url: args.imageUrl!.trim() } });
   }
 
   const res = await fetch("/api/chat/completions", {
