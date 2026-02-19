@@ -63,6 +63,7 @@ export function CatForm({
   const [error, setError] = useState<string | null>(null);
   const [copiedModelId, setCopiedModelId] = useState(false);
   const [lastFullRunOk, setLastFullRunOk] = useState(false);
+  const [pendingTestStep, setPendingTestStep] = useState<number | null>(null);
 
   const normalizedSlug = useMemo(() => {
     return normalizeCatSlug(slug || slugFromName(name));
@@ -315,7 +316,15 @@ export function CatForm({
             </div>
 
             {normalizeKittens(kittens).length > 0 ? (
-              <KittensEditor kittens={kittens} onChange={setKittens} />
+              <KittensEditor
+                kittens={kittens}
+                onChange={setKittens}
+                onTestKitten={
+                  mode === "edit" && normalizedSlug
+                    ? (step) => setPendingTestStep(step)
+                    : undefined
+                }
+              />
             ) : null}
 
             <div className="flex items-center justify-end gap-3 pt-2">
@@ -351,9 +360,12 @@ export function CatForm({
         {mode === "edit" && normalizedSlug ? (
           <>
             <TestRunPanel
+              id="test-run-panel"
               catSlug={normalizedSlug}
               accessToken={session?.access_token ?? null}
               kittens={normalizeKittens(kittens)}
+              runStep={pendingTestStep}
+              onStepRun={() => setPendingTestStep(null)}
               onFullRunResult={({ ok }) => setLastFullRunOk(ok)}
             />
             {editingId ? (

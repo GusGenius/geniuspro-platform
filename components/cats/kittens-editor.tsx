@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Play, Trash2 } from "lucide-react";
 
 import { AVAILABLE_MODELS } from "@/components/models/available-models";
 import {
@@ -12,6 +12,7 @@ import type { CatKitten, CatKittenType } from "@/components/cats/types";
 type Props = {
   kittens: CatKitten[];
   onChange: (next: CatKitten[]) => void;
+  onTestKitten?: (stepIndex: number) => void;
 };
 
 function createKitten(): CatKitten {
@@ -25,7 +26,7 @@ function createKitten(): CatKitten {
   };
 }
 
-export function KittensEditor({ kittens, onChange }: Props) {
+export function KittensEditor({ kittens, onChange, onTestKitten }: Props) {
   const list = kittens.length > 0 ? kittens : [createKitten()];
 
   function updateKitten(id: string, patch: Partial<CatKitten>) {
@@ -137,6 +138,17 @@ export function KittensEditor({ kittens, onChange }: Props) {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {onTestKitten ? (
+                    <button
+                      type="button"
+                      onClick={() => onTestKitten(idx + 1)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 font-medium text-xs"
+                      title={`Test step ${idx + 1} only`}
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      Test
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => moveKitten(idx, idx - 1)}

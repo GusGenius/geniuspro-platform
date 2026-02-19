@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 
 import { supabase } from "@/lib/supabase/client";
@@ -8,9 +8,12 @@ import { runCatOnce, type CatRunDebugStep } from "@/components/cats/cat-runner";
 import type { CatKitten } from "@/components/cats/types";
 
 type Props = {
+  id?: string;
   catSlug: string;
   accessToken: string | null;
   kittens: CatKitten[];
+  runStep?: number | null;
+  onStepRun?: () => void;
   onFullRunResult?: (args: {
     ok: boolean;
     outputText: string;
@@ -65,7 +68,17 @@ async function uploadToStorage(args: {
   return { signedUrl: signed.data.signedUrl, storagePath };
 }
 
-export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }: Props) {
+export function TestRunPanel({
+  id,
+  catSlug,
+  accessToken,
+  kittens,
+  runStep,
+  onStepRun,
+  onFullRunResult,
+}: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const runStepRef = useRef<((step: number | null) => Promise<void>) | null>(null);
   const [testInput, setTestInput] = useState("");
   const [testRunning, setTestRunning] = useState(false);
   const [testOutput, setTestOutput] = useState<string | null>(null);
@@ -215,6 +228,21 @@ export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }:
     }
   };
 
+  runStepRef.current = handleRunToStep;
+
+  useEffect(() => {
+    if (typeof runStep !== "number" || runStep <= 0) return;
+    containerRef.current?.scrollIntoView({ behavior: "smooth" });
+    setShowSteps(true);
+    const fn = runStepRef.current;
+    if (fn && accessToken && testInput.trim()) {
+      void fn(runStep).finally(() => onStepRun?.());
+    } else {
+      if (!testInput.trim()) setTestError("Enter something to test.");
+      onStepRun?.();
+    }
+  }, [runStep]);
+
   const toggleStepOpen = (index: number) => {
     setOpenStepIndices((prev) => {
       const next = new Set(prev);
@@ -225,7 +253,11 @@ export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }:
   };
 
   return (
-    <div className="mt-6 bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6">
+    <div
+      ref={containerRef}
+      id={id}
+      className="mt-6 bg-gray-100/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl p-5 sm:p-6"
+    >
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -335,7 +367,10 @@ export function TestRunPanel({ catSlug, accessToken, kittens, onFullRunResult }:
           className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
           placeholder="Paste a prompt to test this cat..."
         />
-        <div className="mt-3 flex items-center justify-end">
+        <div className="mt-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+            Test each kitten individually (runs through that step) or run the full pipeline.
+          </p>
           <div className="flex flex-wrap items-center justify-end gap-2">
             {kittenLabels.map((k) => (
               <button
