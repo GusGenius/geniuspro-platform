@@ -149,4 +149,5 @@ result = response.json()
 print(result["rooflines"])  # Detected rooflines with points
 print(result["suggested_rain_chains"])  # Rain chain positions
 print(result["suggested_tank"])  # Tank position
-print(result["ground_level"])  # Ground level Y coordinate`;
+print(result["ground_level"])  # Ground level Y coordinate
+# result["overlay_image_base64"]  # Optional: detection overlay PNG (base64)`;

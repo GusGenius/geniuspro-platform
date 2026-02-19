@@ -106,82 +106,146 @@ data: {"type":"error","message":"..."}
 
 ---
 
-## GeniusPro response shape (gutter placement)
+## What the Visualizer needs from SAM 3 (or the pipeline)
 
-What the gutter system needs from GeniusPro to position gutters correctly.
+Source image → SAM 3 segmentation → masks + structured data → Visualizer.
 
-### 1. `gutter_masks_base64` (required for drawing gutters)
+### 1. Gutter masks (`gutter_masks_base64`)
 
-| Property | Value |
-|----------|-------|
-| Type | Array of base64 PNG strings |
-| Format | Each mask must be the same size as the source image (`image_width` × `image_height`) |
-| Content | One mask per gutter run. White/alpha pixels along the gutter centerline; black/transparent elsewhere |
-| Coordinate system | The app vectorizes each mask and treats the resulting points as normalized 0–1 image coordinates (origin top-left) |
+| Requirement | Details |
+|-------------|---------|
+| Format | Base64 PNG strings, one per gutter run |
+| Dimensions | Same as source image (`image_width` × `image_height`) |
+| Content | White/alpha pixels along the gutter centerline; black/transparent elsewhere |
+| Shape | Linear runs (horizontal or vertical) that can be vectorized into a centerline |
 
-### 2. `gutter_offsets` (paired with masks)
+### 2. Downspout masks (`downspout_masks_base64`)
+
+| Requirement | Details |
+|-------------|---------|
+| Format | Base64 PNG strings, one per downspout |
+| Dimensions | Same as source image |
+| Content | White/alpha pixels along the downspout centerline; black/transparent elsewhere |
+| Shape | Vertical lines (top to bottom) |
+
+### 3. Rain chain placements (`suggested_rain_chains`)
+
+| Requirement | Details |
+|-------------|---------|
+| Format | `{ position: [x, y], end_y?: number }` – normalized 0–1 |
+| `position` | Top of rain chain (where it meets the gutter) |
+| `end_y` | Bottom of chain (default: ground_level or tank top) |
+
+Masks are optional; `position` + `end_y` is enough for drawing.
+
+### 4. Tank detection (`suggested_tank`)
+
+| Requirement | Details |
+|-------------|---------|
+| `position` | `[centerX, bottomY]` – normalized 0–1 |
+| `bbox` | `[xMin, yMin, xMax, yMax]` – preferred for size/position |
+| `size` | `[width, height]` – optional fallback |
+
+### 5. Downspout placements (`suggested_downspouts`)
+
+| Requirement | Details |
+|-------------|---------|
+| Format | `{ position: [x, y], end_y?: number, bbox?: [...], size?: [w, h] }` |
+| `position` | Top of downspout (gutter connection) |
+| `end_y` | Bottom (ground or tank) |
+| `bbox` | Optional, for mask-free sizing |
+
+### 6. Rooflines (`rooflines`)
+
+| Requirement | Details |
+|-------------|---------|
+| Format | `{ id?, points: [[x, y], ...] }` – normalized 0–1 polygon |
+| Use | Fallback for `gutter_offsets` when masks are missing |
+
+### 7. Overlay image (`overlay_image_base64`) – optional
+
+| Requirement | Details |
+|-------------|---------|
+| Format | Base64 PNG of the full visualization |
+| Use | Background when "SAM On" is toggled (shows detection overlay) |
+
+### 8. Metadata
+
+| Field | Purpose |
+|-------|---------|
+| `image_width` | Coordinate scaling |
+| `image_height` | Coordinate scaling |
+| `ground_level` | Default 0.92 – bottom of image for downspouts/chains |
+
+### Mask format summary
+
+All masks must be:
+
+- Same size as the source image
+- PNG with alpha
+- White/alpha on the detected region
+- Black/transparent elsewhere
+
+The app vectorizes masks into centerlines and draws along those paths. For gutters it expects horizontal/vertical runs; for downspouts it expects vertical runs.
+
+### Pipeline flow
+
+```
+Source image → SAM 3 segmentation → masks + structured data
+                    ↓
+     gutter_masks_base64 (one per gutter run)
+     downspout_masks_base64 (one per downspout)
+     suggested_rain_chains (position + end_y)
+     suggested_downspouts (position + end_y, optional bbox)
+     suggested_tank (position + bbox)
+     rooflines (polygons)
+     overlay_image_base64 (optional full overlay)
+```
+
+### gutter_offsets (paired with gutter masks)
 
 | Property | Value |
 |----------|-------|
 | Type | Array of `[x, y]`, normalized 0–1, one per mask |
 | Pairing | `gutter_offsets[i]` must correspond to `gutter_masks_base64[i]` |
-| For full-image masks | Use `[0, 0]` for each gutter. The mask already encodes position |
-| Length | Must match `gutter_masks_base64.length` |
+| For full-image masks | Use `[0, 0]` for each gutter |
 
-### 3. `rooflines` (used when masks are missing)
-
-- If GeniusPro does not return masks, the app derives `gutter_offsets` from roofline centers
-- **Issue:** Roofline centers are not gutter centerlines, so placement can be wrong
-- **Improvement:** If GeniusPro returns `suggested_gutters` with `position: [x, y]` per gutter, the app should use those instead of roofline centers
-
-### Recommended response shape (masks)
+### Example response shape
 
 ```json
 {
   "image_width": 1264,
   "image_height": 848,
+  "ground_level": 0.92,
   "rooflines": [
-    { "id": "roof_0", "points": [[x, y], ...] }
+    { "id": "roof_0", "points": [[0.1, 0.2], [0.5, 0.15], [0.9, 0.2]] }
   ],
-  "gutter_masks_base64": [
-    "<base64 PNG, same size as image, white line on gutter run 1>",
-    "<base64 PNG, same size as image, white line on gutter run 2>"
-  ],
-  "gutter_offsets": [
-    [0, 0],
-    [0, 0]
-  ]
+  "gutter_masks_base64": ["<base64 PNG per gutter run>"],
+  "gutter_offsets": [[0, 0]],
+  "downspout_masks_base64": ["<base64 PNG per downspout>"],
+  "suggested_rain_chains": [{ "position": [0.5, 0.35], "end_y": 0.92 }],
+  "suggested_downspouts": [{ "position": [0.5, 0.35], "end_y": 0.92 }],
+  "suggested_tank": { "position": [0.5, 0.95], "bbox": [0.3, 0.85, 0.7, 0.95] },
+  "overlay_image_base64": "<optional full visualization PNG>"
 }
 ```
 
-### Alternative: `suggested_gutters` (positions instead of masks)
+SAM 3 (or the pipeline) should produce these masks and structured fields so the Visualizer can place and draw gutters, downspouts, rain chains, and tank correctly.
 
-```json
-{
-  "suggested_gutters": [
-    {
-      "roof_id": "roof_0",
-      "position": [0.5, 0.32],
-      "points": [[0.2, 0.35], [0.8, 0.30]]
-    }
-  ]
-}
-```
+---
 
-- `position` — center of the gutter run (normalized 0–1)
-- `points` — polyline along the gutter centerline, normalized 0–1. If present, the app could draw gutters without masks
+## Overlay image (`overlay_image_base64`)
 
-### Summary
+The app uses `overlay_image_base64` when "SAM On" is toggled to show the detection overlay. Two paths can supply it:
 
-| Need | Purpose |
-|------|---------|
-| `gutter_masks_base64` | PNG masks, image-sized, one per gutter run. White/alpha on the gutter line |
-| `gutter_offsets` | `[0, 0]` per mask when masks are full-image; otherwise one `[x, y]` per mask |
-| `image_width` / `image_height` | So masks and coordinates can be scaled correctly |
-| `suggested_gutters[].position` (optional) | Better fallback than roofline centers when masks are missing |
-| `suggested_gutters[].points` (optional) | Direct polyline for each gutter; would allow drawing without masks |
+| Path | Returns overlay? | Notes |
+|------|------------------|-------|
+| **gutter-custom-solution** (CAT pipeline) | Yes | When `include_overlay_image: true` and input is PNG. The API passes it through. |
+| **gutter-segment** (analyze-home-photo) | Yes | Passes through when upstream returns it. See app/api/gutter-segment/route.js. |
 
-**Main requirement:** Full-image masks (same size as the source image) so the vectorized centerlines map directly to image coordinates.
+**GeniusPro (gutter-custom-solution):** Returns `overlay_image_base64` when the Gutter Custom Solution kitten has `include_overlay_image: true` (default) and the input image is PNG. The pipeline passes it through unchanged.
+
+**Visualizer (gutter-segment route):** Passes through `overlay_image_base64`, masks, `suggested_downspouts`, `image_width`/`image_height`, and `gutter_offsets` from the upstream response.
 
 ---
 
@@ -223,6 +287,10 @@ if (debugLogs) {
 | `debug_pipeline: true` | geniuspro-cat-progress-client.js (line 59) | ✓ Set |
 | Include `debugSteps` in result | app/api/gutter-custom-solution-stream/route.js | ✓ Result event now includes debugSteps from runCatWithProgress |
 | Log gutter instructions | `components/full-ai-flow/screens/AIScreen5Generating.js` | ✓ Logging in streaming and non-streaming paths |
+| Pass through `overlay_image_base64` | app/api/gutter-segment/route.js | ✓ Done |
+| Pass through masks from upstream | app/api/gutter-segment/route.js | ✓ Done |
+
+**gutter-segment route (app/api/gutter-segment/route.js):** Forwards all placement-related fields from GeniusPro (analyze-home-photo) instead of overwriting with empty values. Passes through: `overlay_image_base64`, `gutter_masks_base64`, `downspout_masks_base64`, `rain_chain_masks_base64`, `suggested_downspouts`, `image_width`, `image_height`. Uses upstream `gutter_offsets` when present; otherwise `[0, 0]` per mask for full-image masks; otherwise roofline centers.
 
 **When pipeline completes, filter console by `[Gutter]`:**
 

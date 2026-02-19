@@ -129,7 +129,8 @@ export function VisionSection({
     {"position": [0.1, 0.3], "connects_to": "roof1"}
   ],
   "suggested_tank": {"position": [0.92, 0.9]},
-  "ground_level": 0.9
+  "ground_level": 0.9,
+  "overlay_image_base64": "<optional base64 PNG of detection overlay>"
 }`}
             </pre>
           </div>
