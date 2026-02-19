@@ -72,6 +72,8 @@ export default function ApiKeysPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [keyModels, setKeyModels] = useState<Record<string, string[]>>({});
+  const [keyToDelete, setKeyToDelete] = useState<ApiKeyRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchKeys = useCallback(async () => {
     if (!user) return;
@@ -159,20 +161,27 @@ export default function ApiKeysPage() {
   };
 
   const handleDeleteKey = async (id: string) => {
+    if (!user) return;
+    setDeleting(true);
     try {
       const { error: deleteError } = await supabase
         .from("api_keys")
         .delete()
         .eq("id", id)
-        .eq("user_id", user?.id);
+        .eq("user_id", user.id);
 
       if (deleteError) {
         console.error("Failed to delete key:", deleteError);
+        setError("Failed to delete key");
         return;
       }
       setKeys((prev) => prev.filter((k) => k.id !== id));
+      setKeyToDelete(null);
     } catch (err) {
       console.error("Failed to delete key:", err);
+      setError("Failed to delete key");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -317,7 +326,7 @@ export default function ApiKeysPage() {
                   </div>
 
                   <button
-                    onClick={() => handleDeleteKey(key.id)}
+                    onClick={() => setKeyToDelete(key)}
                     className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
                     title="Delete key"
                   >
@@ -441,6 +450,57 @@ export default function ApiKeysPage() {
                   {creating ? "Creating..." : "Create Key"}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {keyToDelete && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-key-title"
+            className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl w-full max-w-md"
+          >
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-red-500/10">
+                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                </div>
+                <h2 id="delete-key-title" className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Delete API Key
+                </h2>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-600 dark:text-gray-300">
+                Are you sure you want to delete <strong>{keyToDelete.name}</strong>? Any applications using this key will stop working immediately.
+              </p>
+            </div>
+            <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3 justify-end">
+              <button
+                onClick={() => setKeyToDelete(null)}
+                disabled={deleting}
+                className="px-4 py-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteKey(keyToDelete.id)}
+                disabled={deleting}
+                className="px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </button>
             </div>
           </div>
         </div>
