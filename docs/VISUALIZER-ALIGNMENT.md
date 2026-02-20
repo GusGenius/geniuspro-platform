@@ -388,3 +388,50 @@ if (debugLogs) {
 - `instructionsLength` > 0
 - `systemInstructionsSnippet` starts with "Role: Senior Hydrology"
 - `instructionsSnippet` mentions "hybrid rainwater harvesting"
+
+---
+
+## Troubleshooting: Placement data but no mask arrays
+
+**Symptom:** Unity receives progress SSE and placement data (e.g. `suggested_gutters`, `suggested_downspouts`) but mask arrays (`gutter_masks_base64`, `rain_chain_masks_base64`, `downspout_masks_base64`) are missing.
+
+**Most likely root cause:** The `gutter_custom_solution` kitten config in the **published cat version** does not enable mask output (`include_masks_base64`), or output is transformed before `finalContent` so mask keys are dropped.
+
+### Backend checks (in order)
+
+1. **Published cat version** — Confirm kitten options for `gutter_custom_solution`:
+   - `include_masks_base64: true`
+   - `image_source: "original"` (for first run)
+   - `use_gemini_overlay: true` (optional, but expected in this flow)
+
+2. **`lib/gutter-solution/custom-solution.ts`** — Verify the returned JSON actually contains:
+   - `gutter_masks_base64`
+   - `rain_chain_masks_base64`
+   - `downspout_masks_base64`
+
+3. **`lib/chat-completions/core-executor.ts`** — Confirm `executed.finalContent` is not filtered/sanitized before writing `type: "complete"`.
+
+### Quick proof test
+
+Run the proof test script:
+
+```powershell
+cd geniuspro-api
+$env:GENIUSPRO_API_KEY = "your-api-key"
+npx tsx scripts/proof-test-gutter-api.ts
+```
+
+(Start the API with `npm run dev` first. Use a valid key from the `api_keys` table.)
+
+The script inspects the `complete` event payload:
+
+- **If mask keys are absent** → Backend/cat config issue (fix kitten options in published cat).
+- **If mask keys are present** but Unity logs still show none → Unity parser compatibility issue (patch parser for exact JSON shape).
+
+### Code references
+
+| Location | Purpose |
+|----------|---------|
+| `geniuspro-api/lib/cat-kittens/execute.ts` (L412) | Passes `include_masks_base64: step.include_masks_base64 !== false` to `runGutterCustomSolution` |
+| `geniuspro-api/lib/cat-kittens/parse.ts` (L159) | Parses cat config: `include_masks_base64: item.include_masks_base64 !== false` (defaults to `true` if omitted) |
+| `geniuspro-api/lib/gutter-solution/custom-solution.ts` (L645–686) | Adds mask arrays to output only when `options.include_masks_base64` is true |
