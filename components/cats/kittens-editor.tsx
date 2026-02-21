@@ -279,11 +279,41 @@ export function KittensEditor({
                       }
                       className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                     >
-                      {AVAILABLE_MODELS.map((m) => (
-                        <option key={m.id} value={m.id}>
-                          {m.label}
-                        </option>
-                      ))}
+                      <optgroup label="GeniusPro">
+                        {AVAILABLE_MODELS.filter((m) => m.id.startsWith("geniuspro")).map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Gemini">
+                        {AVAILABLE_MODELS.filter((m) => m.id.startsWith("gemini")).map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Claude">
+                        {AVAILABLE_MODELS.filter((m) => m.id.startsWith("claude")).map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="GPT">
+                        {AVAILABLE_MODELS.filter((m) => m.id.startsWith("gpt")).map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Other">
+                        {AVAILABLE_MODELS.filter((m) => !m.id.match(/^(geniuspro|gemini|claude|gpt)/)).map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select>
                   </div>
 
