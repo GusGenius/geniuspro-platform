@@ -157,6 +157,7 @@ export function normalizeKittens(input: CatKitten[]): CatKitten[] {
         name,
         type: "model" as const,
         model_id: String((k as { model_id?: unknown }).model_id ?? "").trim() || "gemini-3-flash",
+        system_instructions: String((k as { system_instructions?: unknown }).system_instructions ?? "").trim() || undefined,
         instructions: String((k as { instructions?: unknown }).instructions ?? "").trim(),
         test_image_storage_path: testImagePath,
       };

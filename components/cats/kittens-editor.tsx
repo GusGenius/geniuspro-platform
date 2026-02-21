@@ -317,19 +317,42 @@ export function KittensEditor({
                     </select>
                   </div>
 
-                  <div className="mt-3">
-                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
-                      Instructions
-                    </label>
-                    <textarea
-                      value={String((k as { instructions?: unknown }).instructions ?? "")}
-                      onChange={(e) =>
-                        updateKitten(k.id, { instructions: e.target.value } as CatKitten)
-                      }
-                      placeholder="What should this kitten do?"
-                      rows={4}
-                      className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    />
+                  <div className="mt-3 space-y-3">
+                    <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-3">
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-3">
+                        Prompts
+                      </p>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                            1. System prompt (optional)
+                          </label>
+                          <textarea
+                            value={String((k as { system_instructions?: unknown }).system_instructions ?? "")}
+                            onChange={(e) =>
+                              updateKitten(k.id, { system_instructions: e.target.value } as CatKitten)
+                            }
+                            placeholder="Role, constraints, context..."
+                            rows={4}
+                            className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y font-mono text-xs"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+                            2. User prompt (instructions)
+                          </label>
+                          <textarea
+                            value={String((k as { instructions?: unknown }).instructions ?? "")}
+                            onChange={(e) =>
+                              updateKitten(k.id, { instructions: e.target.value } as CatKitten)
+                            }
+                            placeholder="What should this kitten do?"
+                            rows={6}
+                            className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
@@ -407,8 +430,10 @@ export function KittensEditor({
                         }
                         className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                       >
-                        <option value="gemini-nano-banana">Nano Banana</option>
-                        <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                        <optgroup label="Gemini">
+                          <option value="gemini-nano-banana">Nano Banana</option>
+                          <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                        </optgroup>
                       </select>
                     </div>
 
@@ -426,8 +451,10 @@ export function KittensEditor({
                         className="w-full pl-4 pr-10 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat"
                       >
                         <option value="">None</option>
-                        <option value="gemini-nano-banana">Nano Banana</option>
-                        <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                        <optgroup label="Gemini">
+                          <option value="gemini-nano-banana">Nano Banana</option>
+                          <option value="gemini-nano-banana-pro">Nano Banana Pro</option>
+                        </optgroup>
                       </select>
                     </div>
                   </div>

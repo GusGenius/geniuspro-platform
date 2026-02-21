@@ -43,6 +43,8 @@ export type CatModelKitten = {
    */
   type?: "model";
   model_id: string;
+  /** Optional system instruction (role, constraints). */
+  system_instructions?: string;
   instructions: string;
   /** Optional: storage path for this kitten's test image override. */
   test_image_storage_path?: string;
