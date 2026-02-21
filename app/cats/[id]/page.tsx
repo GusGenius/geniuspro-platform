@@ -13,21 +13,26 @@ export default function CatDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
   const { user } = useAuth();
-  const { isAdmin } = useProfile(user?.id);
+  const { isAdmin, loading: profileLoading } = useProfile(user?.id);
   const [loading, setLoading] = useState(true);
   const [initial, setInitial] = useState<Partial<CatRow> | null>(null);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (!user || !id) {
+    if (!id) {
       setLoading(false);
       setNotFound(!id);
+      return;
+    }
+    if (!user || profileLoading) {
+      setLoading(true);
       return;
     }
 
     const userId = user.id;
 
     async function load() {
+      setNotFound(false);
       let query = supabase
         .from("user_cats")
         .select("id, user_id, name, description, slug, kittens, test_image_storage_path, created_at, updated_at")
@@ -44,11 +49,12 @@ export default function CatDetailPage() {
       }
 
       setInitial(res.data as Partial<CatRow>);
+      setNotFound(false);
       setLoading(false);
     }
 
     load();
-  }, [user, id, isAdmin]);
+  }, [user, id, isAdmin, profileLoading]);
 
   if (loading) {
     return <CatDetailSkeleton />;
