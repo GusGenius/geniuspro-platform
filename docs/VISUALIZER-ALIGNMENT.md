@@ -1,5 +1,7 @@
 # Visualizer ↔ GeniusPro Alignment
 
+**Counterpart:** `c:\Dev\gh-gus-divine\Visualizer\VISUALIZER-ALIGNMENT.md` — When working on alignment, check both.
+
 Corrections and requirements for the Visualizer project to work with GeniusPro progress updates.
 
 ---
@@ -325,11 +327,8 @@ The app uses `overlay_image_base64` when "SAM On" is toggled to show the detecti
 | Path | Returns overlay? | Notes |
 |------|------------------|-------|
 | **gutter-custom-solution** (CAT pipeline) | Yes | When `include_overlay_image: true` and input is PNG. The API passes it through. |
-| **gutter-segment** (analyze-home-photo) | Yes | Passes through when upstream returns it. See app/api/gutter-segment/route.js. |
 
-**GeniusPro (gutter-custom-solution):** Returns `overlay_image_base64` when the Gutter Custom Solution kitten has `include_overlay_image: true` (default) and the input image is PNG. The pipeline passes it through unchanged.
-
-**Visualizer (gutter-segment route):** Passes through `overlay_image_base64`, masks, `suggested_downspouts`, `image_width`/`image_height`, and `gutter_offsets` from the upstream response.
+**GeniusPro (gutter-custom-solution):** Returns `overlay_image_base64` when the Gutter Custom Solution kitten has `include_overlay_image: true` (default) and the input image is PNG. The pipeline passes it through unchanged. Visualizer uses only this path (legacy gutter-segment / analyze-home-photo removed).
 
 ---
 
@@ -371,10 +370,10 @@ if (debugLogs) {
 | `debug_pipeline: true` | geniuspro-cat-progress-client.js (line 59) | ✓ Set |
 | Include `debugSteps` in result | app/api/gutter-custom-solution-stream/route.js | ✓ Result event now includes debugSteps from runCatWithProgress |
 | Log gutter instructions | `components/full-ai-flow/screens/AIScreen5Generating.js` | ✓ Logging in streaming and non-streaming paths |
-| Pass through `overlay_image_base64` | app/api/gutter-segment/route.js | ✓ Done |
-| Pass through masks from upstream | app/api/gutter-segment/route.js | ✓ Done |
+| Pass through `overlay_image_base64` | gutter-custom-solution-stream | ✓ Done |
+| Pass through masks from upstream | gutter-custom-solution-stream | ✓ Done |
 
-**gutter-segment route (app/api/gutter-segment/route.js):** Forwards all placement-related fields from GeniusPro (analyze-home-photo) instead of overwriting with empty values. Passes through: `overlay_image_base64`, `gutter_masks_base64`, `downspout_masks_base64`, `rain_chain_masks_base64`, `suggested_downspouts`, `image_width`, `image_height`. Uses upstream `gutter_offsets` when present; otherwise `[0, 0]` per mask for full-image masks; otherwise roofline centers.
+**Visualizer (gutter-custom-solution-stream):** Calls GeniusPro CAT pipeline only. Returns placement JSON with `overlay_image_base64`, `gutter_masks_base64`, `downspout_masks_base64`, `rain_chain_masks_base64`, `suggested_downspouts`, `image_width`, `image_height`, `gutter_offsets`. Legacy gutter-segment (analyze-home-photo) removed.
 
 **When pipeline completes, filter console by `[Gutter]`:**
 
