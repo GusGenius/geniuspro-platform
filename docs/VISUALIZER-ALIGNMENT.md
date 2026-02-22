@@ -330,6 +330,18 @@ The app uses `overlay_image_base64` when "SAM On" is toggled to show the detecti
 
 **GeniusPro (gutter-custom-solution):** Returns `overlay_image_base64` when the Gutter Custom Solution kitten has `include_overlay_image: true` (default) and the input image is PNG. The pipeline passes it through unchanged. Visualizer uses only this path (legacy gutter-segment / analyze-home-photo removed).
 
+### Troubleshooting overlay gating
+
+Overlay gating now uses **decoded PNG truth + source hints**, not header MIME alone. Runtime diagnostics now emit:
+
+- `resolved_mime`
+- `overlay_gate_reason`
+
+Expected healthy values:
+
+- `resolved_mime: "image/png"`
+- `overlay_gate_reason: "overlay_enabled_decoded_png"`
+
 ---
 
 ## Debug logs: verify Gemini instructions
